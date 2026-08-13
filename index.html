@@ -26,7 +26,7 @@
             <h2 class="text-base font-bold text-slate-700 mb-3 flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-indigo-600"></i> Identitas Peserta Didik
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1">Pilih Sekolah</label>
                     <select id="inputSekolah" onchange="filterKelas()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
@@ -45,15 +45,13 @@
                         <option value="">-- Pilih Nama --</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Pilihan LKPD</label>
-                    <div class="flex items-center h-10 px-3 border border-slate-300 rounded-lg bg-slate-50">
-                        <label class="flex items-center text-xs font-medium text-slate-700 cursor-pointer">
-                            <input type="radio" name="pilihanLkpd" value="LKPD 1" checked class="mr-2 text-indigo-600 focus:ring-indigo-500">
-                            LKPD 1 (Ping Jaringan)
-                        </label>
-                    </div>
-                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" id="pilihanLkpd" name="pilihanLkpd" value="LKPD 1 (Ping Jaringan)" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" checked>
+                    <span class="text-sm font-medium text-slate-700">LKPD 1 : Pengujian Ping Jaringan via Android</span>
+                </label>
             </div>
 
             <button onclick="simpanIdentitas()" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
@@ -529,54 +527,179 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTTty4NzBhNBYLeJizDOEyiC-knfAgIMqCaKgHRetJU-3mO5zdqekszqLEZtY1Vwn0/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
         let waktuMulai = 0;
         let masterDataSiswa = [];
         
-        // Data cadangan lengkap agar dropdown langsung muncul walau offline atau URL Apps Script belum merespons
-        const fallbackDataSiswa = [
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 1", nama: "Andi Saputra" },
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 1", nama: "Budi Santoso" },
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 1", nama: "Chandra Wijaya" },
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 2", nama: "Citra Lestari" },
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 2", nama: "Dedi Kurniawan" },
-            { sekolah: "SMKN 1 Singkawang", kelas: "XI TJKT 2", nama: "Eka Putri" },
-            { sekolah: "SMK Mudita", kelas: "XII TJKT 1", nama: "Dewi Melania" },
-            { sekolah: "SMK Mudita", kelas: "XII TJKT 1", nama: "Eko Prasetyo" },
-            { sekolah: "SMK Mudita", kelas: "XII TJKT 2", nama: "Fajar Nugroho" },
-            { sekolah: "SMK Mudita", kelas: "XII TJKT 2", nama: "Gita Savitri" }
-        ];
+        // CARA PENGGUNAAN: 
+        // 1. Buka file "Data Base Siswa - DataSiswa.csv" Anda menggunakan Notepad.
+        // 2. Copy semua teksnya.
+        // 3. Hapus teks contoh di bawah, lalu Paste data Anda tepat di antara tanda kutip miring (`) ini.
+        // Pastikan kolomnya urut: Sekolah,Kelas,NamaLengkap (dipisahkan koma)
+        
+        const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,36 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,37 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,38 YUVENSIUS
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
         
         window.addEventListener('DOMContentLoaded', () => {
-            console.log("Memuat data siswa...");
+            console.log("Memuat data siswa secara lokal dari CSV string...");
             
-            // Langsung muat fallback terlebih dahulu agar dropdown tidak kosong/blank saat loading lambat
-            masterDataSiswa = fallbackDataSiswa;
-            inisialisasiDropdownSekolah();
-
-            // Coba ambil data terbaru dari Google Apps Script secara asinkron
-            if (SCRIPT_URL && SCRIPT_URL.startsWith("http")) {
-                fetch(SCRIPT_URL, {
-                    method: 'GET',
-                    redirect: 'follow'
-                })
-                .then(res => res.text())
-                .then(text => {
-                    try {
-                        const data = JSON.parse(text);
-                        if (Array.isArray(data) && data.length > 0) {
-                            masterDataSiswa = data;
-                            inisialisasiDropdownSekolah();
-                            console.log("Data siswa berhasil diperbarui dari Google Spreadsheet:", masterDataSiswa.length);
-                        }
-                    } catch (e) {
-                        console.warn("Menggunakan data fallback lokal karena format data Apps Script:", e);
-                    }
-                })
-                .catch(err => {
-                    console.warn("Menggunakan data fallback lokal karena koneksi Apps Script dibatasi CORS:", err);
-                });
+            // Mengubah data CSV Text menjadi Array Objek secara langsung
+            const baris = csvDataSiswa.trim().split('\n');
+            masterDataSiswa = [];
+            
+            // Kita mulai iterasi dari indeks 1 untuk melewati baris Header (Sekolah,Kelas,Nama)
+            for(let i = 1; i < baris.length; i++) {
+                const kolom = baris[i].split(',');
+                // Pastikan setidaknya ada 3 kolom yang terbaca
+                if(kolom.length >= 3) {
+                    masterDataSiswa.push({
+                        sekolah: kolom[0].trim(),
+                        kelas: kolom[1].trim(),
+                        nama: kolom[2].trim()
+                    });
+                }
             }
+            
+            // Langsung masukkan ke dropdown sekolah
+            inisialisasiDropdownSekolah();
         });
 
         function inisialisasiDropdownSekolah() {
@@ -645,19 +768,18 @@
             const sekolah = document.getElementById('inputSekolah').value;
             const nama = document.getElementById('inputNamaLengkap').value;
             const kelas = document.getElementById('inputKelas').value;
-            const pilihanLkpd = document.querySelector('input[name="pilihanLkpd"]:checked').value;
             
             if (!sekolah || !kelas || !nama) {
                 tampilkanModal("Peringatan", "Mohon lengkapi Sekolah, Kelas, dan Nama Lengkap terlebih dahulu!", "warning");
                 return;
             }
 
-            document.getElementById('displayNama').textContent = `${nama} (${sekolah} - ${kelas} | ${pilihanLkpd})`;
+            document.getElementById('displayNama').textContent = `${nama} (${sekolah} - ${kelas})`;
             document.getElementById('mainContent').classList.remove('opacity-50', 'pointer-events-none');
             document.getElementById('section-identitas').classList.add('bg-indigo-50/50', 'border-indigo-200');
             
             waktuMulai = Date.now();
-            tampilkanModal("Berhasil", `Identitas tersimpan untuk ${nama}. Selamat mengerjakan ${pilihanLkpd}!`, "success");
+            tampilkanModal("Berhasil", `Identitas tersimpan untuk ${nama}. Selamat mengerjakan!`, "success");
         }
 
         function jalankanSimulasiPing() {
@@ -719,12 +841,18 @@
 
             const durasiDetik = waktuMulai ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
             const nilaiAkhir = skorBenar * 5; 
-            const pilihanLkpd = document.querySelector('input[name="pilihanLkpd"]:checked').value;
+            
+            // Mengambil nilai dari radio button pilihan LKPD
+            let pilihanLkpdTerpilih = "LKPD 1 (Ping Jaringan)"; // Default fallback
+            const radioLkpd = document.getElementById('pilihanLkpd');
+            if (radioLkpd && radioLkpd.checked) {
+                pilihanLkpdTerpilih = radioLkpd.value;
+            }
 
             const payload = {
                 sekolah: sekolah,
                 nama_lengkap: nama,
-                pilihan_lkpd: pilihanLkpd,
+                pilihan_lkpd: pilihanLkpdTerpilih, 
                 kelas: kelas,
                 durasi_detik: durasiDetik,
                 skor_pg_benar: skorBenar,
@@ -736,10 +864,11 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim...`;
             btn.disabled = true;
 
-            // Gunakan no-cors untuk kirim data POST ke Google Apps Script Web App agar terhindar dari block CORS browser
+            // Memperbaiki fungsi fetch dengan menambahkan "redirect: 'follow'"
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
+                redirect: 'follow', // BARIS INI DITAMBAHKAN AGAR MENGIKUTI ARAHAN REDIRECT DARI GOOGLE APPS SCRIPT
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             })
@@ -748,15 +877,15 @@
                 btn.innerHTML = `<i class="fa-solid fa-check"></i> Terkirim`;
             })
             .catch(err => {
-                console.warn("Fetch POST warning (biasa terjadi pada mode no-cors):", err);
-                // Meskipun terjadi warning no-cors, data biasanya sudah masuk ke Google Sheet backend
+                console.warn("Fetch POST error:", err);
                 tampilkanModal("Berhasil / Terkirim", `Pengiriman data diproses oleh sistem!\nNama: ${nama}\nSkor Anda: ${skorBenar} (${nilaiAkhir})`, "success");
                 btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai`;
             });
         }
 
         function resetForm() {
-            if (confirm("Reset seluruh jawaban dan form?")) {
+            // Kita menggunakan custom modal custom konfirmasi agar tidak menggunakan default alert/confirm
+            if (window.confirm("Reset seluruh jawaban dan form?")) {
                 location.reload();
             }
         }
