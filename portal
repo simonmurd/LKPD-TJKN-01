@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LKPD Teknologi Jaringan Kabel dan Nirkabel - Beranda Pembelajaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                            dark: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <nav class="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-300">LKPD Jaringan</span>
+                    <span class="block text-xs text-indigo-400 font-medium">Kabel & Nirkabel System</span>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-3 text-sm">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                    Sistem Aktif
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative overflow-hidden pt-12 pb-16 lg:pt-20 lg:pb-24 border-b border-slate-900 bg-gradient-to-b from-slate-900/50 to-slate-950">
+        <!-- Glow effects background -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-indigo-600/15 blur-[140px] rounded-full pointer-events-none"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Modul Pembelajaran Kejuruan Terpadu
+            </div>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.15]">
+                LKPD <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400">Teknologi Jaringan Kabel & Nirkabel</span>
+            </h1>
+            <p class="text-slate-400 text-base sm:text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
+                Pusat lembar kerja peserta didik interaktif dari pertemuan 1 hingga 12. Akses materi, panduan praktikum, dan lembar evaluasi secara terpusat dan real-time.
+            </p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Daftar Modul LKPD</h2>
+                <p class="text-sm text-slate-400">Pilih salah satu lembar kerja untuk mulai mengakses materi</p>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400">12 Modul Tersedia</span>
+        </div>
+
+        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic Injection via Script with explicit link insertion markers -->
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; 2026 LKPD Teknologi Jaringan Kabel dan Nirkabel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Array judul materi spesifik untuk masing-masing 12 LKPD Jaringan Kabel & Nirkabel
+        const topics = [
+            "Pengenalan Jaringan Kabel & Nirkabel",
+            "Kabel Twisted Pair (UTP/STP) & Crimping",
+            "Pengujian Koneksi Kabel LAN (T568A/T568B)",
+            "Kabel Fiber Optik & Perangkat Pendukung",
+            "Instalasi dan Terminasi Fiber Optik",
+            "Dasar-Dasar Jaringan Nirkabel (Wireless)",
+            "Konfigurasi Access Point & Router WiFi",
+            "Keamanan Jaringan Nirkabel (WPA2/WPA3)",
+            "Analisis Sinyal dan Troubleshooting WiFi",
+            "Routing Statis dan Dinamis Jaringan",
+            "Manajemen Bandwidth & QoS",
+            "Evaluasi Akhir Praktikum Jaringan"
+        ];
+
+        const grid = document.getElementById('cardGrid');
+
+        for (let i = 1; i <= 12; i++) {
+            const card = document.createElement('div');
+            card.className = "group relative p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col justify-between";
+            
+            // Catatan: Anda bisa mengubah nama file link LKPD (misal: "lkpd1.html", atau URL eksternal) di atribut href bawah ini:
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold text-sm border border-indigo-500/20 group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
+                            ${i}
+                        </span>
+                        <span class="text-xs font-medium text-slate-500">Modul 0${i}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition">LKPD Pertemuan ${i}</h3>
+                    <p class="text-slate-400 text-sm mb-6 line-clamp-2">${topics[i-1]}</p>
+                </div>
+                <!-- ======================================================== -->
+                <!-- [PANDUAN] UBAH LINK FILE LKPD DI ATRIBUT href DI BAWAH INI -->
+                <!-- Contoh: href="lkpd1.html" atau link Google Docs / PDF -->
+                <!-- ======================================================== -->
+                <a href="lkpd${i}.html" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white text-sm font-semibold transition duration-200 flex items-center justify-center gap-2 group/btn border border-slate-700/50 hover:border-transparent shadow-sm">
+                    <span>Buka LKPD</span>
+                    <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            `;
+            grid.appendChild(card);
+        }
+    </script>
+</body>
+</html>
