@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 3 Karakteristik Media Transmisi Kabel: UTP, STP, Coaxial & Optik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8 selection:bg-indigo-100 selection:text-indigo-700">
+  <div class="max-w-5xl mx-auto space-y-8">
+    
+    <!-- HEADER -->
+    <header class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-sm text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600 mb-3 border border-indigo-100">Lembar Kerja Peserta Didik</span>
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">LKPD 3: Karakteristik Media Transmisi Kabel</h1>
+      <p class="text-slate-500 text-sm max-w-2xl mx-auto">Analisis Perbandingan Karakteristik Fisik & Performa Kabel UTP, STP, Coaxial, dan Fiber Optic</p>
+    </header>
+
+    <!-- BAGIAN 1: IDENTITAS -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 1: Identitas Peserta Didik</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Pilih Sekolah</label>
+          <select id="sekolah" onchange="onSekolahChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Kelas</label>
+          <select id="kelas" onchange="onKelasChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Nama Lengkap</label>
+          <select id="nama" onchange="checkIdentity()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="identity-warning" class="bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all">
+        <svg class="w-4 h-4 flex-shrink-0 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        <span>Harap lengkapi Identitas Peserta Didik terlebih dahulu untuk membuka Bagian 2 s/d Bagian 6.</span>
+      </div>
+    </section>
+
+    <!-- WRAPPER UNTUK SECTION BERIKUTNYA -->
+    <div id="content-sections" class="space-y-8 opacity-40 pointer-events-none select-none transition-all duration-300">
+      
+      <!-- BAGIAN 2: RINGKASAN MATERI -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 2: Ringkasan Materi Media Transmisi Kabel</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <!-- UTP -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs md:text-sm text-indigo-700">UTP (Unshielded Twisted Pair)</span>
+              <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full font-semibold">Maks 100m</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Kabel tanpa pelindung foil, fleksibel, biaya terjangkau, jarak maksimum 100 meter. Sangat rentan terhadap Electromagnetic Interference (EMI).
+            </p>
+          </div>
+
+          <!-- STP -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs md:text-sm text-indigo-700">STP (Shielded Twisted Pair)</span>
+              <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full font-semibold">Pelindung Foil</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Kabel dengan pelindung aluminum foil/braided mesh. Menahan EMI dari mesin/listrik tegangan tinggi, memerlukan grounding pada konektor RJ-45 shielded.
+            </p>
+          </div>
+
+          <!-- Coaxial -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs md:text-sm text-indigo-700">Coaxial</span>
+              <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full font-semibold">50 &Omega; / 75 &Omega;</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Menggunakan inti tembaga (center conductor), isolator dielektrik, shielding kepang tembaga, dan outer jacket. Memiliki impedansi 50 &Omega; (data/LAN) atau 75 &Omega; (CCTV/TV). Lebih tahan interferensi daripada UTP.
+            </p>
+          </div>
+
+          <!-- Fiber Optic -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs md:text-sm text-indigo-700">Fiber Optic</span>
+              <span class="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded-full font-semibold">Kebal EMI</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Menggunakan inti kaca (core & cladding) dengan prinsip pemantulan cahaya internal (total internal reflection). Kebal total terhadap EMI, bandwidth sangat tinggi, jangkauan hingga puluhan kilometer.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 3: SIMULASI INTERAKTIF -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 3: Simulasi Interaktif Karakteristik Kabel</h2>
+        </div>
+
+        <!-- 3A. Skenario Studi Kasus -->
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+            <h3 class="text-sm font-semibold text-slate-800">Simulasi 3A: Uji Kesesuaian Kabel pada 6 Skenario Lingkungan</h3>
+            <span class="text-[11px] font-medium text-slate-500">Pilih media transmisi terbaik untuk setiap kondisi</span>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Skenario 1 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">1. Lab Komputer / Kantor</span>
+                  <span class="text-[10px] bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded-full">Jarak 15m</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Ruang tertutup, ekonomis, bebas dari gangguan arus listrik/EMI.</p>
+              </div>
+              <select id="scenario-1" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+
+            <!-- Skenario 2 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">2. Area Industri & Mesin</span>
+                  <span class="text-[10px] bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded-full">EMI Tinggi • 70m</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Pabrik dengan mesin industri, butuh perlindungan foil peredam EMI.</p>
+              </div>
+              <select id="scenario-2" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+
+            <!-- Skenario 3 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">3. CCTV Analog & Antena TV</span>
+                  <span class="text-[10px] bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded-full">Impedansi 75 Ω</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Transmisi frekuensi radio & sinyal video analog dengan penyalur inti tembaga tunggal.</p>
+              </div>
+              <select id="scenario-3" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+
+            <!-- Skenario 4 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">4. Antar Gedung Kampus</span>
+                  <span class="text-[10px] bg-purple-100 text-purple-800 font-medium px-2 py-0.5 rounded-full">Jarak 2.5 km</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Koneksi backbone antar wilayah gedung tanpa repeater, transmisi kecepatan tinggi.</p>
+              </div>
+              <select id="scenario-4" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+
+            <!-- Skenario 5 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">5. Core Data Center</span>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-800 font-medium px-2 py-0.5 rounded-full">High-Speed Kebal EMI</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Interkoneksi antar switch & server utama berkecepatan Gbps/Tbps tanpa latensi.</p>
+              </div>
+              <select id="scenario-5" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+
+            <!-- Skenario 6 -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-2 flex flex-col justify-between transition hover:border-indigo-200">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-slate-800">6. Bengkel Tegangan Tinggi</span>
+                  <span class="text-[10px] bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded-full">Jarak 80m + Grounding</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mb-2 leading-relaxed">Jalur kabel berdampingan dengan kabel listrik utama, membutuhkan grounding pelindung.</p>
+              </div>
+              <select id="scenario-6" onchange="evalScenario()" class="w-full bg-white text-xs p-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">-- Pilih Jenis Kabel --</option>
+                <option value="UTP">UTP (Unshielded Twisted Pair)</option>
+                <option value="STP">STP (Shielded Twisted Pair)</option>
+                <option value="Coaxial">Coaxial</option>
+                <option value="Fiber">Fiber Optic</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="scenario-feedback" class="p-3 rounded-xl text-xs font-semibold hidden transition-all"></div>
+        </div>
+
+        <hr class="border-slate-100">
+
+        <!-- 3B. Attenuation Simulation -->
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-800">Simulasi 3B: Perbandingan Redaman Sinyal (Attenuation) 4 Media Transmisi</h3>
+            <p class="text-xs text-slate-500">Geser slider panjang kabel untuk mengamati penurunan daya tahan sinyal secara bersamaan.</p>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-medium text-slate-600">Panjang Bentangan Kabel:</label>
+              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100"><span id="distance-val">100</span> Meter</span>
+            </div>
+            <input type="range" id="distance-slider" min="1" max="2000" value="100" class="w-full accent-indigo-600 cursor-pointer" oninput="updateMultiSimulation()">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- UTP -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-700">UTP Cat6a</span>
+                <span id="utp-db" class="text-xs font-semibold text-indigo-600">0 dB</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div id="utp-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+              </div>
+              <p id="utp-status" class="text-[11px] text-slate-500">Kondisi Normal</p>
+            </div>
+
+            <!-- STP -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-700">STP Cat6a</span>
+                <span id="stp-db" class="text-xs font-semibold text-indigo-600">0 dB</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div id="stp-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+              </div>
+              <p id="stp-status" class="text-[11px] text-slate-500">Kondisi Normal</p>
+            </div>
+
+            <!-- Coaxial -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-700">Coaxial RG-6</span>
+                <span id="coax-db" class="text-xs font-semibold text-indigo-600">0 dB</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div id="coax-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+              </div>
+              <p id="coax-status" class="text-[11px] text-slate-500">Kondisi Normal</p>
+            </div>
+
+            <!-- Fiber Optic -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/60 space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-700">Single-Mode Fiber Optic</span>
+                <span id="fo-db" class="text-xs font-semibold text-indigo-600">0 dB</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                <div id="fo-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+              </div>
+              <p id="fo-status" class="text-[11px] text-slate-500">Sangat Stabil</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 4: TABEL PENGAMATAN -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+            <h2 class="text-base font-semibold text-slate-800">Bagian 4: Tabel Pengamatan Praktikum Media Transmisi</h2>
+          </div>
+          <button onclick="simpanKeTabel()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3.5 rounded-xl text-xs transition border border-indigo-100 flex items-center space-x-1">
+            <span>+ Catat Data Simulasi</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-600">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="px-4 py-2.5 rounded-l-lg">Jarak Bentang</th>
+                <th class="px-4 py-2.5">Kabel UTP Cat6a</th>
+                <th class="px-4 py-2.5">Kabel STP Cat6a</th>
+                <th class="px-4 py-2.5">Coaxial RG-6</th>
+                <th class="px-4 py-2.5 rounded-r-lg">Single-Mode FO</th>
+              </tr>
+            </thead>
+            <tbody id="observation-table-body" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="5" class="text-center py-6 text-slate-400 italic">Belum ada data dicatat. Klik "+ Catat Data Simulasi" untuk menyimpan pengamatan.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BAGIAN 5: UJI KOMPETENSI (20 SOAL) -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 5: Uji Kompetensi Media Transmisi (20 Soal Pilihan Ganda A-E)</h2>
+        </div>
+        <div id="quiz-container" class="space-y-4">
+          <!-- Soal dimasukkan via JavaScript -->
+        </div>
+      </section>
+
+      <!-- BAGIAN 6: SUBMIT & EXPORT -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 6: Finalisasi & Pengiriman Laporan LKPD 3</h2>
+        </div>
+
+        <div id="notification-box" class="hidden max-w-xl mx-auto p-3.5 rounded-xl text-xs font-medium text-center transition"></div>
+
+        <div class="flex items-center justify-end space-x-3 pt-2">
+          <button type="button" onclick="resetForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 px-5 rounded-xl text-xs transition">
+            Reset Form
+          </button>
+          <button id="btn-submit" type="button" onclick="submitWorksheet()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-5 rounded-xl text-xs shadow-sm transition flex items-center space-x-2">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H5.5z"/>
+            </svg>
+            <span>Selesaikan & Kirim LKPD 3</span>
+          </button>
+        </div>
+
+        <div id="loading-spinner" class="hidden text-center text-indigo-600 text-xs font-medium space-y-2 py-4">
+          <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent"></div>
+          <p>Memproses data & mengirimkan laporan ke Google Apps Script...</p>
+        </div>
+
+        <div id="pdf-result" class="hidden text-center pt-2">
+          <a id="pdf-link" href="#" target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-5 rounded-xl text-xs shadow-sm transition">
+            <span>📄 Unduh Laporan PDF Hasil Praktikum LKPD 3</span>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    // DATA SISWA LENGKAP YANG TELAH DIINTEGRASIKAN
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,36 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,37 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,38 YUVENSIUS
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    // 20 SOAL PILIHAN GANDA (A-E)
+    const quizQuestions = [
+      { q: "1. Perbedaan mendasar antara kabel UTP dan STP terletak pada...", options: ["Jumlah pasangan kawat tembaga", "Keberadaan lapisan aluminium foil penyaring EMI", "Jenis konektor yang digunakan", "Batas kecepatan maksimum transmisi", "Bahan isolator luar kabel"], answer: 1 },
+      { q: "2. Fungsi utama lapisan braided copper / foil shield pada kabel STP dan Coaxial adalah untuk...", options: ["Menambah kelenturan kabel saat ditekuk", "Mencegah terjadinya arus pendek listrik", "Meredam dampak interferensi elektromagnetik (EMI)", "Mempercepat hantaran sinyal analog", "Meningkatkan daya tahan terhadap air"], answer: 2 },
+      { q: "3. Komponen kabel Coaxial yang berfungsi sebagai media utama perambatan arus sinyal data adalah...", options: ["Outer Jacket", "Metallic Shield", "Dielectric Insulator", "Center Conductor (Core)", "Foil Shield"], answer: 3 },
+      { q: "4. Impedansi standar kabel Coaxial yang umum digunakan untuk jaringan antena TV dan sistem CCTV analog adalah...", options: ["50 Ohm", "75 Ohm", "100 Ohm", "120 Ohm", "600 Ohm"], answer: 1 },
+      { q: "5. Jenis konektor yang dipasang pada kedua ujung kabel Coaxial untuk dihubungkan ke perangkat penerima adalah...", options: ["Konektor RJ-45", "Konektor BNC", "Konektor SC", "Konektor LC", "Konektor RJ-11"], answer: 1 },
+      { q: "6. Karakteristik utama dari kabel Fiber Optic yang tidak dimiliki oleh kabel tembaga (Copper) adalah...", options: ["Harganya jauh lebih murah", "Proses crimping yang sangat praktis", "Kebal total terhadap elektromagnetik (EMI)", "Sangat lentur dan tahan ditekuk tajam", "Menggunakan tegangan listrik DC tinggi"], answer: 2 },
+      { q: "7. Bagian dari kabel Fiber Optic yang berfungsi memantulkan kembali gelombang cahaya ke dalam inti (core) adalah...", options: ["Core", "Cladding", "Buffer Coating", "Strength Member", "Outer Jacket"], answer: 1 },
+      { q: "8. Batas maksimum panjang bentangan kabel UTP Cat6 standar tanpa tambahan repeater adalah...", options: ["50 meter", "100 meter", "185 meter", "500 meter", "1000 meter"], answer: 1 },
+      { q: "9. Jika kabel STP diinstal tanpa menghubungkan grounding pada konektor shielded, maka yang akan terjadi adalah...", options: ["Kabel tidak bisa mengalirkan sinyal sama sekali", "Lapisan shield justru bertindak sebagai antena penangkap EMI", "Kecepatan jaringan otomatis naik dua kali lipat", "Kabel akan terasa panas dan terbakar", "Tidak terjadi pengaruh apapun pada sinyal"], answer: 1 },
+      { q: "10. Jenis kabel Coaxial tipis (Thinnet) yang dulunya banyak digunakan untuk topologi bus 10Base2 menggunakan tipe...", options: ["RG-6", "RG-58", "RG-59", "RG-11", "Cat5e"], answer: 1 },
+      { q: "11. Prinsip kerja transmisi data pada serat optik didasarkan pada fenomena fisika...", options: ["Induksi Elektromagnetik", "Total Internal Reflection (Pemantulan Internal Sempurna)", "Resonansi Gelombang Radio", "Konduksi Arus Searah", "Efek Fotoelektrik"], answer: 1 },
+      { q: "12. Penyebab utama penurunan kualitas sinyal (attenuation) pada kabel tembaga saat jarak bertambah panjang adalah...", options: ["Resistansi/hambatan listrik dari kawat tembaga", "Kebocoran sinar ultraviolet", "Pembiasan cahaya di dalam kawat", "Suhu udara ruangan yang terlalu dingin", "Penggunaan konektor bertipe emas"], answer: 0 },
+      { q: "13. Penggunaan kabel UTP tidak direkomendasikan pada lingkungan pabrik dengan mesin berdaya listrik tinggi karena...", options: ["Kabel UTP sangat berat", "Mudah terganggu oleh crosstalk internal & EMI pabrik", "Transmisi UTP terlalu cepat untuk mesin pabrik", "Tidak mendukung protokol Ethernet", "Harganya terlalu mahal untuk pabrik"], answer: 1 },
+      { q: "14. Sumber cahaya transmisi yang digunakan pada kabel Single-Mode Fiber Optic untuk bentangan jarak jauh adalah...", options: ["LED (Light Emitting Diode)", "Sinar Laser Diode", "Lampu Halogen", "Sinar Infrared Biasa", "Lampu Neon Mini"], answer: 1 },
+      { q: "15. Konektor RJ-45 khusus yang dilapisi cangkang logam pada bagian luar digunakan untuk terminasi jenis kabel...", options: ["UTP", "STP / FTP", "Coaxial RG-58", "Fiber Optic Patch Cord", "Kabel Telepon RJ-11"], answer: 1 },
+      { q: "16. Di antara jenis kabel berikut, kabel yang memiliki tingkat kerentanan paling tinggi terhadap kebocoran sinyal (Crosstalk) adalah...", options: ["UTP Cat5e", "STP Cat6", "Coaxial RG-6", "Single-Mode Fiber Optic", "Multi-Mode Fiber Optic"], answer: 0 },
+      { q: "17. Impedansi standar kabel Coaxial RG-58 yang dulunya digunakan untuk transmisi data jaringan komputer Ethernet adalah...", options: ["25 Ohm", "50 Ohm", "75 Ohm", "93 Ohm", "100 Ohm"], answer: 1 },
+      { q: "18. Untuk menghubungkan jaringan antar gedung sejauh 3 kilometer, jenis media transmisi kabel terbaik adalah...", options: ["UTP Cat6a", "STP Cat7", "Coaxial Thicknet", "Single-Mode Fiber Optic", "UTP Cat5e"], answer: 3 },
+      { q: "19. Alat pengukur yang digunakan khusus untuk mengetahui lokasi kerusakan atau titik putus pada bentangan kabel Fiber Optic adalah...", options: ["Crimping Tool", "LAN Tester Digital", "OTDR (Optical Time Domain Reflectometer)", "Multimeter Analog", "Visual Fault Locator (VFL)"], answer: 2 },
+      { q: "20. Keunggulan utama kabel Coaxial dibanding kabel UTP pada masa awal perkembangan jaringan komputer adalah...", options: ["Jangkauan bentangan tanpa repeater lebih jauh dan kekebalan EMI lebih baik", "Proses pemasangan jauh lebih murah dan mudah", "Menggunakan serat kaca berkualitas tinggi", "Mendukung fitur Power over Ethernet (PoE)", "Memiliki ukuran yang sangat tipis dan lentur"], answer: 0 }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      waktuMulai = Date.now();
+      initStudentData();
+      buildQuiz();
+      updateMultiSimulation();
+      checkIdentity();
+    });
+
+    function showNotification(msg, type = "error") {
+      const box = document.getElementById("notification-box");
+      if (!box) return;
+      box.classList.remove("hidden", "bg-rose-50", "text-rose-700", "border-rose-200", "bg-emerald-50", "text-emerald-700", "border-emerald-200");
+      if (type === "success") {
+        box.classList.add("bg-emerald-50", "text-emerald-700", "border", "border-emerald-200");
+      } else {
+        box.classList.add("bg-rose-50", "text-rose-700", "border", "border-rose-200");
+      }
+      box.innerText = msg;
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function checkIdentity() {
+      const sekolah = document.getElementById("sekolah").value;
+      const kelas = document.getElementById("kelas").value;
+      const nama = document.getElementById("nama").value;
+      const content = document.getElementById("content-sections");
+      const warning = document.getElementById("identity-warning");
+
+      if (sekolah && kelas && nama) {
+        content.classList.remove("opacity-40", "pointer-events-none", "select-none");
+        warning.className = "bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all";
+        warning.innerHTML = `<span>Identitas terverifikasi. Seluruh bagian LKPD 3 telah terbuka!</span>`;
+      } else {
+        content.classList.add("opacity-40", "pointer-events-none", "select-none");
+        warning.className = "bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all";
+        warning.innerHTML = `<span>Harap lengkapi Identitas Peserta Didik terlebih dahulu untuk membuka Bagian 2 s/d Bagian 6.</span>`;
+      }
+    }
+
+    function initStudentData() {
+      const lines = csvDataSiswa.trim().split("\n");
+      masterDataSiswa = [];
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(",");
+        if (parts.length >= 3) {
+          masterDataSiswa.push({ sekolah: parts[0].trim(), kelas: parts[1].trim(), nama: parts[2].trim() });
+        }
+      }
+
+      const sekolahSelect = document.getElementById("sekolah");
+      const listSekolah = [...new Set(masterDataSiswa.map(item => item.sekolah))];
+      sekolahSelect.innerHTML = `<option value="">-- Pilih Sekolah --</option>` + listSekolah.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function onSekolahChange() {
+      const selectedSekolah = document.getElementById("sekolah").value;
+      const kelasSelect = document.getElementById("kelas");
+      const namaSelect = document.getElementById("nama");
+      kelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+      namaSelect.innerHTML = `<option value="">-- Pilih Nama --</option>`;
+      namaSelect.disabled = true;
+      checkIdentity();
+
+      if (!selectedSekolah) { kelasSelect.disabled = true; return; }
+      const filtered = masterDataSiswa.filter(item => item.sekolah === selectedSekolah);
+      const listKelas = [...new Set(filtered.map(item => item.kelas))];
+      kelasSelect.innerHTML += listKelas.map(k => `<option value="${k}">${k}</option>`).join('');
+      kelasSelect.disabled = false;
+    }
+
+    function onKelasChange() {
+      const selectedSekolah = document.getElementById("sekolah").value;
+      const selectedKelas = document.getElementById("kelas").value;
+      const namaSelect = document.getElementById("nama");
+      namaSelect.innerHTML = `<option value="">-- Pilih Nama --</option>`;
+      checkIdentity();
+
+      if (!selectedKelas) { namaSelect.disabled = true; return; }
+      const filtered = masterDataSiswa.filter(item => item.sekolah === selectedSekolah && item.kelas === selectedKelas);
+      namaSelect.innerHTML += filtered.map(item => `<option value="${item.nama}">${item.nama}</option>`).join('');
+      namaSelect.disabled = false;
+    }
+
+    function evalScenario() {
+      const answers = {
+        1: document.getElementById("scenario-1").value,
+        2: document.getElementById("scenario-2").value,
+        3: document.getElementById("scenario-3").value,
+        4: document.getElementById("scenario-4").value,
+        5: document.getElementById("scenario-5").value,
+        6: document.getElementById("scenario-6").value,
+      };
+
+      const key = {
+        1: "UTP",
+        2: "STP",
+        3: "Coaxial",
+        4: "Fiber",
+        5: "Fiber",
+        6: "STP"
+      };
+
+      const total = 6;
+      let filled = 0;
+      let correct = 0;
+
+      for (let i = 1; i <= total; i++) {
+        if (answers[i]) {
+          filled++;
+          if (answers[i] === key[i]) {
+            correct++;
+          }
+        }
+      }
+
+      const fb = document.getElementById("scenario-feedback");
+      fb.classList.remove("hidden", "bg-emerald-50", "text-emerald-700", "border-emerald-200", "bg-amber-50", "text-amber-800", "border-amber-200", "bg-slate-100", "text-slate-700");
+
+      if (filled === 0) {
+        fb.classList.add("hidden");
+        return;
+      }
+
+      if (filled === total) {
+        if (correct === total) {
+          fb.classList.add("bg-emerald-50", "text-emerald-700", "border", "border-emerald-200");
+          fb.innerHTML = `<strong>Sempurna! (6/6 Tepat)</strong> Seluruh pilihan kabel sesuai dengan karakteristik fisik dan lingkungan transmisi.`;
+        } else {
+          fb.classList.add("bg-amber-50", "text-amber-800", "border", "border-amber-200");
+          fb.innerHTML = `<strong>Hasil Evaluasi: ${correct} dari ${total} Skenario Tepat.</strong> Analisis kembali skenario yang belum pas: UTP untuk area dalam ruangan hemat biaya, STP untuk area ber-EMI tinggi/grounding, Coaxial untuk sinyal CCTV 75 Ω, dan Fiber Optic untuk jarak jauh/kecepatan tinggi.`;
+        }
+      } else {
+        fb.classList.add("bg-slate-100", "text-slate-700");
+        fb.innerHTML = `Progres Skenario: <strong>${filled}/${total}</strong> terisi (${correct} benar). Silakan selesaikan seluruh 6 skenario.`;
+      }
+    }
+
+    function updateMultiSimulation() {
+      const dist = parseInt(document.getElementById("distance-slider").value);
+      document.getElementById("distance-val").innerText = dist;
+
+      // Kalkulasi Attenuation (Redaman)
+      let utpDb = (dist * 0.22).toFixed(1);
+      let stpDb = (dist * 0.20).toFixed(1);
+      let coaxDb = (dist * 0.12).toFixed(1);
+      let foDb = (dist * 0.00035).toFixed(3);
+
+      let utpQual = Math.max(0, 100 - (dist > 100 ? (dist-100)*0.8 + 20 : dist*0.2));
+      let stpQual = Math.max(0, 100 - (dist > 100 ? (dist-100)*0.8 + 18 : dist*0.18));
+      let coaxQual = Math.max(0, 100 - (dist > 500 ? (dist-500)*0.2 + 30 : dist*0.06));
+      let foQual = Math.max(95, 100 - (dist * 0.005));
+
+      document.getElementById("utp-db").innerText = `${utpDb} dB`;
+      document.getElementById("utp-bar").style.width = `${utpQual}%`;
+      document.getElementById("utp-status").innerText = dist > 100 ? "Drop sinyal! >100m" : "Optimal (Maks 100m)";
+
+      document.getElementById("stp-db").innerText = `${stpDb} dB`;
+      document.getElementById("stp-bar").style.width = `${stpQual}%`;
+      document.getElementById("stp-status").innerText = dist > 100 ? "Drop sinyal! >100m" : "Optimal (Tahan EMI)";
+
+      document.getElementById("coax-db").innerText = `${coaxDb} dB`;
+      document.getElementById("coax-bar").style.width = `${coaxQual}%`;
+      document.getElementById("coax-status").innerText = dist > 500 ? "Sinyal Melemah" : "Stabil hingga 500m";
+
+      document.getElementById("fo-db").innerText = `${foDb} dB`;
+      document.getElementById("fo-bar").style.width = `${foQual}%`;
+      document.getElementById("fo-status").innerText = "Sangat Baik & Stabil";
+    }
+
+    function simpanKeTabel() {
+      const dist = document.getElementById("distance-slider").value;
+      const utpDb = (dist * 0.22).toFixed(1);
+      const stpDb = (dist * 0.20).toFixed(1);
+      const coaxDb = (dist * 0.12).toFixed(1);
+      const foDb = (dist * 0.00035).toFixed(3);
+
+      tableData.push({
+        jarak: `${dist} m`,
+        utp: `${utpDb} dB (${dist > 100 ? 'Lemah' : 'Bagus'})`,
+        stp: `${stpDb} dB (${dist > 100 ? 'Lemah' : 'Bagus'})`,
+        coax: `${coaxDb} dB (${dist > 500 ? 'Sedang' : 'Bagus'})`,
+        fo: `${foDb} dB (Sangat Stabil)`
+      });
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("observation-table-body");
+      if (tableData.length === 0) return;
+
+      tbody.innerHTML = tableData.map(item => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-2.5 font-medium text-slate-800">${item.jarak}</td>
+          <td class="px-4 py-2.5">${item.utp}</td>
+          <td class="px-4 py-2.5">${item.stp}</td>
+          <td class="px-4 py-2.5">${item.coax}</td>
+          <td class="px-4 py-2.5">${item.fo}</td>
+        </tr>
+      `).join('');
+    }
+
+    function buildQuiz() {
+      const labels = ["A", "B", "C", "D", "E"];
+      const container = document.getElementById("quiz-container");
+      container.innerHTML = quizQuestions.map((q, idx) => `
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2.5">
+          <p class="text-xs font-semibold text-slate-800">${q.q}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            ${q.options.map((opt, optIdx) => `
+              <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg cursor-pointer hover:bg-slate-100 border border-slate-200/80 transition">
+                <input type="radio" name="quiz-${idx}" value="${optIdx}" class="accent-indigo-600">
+                <span class="text-xs text-slate-700"><strong class="text-indigo-600">${labels[optIdx]}.</strong> ${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function calculateScore() {
+      let score = 0;
+      let countCorrect = 0;
+      quizQuestions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="quiz-${idx}"]:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+          score += 5;
+          countCorrect++;
+        }
+      });
+      return { score, countCorrect };
+    }
+
+    function resetForm() {
+      document.getElementById("sekolah").value = "";
+      onSekolahChange();
+      document.getElementById("distance-slider").value = 100;
+      updateMultiSimulation();
+      tableData = [];
+      document.getElementById("observation-table-body").innerHTML = `
+        <tr><td colspan="5" class="text-center py-6 text-slate-400 italic">Belum ada data dicatat. Klik "+ Catat Data Simulasi" untuk menyimpan pengamatan.</td></tr>
+      `;
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      document.getElementById("pdf-result").classList.add("hidden");
+      checkIdentity();
+      showNotification("Formulir LKPD 3 berhasil di-reset.", "success");
+    }
+
+    async function submitWorksheet() {
+      const sekolah = document.getElementById("sekolah").value;
+      const kelas = document.getElementById("kelas").value;
+      const nama = document.getElementById("nama").value;
+
+      if (!sekolah || !kelas || !nama) {
+        showNotification("Mohon pilih Sekolah, Kelas, dan Nama Lengkap terlebih dahulu!", "error");
+        return;
+      }
+
+      if (!tableData || tableData.length === 0) {
+        showNotification("Mohon catat data hasil simulasi ke Tabel Pengamatan dengan menekan tombol '+ Catat Data Simulasi'!", "error");
+        return;
+      }
+
+      let answeredCount = 0;
+      quizQuestions.forEach((q, idx) => {
+        if (document.querySelector(`input[name="quiz-${idx}"]:checked`)) answeredCount++;
+      });
+
+      if (answeredCount < quizQuestions.length) {
+        showNotification(`Mohon jawab seluruh 20 soal Uji Kompetensi! (Baru terisi ${answeredCount} soal)`, "error");
+        return;
+      }
+
+      const { score: nilaiAkhir, countCorrect: skorBenar } = calculateScore();
+      const durasiDetik = Math.floor((Date.now() - waktuMulai) / 1000);
+      const pilihanLkpdTerpilih = "LKPD 3 Karakteristik Media Transmisi Kabel: UTP, STP, Coaxial & Optik";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData,
+        tanggal: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
+      };
+
+      document.getElementById("loading-spinner").classList.remove("hidden");
+      document.getElementById("btn-submit").disabled = true;
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const textData = await response.text();
+        let res = {};
+        try { res = JSON.parse(textData); } catch (e) { if (response.ok) res = { status: "success" }; }
+
+        if (res.status === "success" || response.ok) {
+          document.getElementById("loading-spinner").classList.add("hidden");
+          const pdfUrl = res.pdfUrl || res.pdf_url || res.url;
+          if (pdfUrl) {
+            document.getElementById("pdf-result").classList.remove("hidden");
+            document.getElementById("pdf-link").href = pdfUrl;
+          }
+          showNotification(`Submit Berhasil!\nNama: ${nama}\nSkor Benar: ${skorBenar}/20\nNilai Akhir: ${nilaiAkhir}/100.`, "success");
+        } else {
+          throw new Error("Gagal menyimpan data.");
+        }
+      } catch (err) {
+        document.getElementById("loading-spinner").classList.add("hidden");
+        document.getElementById("btn-submit").disabled = false;
+        showNotification("Terjadi kesalahan: " + err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>
