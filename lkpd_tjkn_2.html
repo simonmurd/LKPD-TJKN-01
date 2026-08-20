@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 2 Perancangan & Struktur Jaringan Kabel: Copper (UTP) & Fiber Optic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .pin-orange-white { background: linear-gradient(135deg, #ff9800 50%, #ffffff 50%); }
+    .pin-orange { background-color: #ff9800; }
+    .pin-green-white { background: linear-gradient(135deg, #4caf50 50%, #ffffff 50%); }
+    .pin-blue { background-color: #2196f3; }
+    .pin-blue-white { background: linear-gradient(135deg, #2196f3 50%, #ffffff 50%); }
+    .pin-green { background-color: #4caf50; }
+    .pin-brown-white { background: linear-gradient(135deg, #795548 50%, #ffffff 50%); }
+    .pin-brown { background-color: #795548; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8 selection:bg-indigo-100 selection:text-indigo-700">
+  <div class="max-w-5xl mx-auto space-y-8">
+    
+    <header class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-sm text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600 mb-3 border border-indigo-100">Lembar Kerja Peserta Didik</span>
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">LKPD 2: Perancangan & Struktur Jaringan Kabel</h1>
+      <p class="text-slate-500 text-sm max-w-2xl mx-auto">Analisis Perbandingan Kabel Tembaga (Copper UTP) & Serat Optik (Fiber Optic)</p>
+    </header>
+
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 1: Identitas Peserta Didik</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Pilih Sekolah</label>
+          <select id="sekolah" onchange="onSekolahChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Kelas</label>
+          <select id="kelas" onchange="onKelasChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Nama Lengkap</label>
+          <select id="nama" onchange="checkIdentity()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="identity-warning" class="bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all">
+        <svg class="w-4 h-4 flex-shrink-0 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        <span>Harap lengkapi Identitas Peserta Didik (Sekolah, Kelas, & Nama Lengkap) terlebih dahulu untuk membuka Bagian 2 s/d Bagian 5.</span>
+      </div>
+    </section>
+
+    <div id="content-sections" class="space-y-8 opacity-40 pointer-events-none select-none transition-all duration-300">
+      
+    
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 2: Simulasi Interaktif Praktikum</h2>
+      </div>
+      
+      <!-- 2a. Virtual LAN Tester T568B -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-800">Simulasi 2A: Susunan Warna T568B & Virtual LAN Tester</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Pilih urutan warna pin kabel UTP sesuai standar TIA/EIA-568B (Pin 1 sampai Pin 8).</p>
+        </div>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5" id="wire-container">
+          <!-- Dynamically generated via JS -->
+        </div>
+
+        <div class="flex items-center space-x-4 pt-1">
+          <button onclick="testLan()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-xl text-xs transition shadow-sm">Uji LAN Tester</button>
+          <div id="tester-result" class="text-xs font-semibold"></div>
+        </div>
+
+        <!-- Virtual LED Lights -->
+        <div class="flex space-x-2 pt-1" id="led-indicators">
+          <!-- 8 LEDs -->
+        </div>
+      </div>
+
+      <hr class="border-slate-100">
+
+      <!-- 2b. Simulasi Jarak & Attenuation -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-800">Simulasi 2B: Analisis Redaman (Attenuation) Jarak Kabel</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Geser slider untuk mensimulasikan pengaruh jarak terhadap daya tahan sinyal.</p>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-medium text-slate-600">Panjang Kabel Simulasikan:</label>
+            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100"><span id="distance-val">100</span> Meter</span>
+          </div>
+          <input type="range" id="distance-slider" min="1" max="500" value="100" class="w-full accent-indigo-600 cursor-pointer" oninput="updateSimulation()">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-semibold text-slate-700">UTP Cat6a (Copper)</span>
+              <span id="utp-db" class="text-xs font-semibold text-amber-600">0 dB</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
+              <div id="utp-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+            </div>
+            <p id="utp-status" class="text-[11px] text-slate-500">Sinyal Optimal</p>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-semibold text-slate-700">Single-Mode Fiber Optic (SMFO)</span>
+              <span id="fo-db" class="text-xs font-semibold text-indigo-600">0 dB</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
+              <div id="fo-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 100%;"></div>
+            </div>
+            <p id="fo-status" class="text-[11px] text-slate-500">Sinyal Sangat Stabil</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 3: Tabel Pengamatan Praktikum</h2>
+        </div>
+        <button onclick="simpanKeTabel()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-1.5 px-3.5 rounded-xl text-xs transition border border-indigo-100 flex items-center space-x-1">
+          <span>+ Catat Data Simulasi</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left text-slate-600">
+          <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-[10px]">
+            <tr>
+              <th class="px-4 py-2.5 rounded-l-lg">Jarak (m)</th>
+              <th class="px-4 py-2.5">Media Transmisi</th>
+              <th class="px-4 py-2.5">Ketahanan EMI</th>
+              <th class="px-4 py-2.5">Est. Redaman (dB)</th>
+              <th class="px-4 py-2.5 rounded-r-lg">Kualitas Sinyal</th>
+            </tr>
+          </thead>
+          <tbody id="observation-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="text-center py-6 text-slate-400 italic">Belum ada data dicatat. Klik "+ Catat Data Simulasi" untuk menyimpan pengamatan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 4: Uji Kompetensi Teori & Troubleshooting (20 Soal)</h2>
+      </div>
+      <div id="quiz-container" class="space-y-4">
+        <!-- Soal Quiz dimasukkan via JavaScript -->
+      </div>
+    </section>
+
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 5: Finalisasi & Pengiriman Laporan</h2>
+      </div>
+
+      <div id="notification-box" class="hidden max-w-xl mx-auto p-3.5 rounded-xl text-xs font-medium text-center transition"></div>
+
+      <!-- Minimalist Action Bar as depicted in image -->
+      <div class="flex items-center justify-end space-x-3 pt-2">
+        <button type="button" onclick="resetForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 px-5 rounded-xl text-xs transition">
+          Reset Form
+        </button>
+        <button id="btn-submit" type="button" onclick="submitWorksheet()" class="bg-indigo-400 hover:bg-indigo-500 text-white font-medium py-2.5 px-5 rounded-xl text-xs shadow-sm transition flex items-center space-x-2">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H5.5z"/>
+            <path d="M9 13a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"/>
+            <path fill-rule="evenodd" d="M10 9a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>Selesaikan & Kirim LKPD</span>
+        </button>
+      </div>
+
+      <!-- Loading & Result Indicator -->
+      <div id="loading-spinner" class="hidden text-center text-indigo-600 text-xs font-medium space-y-2 py-4">
+        <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent"></div>
+        <p>Memproses data & mengirimkan laporan ke Google Sheets...</p>
+      </div>
+
+      <div id="pdf-result" class="hidden text-center pt-2">
+        <a id="pdf-link" href="#" target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-5 rounded-xl text-xs shadow-sm transition">
+          <span>📄 Unduh Laporan PDF Hasil Praktikum</span>
+        </a>
+      </div>
+    </section>
+
+    </div> <!-- End of content-sections wrapper -->
+
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,36 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,37 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,38 YUVENSIUS
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    // T568B Standard Color Sequence
+    const T568B_CORRECT = [
+      "Putih-Oren", "Oren", "Putih-Hijau", "Biru",
+      "Putih-Biru", "Hijau", "Putih-Cokelat", "Cokelat"
+    ];
+
+    const COLOR_OPTIONS = [
+      "Putih-Oren", "Oren", "Putih-Hijau", "Hijau",
+      "Putih-Biru", "Biru", "Putih-Cokelat", "Cokelat"
+    ];
+
+    let tableData = [];
+
+    const quizQuestions = [
+      { q: "1. Urutan warna standar T568B untuk pin ke-1 dan ke-2 secara berturut-turut adalah...", options: ["Putih-Hijau, Hijau", "Putih-Oren, Oren", "Putih-Biru, Biru", "Putih-Cokelat, Cokelat", "Oren, Putih-Oren"], answer: 1 },
+      { q: "2. Batas jarak maksimum efektif transmisi data kabel UTP Cat6 tanpa repeater adalah...", options: ["50 meter", "100 meter", "185 meter", "500 meter", "1000 meter"], answer: 1 },
+      { q: "3. Alat yang digunakan untuk menyambung core serat optik secara permanen dengan teknik lebur adalah...", options: ["Crimping Tool", "Fusion Splicer", "Optical Power Meter", "Stripper FO", "Cleaver FO"], answer: 1 },
+      { q: "4. Jenis kabel serat optik yang memiliki diameter core sangat kecil (sekitar 9 micron) dan digunakan untuk jarak jauh adalah...", options: ["Multi-Mode Step Index", "Multi-Mode Graded Index", "Single-Mode", "UTP Cable", "STP Cable"], answer: 2 },
+      { q: "5. Alat ukur yang digunakan untuk mendeteksi lokasi titik putus dan mengukur besar redaman serat optik adalah...", options: ["LAN Tester", "Multimeter", "OTDR (Optical Time Domain Reflectometer)", "Visual Fault Locator", "Spectrum Analyzer"], answer: 2 },
+      { q: "6. Gangguan sinyal berupa induksi medan listrik/magnetik dari perangkat eksternal pada kabel tembaga disebut...", options: ["Attenuation", "Crosstalk", "Electromagnetic Interference (EMI)", "Dispersion", "Jitter"], answer: 2 },
+      { q: "7. Jenis konektor standar yang dipasang pada ujung kabel UTP untuk dimasukkan ke port Ethernet RJ-45 adalah...", options: ["Konektor ST", "Konektor SC", "Konektor RJ-45", "Konektor LC", "Konektor BNC"], answer: 2 },
+      { q: "8. Pada standar T568B, pin yang berfungsi sebagai pasangan jalur penerima data (Rx) pada jaringan Fast Ethernet (100Mbps) adalah pin...", options: ["1 dan 2", "3 dan 6", "4 dan 5", "7 dan 8", "1 dan 3"], answer: 1 },
+      { q: "9. Jenis kabel UTP yang memiliki pelindung aluminium foil untuk menahan EMI eksternal dinamakan...", options: ["Unshielded Twisted Pair", "Shielded / Foiled Twisted Pair (STP/FTP)", "Coaxial Cable", "Fiber Optic Armor", "Patch Cord UTP"], answer: 1 },
+      { q: "10. Alat tangan yang digunakan untuk mengupas selubung luar dan menjepit konektor RJ-45 pada kabel UTP adalah...", options: ["Tang Potong", "Crimping Tool", "Punch Down Tool", "Cable Stripper", "Splicer Tool"], answer: 1 },
+      { q: "11. Fenomena berkurangnya kekuatan sinyal seiring bertambahnya jarak lintasan media transmisi dinamakan...", options: ["Refraksi", "Redaman (Attenuation)", "Crosstalk", "Jitter", "Dispersion"], answer: 1 },
+      { q: "12. Sumber cahaya pemancar sinyal yang umum digunakan pada modul transiver Single-Mode Fiber Optic adalah...", options: ["LED (Light Emitting Diode)", "Sinar Laser Diode", "Lampu Halogen", "Infrarot Biasa", "Lampu Neon"], answer: 1 },
+      { q: "13. Sumber cahaya transmisi yang paling ekonomis dan umum digunakan pada jaringan Multi-Mode Fiber Optic adalah...", options: ["LED", "Laser Diode High Power", "Sinar X", "Ultrasonic", "Sinar Ultraviolet"], answer: 0 },
+      { q: "14. Tipe konektor Fiber Optic yang menggunakan mekanisme pengunci bentuk bayonet diputar adalah...", options: ["SC", "LC", "ST", "FC", "MTRJ"], answer: 2 },
+      { q: "15. Penyebab utama tingginya loss/redaman pada sambungan kabel Fiber Optic adalah...", options: ["Kabel tertekuk melebihi bending radius & kotoran pada konektor", "Panjang kabel kurang dari 1 meter", "Suhu udara ruangan terlalu dingin", "Penggunaan konektor RJ-45", "Kabel terlalu pendek"], answer: 0 },
+      { q: "16. Kebocoran sinyal elektromagnetik antara dua pasang kabel yang berdekatan di dalam mantel UTP dinamakan...", options: ["NEXT (Near-End Crosstalk)", "Refleksi Sinyal", "Attenuation Total", "Dispersion Loss", "Insertion Loss"], answer: 0 },
+      { q: "17. Standar pengkabelan struktur internasional yang diterbitkan oleh Telecommunications Industry Association adalah...", options: ["IEEE 802.11", "TIA/EIA-568", "ISO 9001", "RFC 1918", "IEEE 802.3"], answer: 1 },
+      { q: "18. Perbedaan mendasar antara standar T568A dan T568B terletak pada pertukaran posisi pin kabel warna...", options: ["Oren dan Cokelat", "Hijau dan Biru", "Oren dan Hijau", "Biru dan Cokelat", "Hijau dan Cokelat"], answer: 2 },
+      { q: "19. Kabel UTP tipe Straight-Through digunakan untuk menghubungkan dua perangkat...", options: ["Berbeda jenis (misal: PC ke Switch)", "Sama jenis (misal: Switch ke Switch)", "PC langsung ke PC", "Router langsung ke Router", "Switch langsung ke Switch"], answer: 0 },
+      { q: "20. Keunggulan utama kabel Fiber Optic dibandingkan kabel tembaga (Copper) adalah...", options: ["Harganya jauh lebih murah", "Sangat tahan terhadap interferensi elektromagnetik & bandwidth sangat besar", "Pemasangan jauh lebih mudah tanpa alat khusus", "Bisa ditekuk dengan sudut tajam tanpa merusak kabel", "Tidak memerlukan konektor sama sekali"], answer: 1 }
+    ];
+
+    function showNotification(msg, type = "error") {
+      const box = document.getElementById("notification-box");
+      if (!box) return;
+      box.classList.remove("hidden", "bg-rose-50", "text-rose-700", "border-rose-200", "bg-emerald-50", "text-emerald-700", "border-emerald-200");
+      if (type === "success") {
+        box.classList.add("bg-emerald-50", "text-emerald-700", "border", "border-emerald-200");
+      } else {
+        box.classList.add("bg-rose-50", "text-rose-700", "border", "border-rose-200");
+      }
+      box.innerText = msg;
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      waktuMulai = Date.now();
+      initStudentData();
+      buildWireSelectors();
+      buildLeds();
+      buildQuiz();
+      updateSimulation();
+      checkIdentity();
+    });
+
+    function checkIdentity() {
+      const sekolah = document.getElementById("sekolah").value;
+      const kelas = document.getElementById("kelas").value;
+      const nama = document.getElementById("nama").value;
+      const content = document.getElementById("content-sections");
+      const warning = document.getElementById("identity-warning");
+
+      if (sekolah && kelas && nama) {
+        content.classList.remove("opacity-40", "pointer-events-none", "select-none");
+        warning.className = "bg-emerald-50 border border-emerald-200 text-emerald-700 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all";
+        warning.innerHTML = `
+          <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Identitas terverifikasi. Seluruh bagian LKPD telah terbuka dan siap dikerjakan!</span>
+        `;
+      } else {
+        content.classList.add("opacity-40", "pointer-events-none", "select-none");
+        warning.className = "bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all";
+        warning.innerHTML = `
+          <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+          </svg>
+          <span>Harap lengkapi Identitas Peserta Didik (Sekolah, Kelas, & Nama Lengkap) terlebih dahulu untuk membuka Bagian 2 s/d Bagian 5.</span>
+        `;
+      }
+    }
+
+    function initStudentData() {
+      const lines = csvDataSiswa.trim().split("\n");
+      masterDataSiswa = [];
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(",");
+        if (parts.length >= 3) {
+          masterDataSiswa.push({
+            sekolah: parts[0].trim(),
+            kelas: parts[1].trim(),
+            nama: parts[2].trim()
+          });
+        }
+      }
+
+      const sekolahSelect = document.getElementById("sekolah");
+      const listSekolah = [...new Set(masterDataSiswa.map(item => item.sekolah))];
+      sekolahSelect.innerHTML = `<option value="">-- Pilih Sekolah --</option>` +
+        listSekolah.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function onSekolahChange() {
+      const selectedSekolah = document.getElementById("sekolah").value;
+      const kelasSelect = document.getElementById("kelas");
+      const namaSelect = document.getElementById("nama");
+
+      kelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+      namaSelect.innerHTML = `<option value="">-- Pilih Nama --</option>`;
+      namaSelect.disabled = true;
+
+      checkIdentity();
+
+      if (!selectedSekolah) {
+        kelasSelect.disabled = true;
+        return;
+      }
+
+      const filtered = masterDataSiswa.filter(item => item.sekolah === selectedSekolah);
+      const listKelas = [...new Set(filtered.map(item => item.kelas))];
+
+      kelasSelect.innerHTML += listKelas.map(k => `<option value="${k}">${k}</option>`).join('');
+      kelasSelect.disabled = false;
+    }
+
+    function onKelasChange() {
+      const selectedSekolah = document.getElementById("sekolah").value;
+      const selectedKelas = document.getElementById("kelas").value;
+      const namaSelect = document.getElementById("nama");
+
+      namaSelect.innerHTML = `<option value="">-- Pilih Nama --</option>`;
+
+      checkIdentity();
+
+      if (!selectedKelas) {
+        namaSelect.disabled = true;
+        return;
+      }
+
+      const filtered = masterDataSiswa.filter(item => item.sekolah === selectedSekolah && item.kelas === selectedKelas);
+      namaSelect.innerHTML += filtered.map(item => `<option value="${item.nama}">${item.nama}</option>`).join('');
+      namaSelect.disabled = false;
+    }
+
+    function buildWireSelectors() {
+      const container = document.getElementById("wire-container");
+      container.innerHTML = "";
+      for (let i = 1; i <= 8; i++) {
+        container.innerHTML += `
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/60 text-center space-y-1">
+            <span class="text-[11px] font-semibold text-slate-500 block">Pin ${i}</span>
+            <select id="pin-${i}" class="w-full bg-white text-xs text-slate-700 p-1 rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="">-- Pilih --</option>
+              ${COLOR_OPTIONS.map(c => `<option value="${c}">${c}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }
+    }
+
+    function buildLeds() {
+      const container = document.getElementById("led-indicators");
+      container.innerHTML = "";
+      for (let i = 1; i <= 8; i++) {
+        container.innerHTML += `
+          <div id="led-${i}" class="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold border border-slate-300">
+            ${i}
+          </div>
+        `;
+      }
+    }
+
+    function testLan() {
+      let correctCount = 0;
+      for (let i = 1; i <= 8; i++) {
+        const val = document.getElementById(`pin-${i}`).value;
+        const led = document.getElementById(`led-${i}`);
+        if (val === T568B_CORRECT[i - 1]) {
+          led.className = "w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm";
+          correctCount++;
+        } else {
+          led.className = "w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] font-bold";
+        }
+      }
+
+      const resDiv = document.getElementById("tester-result");
+      if (correctCount === 8) {
+        resDiv.className = "text-xs font-semibold text-emerald-600";
+        resDiv.innerText = "PASSED: Susunan T568B Benar!";
+      } else {
+        resDiv.className = "text-xs font-semibold text-rose-600";
+        resDiv.innerText = `FAILED: ${8 - correctCount} Pin Salah Wire.`;
+      }
+    }
+
+    function updateSimulation() {
+      const dist = parseInt(document.getElementById("distance-slider").value);
+      document.getElementById("distance-val").innerText = dist;
+
+      let utpDb = (dist * 0.22).toFixed(1);
+      let utpQuality = Math.max(0, 100 - (dist > 100 ? (dist - 100) * 0.8 + 20 : dist * 0.2));
+      
+      let foDb = (dist * 0.00035).toFixed(3);
+      let foQuality = Math.max(95, 100 - (dist * 0.01));
+
+      document.getElementById("utp-db").innerText = `${utpDb} dB`;
+      document.getElementById("utp-bar").style.width = `${utpQuality}%`;
+      document.getElementById("utp-bar").className = `h-full transition-all duration-300 ${utpQuality > 60 ? 'bg-emerald-500' : utpQuality > 30 ? 'bg-amber-500' : 'bg-rose-500'}`;
+      document.getElementById("utp-status").innerText = dist > 100 ? "WARNING: Melebihi standar 100m! Redaman tinggi." : "Sinyal Baik & Sesuai Standar TIA/EIA.";
+
+      document.getElementById("fo-db").innerText = `${foDb} dB`;
+      document.getElementById("fo-bar").style.width = `${foQuality}%`;
+      document.getElementById("fo-status").innerText = "Sangat Baik. Redaman sangat kecil untuk jarak jauh.";
+    }
+
+    function simpanKeTabel() {
+      const dist = document.getElementById("distance-slider").value;
+      const utpDb = (dist * 0.22).toFixed(1);
+      const foDb = (dist * 0.00035).toFixed(3);
+
+      const entryUtp = {
+        jarak: `${dist} m`,
+        media: "UTP Cat6a",
+        emi: "Rendah (Rentan EMI)",
+        redaman: `${utpDb} dB`,
+        kualitas: dist > 100 ? "Sinyal Lemah / Unstable" : "Sinyal Bagus"
+      };
+
+      const entryFo = {
+        jarak: `${dist} m`,
+        media: "Single-Mode FO",
+        emi: "Sangat Tinggi (Tahan EMI)",
+        redaman: `${foDb} dB`,
+        kualitas: "Sangat Bagus (Sangat Stabil)"
+      };
+
+      tableData.push(entryUtp, entryFo);
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("observation-table-body");
+      if (tableData.length === 0) return;
+
+      tbody.innerHTML = tableData.map(item => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-2.5 font-medium text-slate-800">${item.jarak}</td>
+          <td class="px-4 py-2.5">${item.media}</td>
+          <td class="px-4 py-2.5">${item.emi}</td>
+          <td class="px-4 py-2.5">${item.redaman}</td>
+          <td class="px-4 py-2.5">${item.kualitas}</td>
+        </tr>
+      `).join('');
+    }
+
+    function buildQuiz() {
+      const labels = ["A", "B", "C", "D", "E"];
+      const container = document.getElementById("quiz-container");
+      container.innerHTML = quizQuestions.map((q, idx) => `
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2.5">
+          <p class="text-xs font-semibold text-slate-800">${q.q}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            ${q.options.map((opt, optIdx) => `
+              <label class="flex items-center space-x-2 bg-white p-2.5 rounded-lg cursor-pointer hover:bg-slate-100 border border-slate-200/80 transition">
+                <input type="radio" name="quiz-${idx}" value="${optIdx}" class="accent-indigo-600">
+                <span class="text-xs text-slate-700"><strong class="text-indigo-600">${labels[optIdx]}.</strong> ${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function calculateScore() {
+      let score = 0;
+      let countCorrect = 0;
+      quizQuestions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="quiz-${idx}"]:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+          score += 5; // 20 Soal * 5 = 100
+          countCorrect++;
+        }
+      });
+      return { score, countCorrect };
+    }
+
+    function resetForm() {
+      document.getElementById("sekolah").value = "";
+      onSekolahChange();
+      for (let i = 1; i <= 8; i++) {
+        document.getElementById(`pin-${i}`).value = "";
+      }
+      buildLeds();
+      document.getElementById("tester-result").innerText = "";
+      document.getElementById("distance-slider").value = 100;
+      updateSimulation();
+      tableData = [];
+      document.getElementById("observation-table-body").innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center py-6 text-slate-400 italic">Belum ada data dicatat. Klik "+ Catat Data Simulasi" untuk menyimpan pengamatan.</td>
+        </tr>
+      `;
+      const radios = document.querySelectorAll('input[type="radio"]');
+      radios.forEach(r => r.checked = false);
+      
+      const notif = document.getElementById("notification-box");
+      notif.classList.add("hidden");
+      document.getElementById("pdf-result").classList.add("hidden");
+      
+      checkIdentity();
+      showNotification("Formulir berhasil di-reset.", "success");
+    }
+
+    async function submitWorksheet() {
+      const sekolah = document.getElementById("sekolah").value;
+      const kelas = document.getElementById("kelas").value;
+      const nama = document.getElementById("nama").value;
+      const scriptUrl = SCRIPT_URL;
+
+      // 1. Validasi Identitas
+      if (!sekolah || !kelas || !nama) {
+        showNotification("Mohon pilih Sekolah, Kelas, dan Nama Lengkap terlebih dahulu!", "error");
+        return;
+      }
+
+      // 2. Validasi Simulasi 2A: Susunan Warna T568B (Pin 1 - Pin 8)
+      let unselectedPins = [];
+      for (let i = 1; i <= 8; i++) {
+        const val = document.getElementById(`pin-${i}`) ? document.getElementById(`pin-${i}`).value : "";
+        if (!val) unselectedPins.push(i);
+      }
+      if (unselectedPins.length > 0) {
+        showNotification(`Mohon lengkapi susunan warna kabel UTP di Simulasi 2A! (Pin ${unselectedPins.join(", ")} belum dipilih)`, "error");
+        return;
+      }
+
+      // 3. Validasi Bagian 3: Tabel Pengamatan Praktikum
+      if (!tableData || tableData.length === 0) {
+        showNotification("Mohon catat data hasil simulasi ke Tabel Pengamatan Praktikum dengan menekan tombol '+ Catat Data Simulasi'!", "error");
+        return;
+      }
+
+      // 4. Validasi Bagian 4: Uji Kompetensi Teori (20 Soal)
+      let answeredCount = 0;
+      quizQuestions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="quiz-${idx}"]:checked`);
+        if (selected) answeredCount++;
+      });
+
+      if (answeredCount < quizQuestions.length) {
+        showNotification(`Mohon jawab seluruh soal Uji Kompetensi Teori di Bagian 4! (Baru terisi ${answeredCount} dari ${quizQuestions.length} soal)`, "error");
+        return;
+      }
+
+      const { score: nilaiAkhir, countCorrect: skorBenar } = calculateScore();
+      const durasiDetik = Math.floor((Date.now() - waktuMulai) / 1000);
+      const pilihanLkpdTerpilih = "LKPD 2 Perancangan & Struktur Jaringan Kabel: Copper (UTP) & Fiber Optic";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData,
+        tanggal: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
+      };
+
+      document.getElementById("loading-spinner").classList.remove("hidden");
+      document.getElementById("btn-submit").disabled = true;
+      document.getElementById("pdf-result").classList.add("hidden");
+
+      try {
+        const response = await fetch(scriptUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const textData = await response.text();
+        let res = {};
+        try {
+          res = JSON.parse(textData);
+        } catch (jsonErr) {
+          // Jika balasan dari Apps Script berupa teks biasa/HTML tetapi HTTP status OK (200)
+          if (response.ok) {
+            res = { status: "success", message: "Data berhasil disimpan" };
+          } else {
+            throw jsonErr;
+          }
+        }
+
+        // Memeriksa berbagai kemungkinan format status sukses dari Google Apps Script
+        const isSuccess = res.status === "success" || 
+                          res.result === "success" || 
+                          res.success === true || 
+                          response.ok ||
+                          (res.message && res.message.toLowerCase().includes("berhasil"));
+
+        if (isSuccess) {
+          document.getElementById("loading-spinner").classList.add("hidden");
+          
+          const pdfUrl = res.pdfUrl || res.pdf_url || res.url;
+          if (pdfUrl) {
+            document.getElementById("pdf-result").classList.remove("hidden");
+            document.getElementById("pdf-link").href = pdfUrl;
+          }
+          
+          showNotification(`Submit Berhasil!\nNama: ${nama}\nSkor Benar: ${skorBenar}/20\nNilai Akhir: ${nilaiAkhir}/100\nDurasi: ${durasiDetik} detik.`, "success");
+        } else {
+          throw new Error(res.message || "Gagal memproses data.");
+        }
+      } catch (err) {
+        document.getElementById("loading-spinner").classList.add("hidden");
+        document.getElementById("btn-submit").disabled = false;
+        showNotification("Terjadi kesalahan pengiriman data: " + err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>
