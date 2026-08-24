@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 5: Gelombang Radio & Frekuensi Nirkabel (2.4 GHz vs 5 GHz)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-freq { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-freq:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+    canvas { background-color: #0f172a; border-radius: 0.75rem; }
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-indigo-700 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+          <i class="fa-solid fa-wifi text-3xl text-amber-400"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-widest text-indigo-200 uppercase">Lembar Kerja Peserta Didik Interaktif</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">LKPD 5: Gelombang Radio & Frekuensi Nirkabel</h1>
+          <p class="text-xs sm:text-sm text-indigo-100 mt-1">Pengujian Karakteristik Frekuensi 2.4 GHz vs 5 GHz, Interferensi, dan Topologi AP</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-indigo-800/80 px-4 py-2 rounded-xl text-sm border border-indigo-500/30">
+        <i class="fa-solid fa-graduation-cap text-amber-400"></i>
+        <span class="font-medium" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-7 h-7 bg-amber-100 text-amber-700 rounded-lg text-sm font-bold">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-800 rounded-r-lg text-sm flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+        <span>Harap lengkapi seluruh identitas di bawah ini untuk membuka materi, simulasi, dan uji kompetensi.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Locked / Unlocked Wrapper -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">2</span>
+            Ringkasan Materi Gelombang Radio & Frekuensi
+          </h2>
+          <span class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-3 py-1 rounded-full">Teori Pengantar</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- 2.4 GHz Card -->
+          <div class="card-freq bg-white border-t-4 border-amber-500 rounded-xl p-5 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold text-amber-900 text-base">Pita Frekuensi 2.4 GHz</h3>
+              <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono">12.5 cm λ</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">Panjang Gelombang Lebih Besar (Cakupan Luas)</p>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-tower-cell text-amber-500 w-4"></i> Jangkauan Sinyal: <b>Tinggi (~45 - 100 meter)</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-cube text-emerald-500 w-4"></i> Daya Tembus Objek: <b>Sangat Baik (Penetrasi Dinding Tinggi)</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-[#000] fa-layer-group text-rose-500 w-4"></i> Kanal Bersih: <b>3 Kanal (1, 6, 11) Non-overlapping</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-600 w-4"></i> Kerentanan Interferensi: <b>Tinggi (Microwave, Bluetooth, Router lain)</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-gauge-high text-indigo-500 w-4"></i> Bandwidth Maksimal: <b>Rendah - Sedang (s/d ~450 Mbps)</b></li>
+            </ul>
+          </div>
+
+          <!-- 5 GHz Card -->
+          <div class="card-freq bg-white border-t-4 border-cyan-500 rounded-xl p-5 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold text-cyan-900 text-base">Pita Frekuensi 5 GHz</h3>
+              <span class="text-xs bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded font-mono">6 cm λ</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">Panjang Gelombang Lebih Pendek (Kecepatan Tinggi)</p>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-tower-cell text-cyan-500 w-4"></i> Jangkauan Sinyal: <b>Pendek (~15 - 30 meter)</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-cube text-rose-500 w-4"></i> Daya Tembus Objek: <b>Rendah (Sangat Terpengaruh Penghalang)</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-layer-group text-emerald-500 w-4"></i> Kanal Bersih: <b>24+ Kanal Non-overlapping</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-600 w-4"></i> Kerentanan Interferensi: <b>Sangat Rendah</b></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-gauge-high text-indigo-600 w-4"></i> Bandwidth Maksimal: <b>Sangat Tinggi (s/d 1300+ Mbps)</b></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">3</span>
+            Laboratorium Simulasi Gelombang Radio Interaktif
+          </h2>
+          <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-3 py-1 rounded-full">4 Modul Eksperimen</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: Attenuation Simulator -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-shield-cat text-amber-500"></i> Simulasi 1: Daya Tembus Penghalang
+                </h3>
+                <span id="sim1-badge" class="text-xs font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">2.4 GHz vs 5 GHz</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Uji perbedaan redaman sinyal (dBm) 2.4 GHz vs 5 GHz melintasi berbagai material.</p>
+
+              <canvas id="canvas-sim1" class="w-full h-40 mb-3 shadow-inner"></canvas>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Penghalang</label>
+                  <select id="sim1-material" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim1()">
+                    <option value="kaca">Kaca (Daya Redam Rendah)</option>
+                    <option value="kayu">Kayu / Pintu (Sedang)</option>
+                    <option value="bata">Dinding Bata (Tinggi)</option>
+                    <option value="beton">Beton Bertulang (Sangat Tinggi)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                    <span>Ketebalan</span>
+                    <span id="sim1-tebal-val" class="text-indigo-600 font-bold">15 cm</span>
+                  </label>
+                  <input type="range" class="w-full accent-indigo-600 cursor-pointer mt-2" id="sim1-tebal" min="5" max="50" value="15" oninput="runSim1()">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Hasil Pengujian RSSI:</span>
+                <span id="sim1-out" class="font-bold text-slate-800">2.4 GHz: -55 dBm | 5 GHz: -68 dBm</span>
+              </div>
+              <button onclick="catatSimulasi(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: Interference & Channel Overlap -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-[#000] fa-chart-area text-indigo-600"></i> Simulasi 2: Channel Overlap & Interferensi
+                </h3>
+                <span id="sim2-snr-badge" class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">SNR: Bagus</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Geser kanal Wi-Fi 2.4 GHz Anda dan aktifkan noise untuk mengukur SNR & Throughput.</p>
+
+              <canvas id="canvas-sim2" class="w-full h-40 mb-3 shadow-inner"></canvas>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                    <span>Kanal Utama (WiFi Kita)</span>
+                    <span id="sim2-ch-val" class="text-indigo-600 font-bold">Ch 1</span>
+                  </label>
+                  <input type="range" class="w-full accent-indigo-600 cursor-pointer" id="sim2-channel" min="1" max="13" value="1" oninput="runSim2()">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Perangkat Pengganggu (Noise)</label>
+                  <select id="sim2-noise" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim2()">
+                    <option value="none">Tidak Ada (Bersih)</option>
+                    <option value="ap_ch1">WiFi Tetangga (Channel 1)</option>
+                    <option value="ap_ch6">WiFi Tetangga (Channel 6)</option>
+                    <option value="microwave">Microwave (Interferensi 2.4 GHz)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Estimasi Kinerja:</span>
+                <span id="sim2-out" class="font-bold text-slate-800">SNR: 30 dB | Est. Throughput: 150 Mbps</span>
+              </div>
+              <button onclick="catatSimulasi(2)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: Propagation & Bandwidth Sandbox -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-arrows-left-right-to-line text-cyan-600"></i> Simulasi 3: Jangkauan vs Speed Sandbox
+                </h3>
+                <span id="sim3-freq-badge" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Dual-Band Active</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Uji hubungan jarak klien dari Access Point terhadap kecepatan transfer data real-time.</p>
+
+              <canvas id="canvas-sim3" class="w-full h-40 mb-3 shadow-inner"></canvas>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Pita Frekuensi Klien</label>
+                  <select id="sim3-freq" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim3()">
+                    <option value="2.4">2.4 GHz (λ ≈ 12.5 cm)</option>
+                    <option value="5">5.0 GHz (λ ≈ 6.0 cm)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                    <span>Jarak Klien ke AP</span>
+                    <span id="sim3-jarak-val" class="text-indigo-600 font-bold">10 m</span>
+                  </label>
+                  <input type="range" class="w-full accent-indigo-600 cursor-pointer mt-2" id="sim3-jarak" min="2" max="60" value="10" oninput="runSim3()">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Status Koneksi Klien:</span>
+                <span id="sim3-out" class="font-bold text-slate-800">Speed: 450 Mbps | RSSI: -48 dBm</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: Interactive AP Placement Planner -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-map-location-dot text-rose-500"></i> Simulasi 4: AP Placement & Heatmap Planner
+                </h3>
+                <span id="sim4-coverage-badge" class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Cakupan: 85%</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Klik pada denah untuk memindahkan Access Point dan atur kombinasi pita frekuensi.</p>
+
+              <canvas id="canvas-sim4" class="w-full h-40 mb-3 shadow-inner cursor-pointer" onclick="handleCanvasSim4Click(event)"></canvas>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Mode Frekuensi AP</label>
+                  <select id="sim4-mode" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim4()">
+                    <option value="dual">Dual-Band (2.4GHz + 5GHz)</option>
+                    <option value="2.4only">2.4 GHz Only</option>
+                    <option value="5only">5 GHz Only</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Daya Pancar (TX Power)</label>
+                  <select id="sim4-power" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim4()">
+                    <option value="20">High (20 dBm / 100mW)</option>
+                    <option value="14">Medium (14 dBm / 25mW)</option>
+                    <option value="8">Low (8 dBm / 6mW)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Analisis Denah:</span>
+                <span id="sim4-out" class="font-bold text-slate-800">Blank Spot: 15% | Rec: Tambah 1 AP di Sisi Kanan</span>
+              </div>
+              <button onclick="catatSimulasi(4)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">4</span>
+              Tabel Pengamatan Praktikum Frekuensi Radio
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan log hasil uji dari seluruh laboratorium simulasi nirkabel.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-600" id="tbl-pengamatan">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Uji</th>
+                <th class="px-4 py-3">Hasil Pengukuran</th>
+                <th class="px-4 py-3">Status Sinyal / Kinerja</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-200 bg-white">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">5</span>
+              Uji Kompetensi Gelombang Radio & Nirkabel
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut dengan cermat.</p>
+          </div>
+          <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">20 Soal PG</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Akhir:</p>
+          <p>Pastikan semua soal uji kompetensi dan tabel pengamatan terisi sebelum menyelesaikan LKPD.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetForm()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Evaluasi Result -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">LKPD 5 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nilai Akhir Uji Kompetensi</p>
+          <div class="text-5xl font-black text-indigo-600 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil dikirim ke server guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Integration Endpoint Script
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    // Database Siswa Terintegrasi
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,36 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,37 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,38 YUVENSIUS
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const sekSelect = document.getElementById('sel-sekolah');
+      sekSelect.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+      Object.keys(dbSiswaParsed).forEach(sek => {
+        sekSelect.add(new Option(sek, sek));
+      });
+    }
+
+    function updateDropdownKelas() {
+      const sek = document.getElementById('sel-sekolah').value;
+      const klsSelect = document.getElementById('sel-kelas');
+      const nmSelect = document.getElementById('sel-nama');
+      
+      klsSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      nmSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      nmSelect.disabled = true;
+
+      if (sek && dbSiswaParsed[sek]) {
+        klsSelect.disabled = false;
+        Object.keys(dbSiswaParsed[sek]).forEach(k => klsSelect.add(new Option(k, k)));
+      } else {
+        klsSelect.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sek = document.getElementById('sel-sekolah').value;
+      const kls = document.getElementById('sel-kelas').value;
+      const nmSelect = document.getElementById('sel-nama');
+      
+      nmSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      if (sek && kls && dbSiswaParsed[sek][kls]) {
+        nmSelect.disabled = false;
+        dbSiswaParsed[sek][kls].forEach(n => nmSelect.add(new Option(n, n)));
+      } else {
+        nmSelect.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sek = document.getElementById('sel-sekolah').value;
+      const kls = document.getElementById('sel-kelas').value;
+      const nm = document.getElementById('sel-nama').value;
+      const warning = document.getElementById('validation-warning');
+      const mainContent = document.getElementById('main-content');
+      const badge = document.getElementById('identity-status-badge');
+      const statusLkpd = document.getElementById('status-lkpd-text');
+
+      if (sek && kls && nm) {
+        warning.classList.add('hidden');
+        mainContent.classList.remove('locked-section');
+        mainContent.classList.add('unlocked-section');
+        badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+        badge.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Terverifikasi';
+        statusLkpd.innerText = `Siswa: ${nm} (${kls})`;
+
+        if (waktuMulai === 0) {
+          waktuMulai = Date.now();
+        }
+      } else {
+        warning.classList.remove('hidden');
+        mainContent.classList.add('locked-section');
+        mainContent.classList.remove('unlocked-section');
+        badge.className = "text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200";
+        badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        statusLkpd.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Bank Soal Pertemuan 5: Gelombang Radio & Frekuensi Nirkabel
+    const questionBank = [
+      { id: 1, q: "Hubungan antara frekuensi (f) dan panjang gelombang (λ) pada gelombang radio adalah...", options: ["A. Berbanding lurus", "B. Berbanding terbalik", "C. Tidak memiliki korelasi", "D. Selalu konstan pada 10 meter", "E. Eksponensial positif"], ans: "B" },
+      { id: 2, q: "Pita frekuensi Wi-Fi 2.4 GHz memiliki panjang gelombang berkisar sekitar...", options: ["A. 1.2 cm", "B. 6.0 cm", "C. 12.5 cm", "D. 24.0 cm", "E. 50.0 cm"], ans: "C" },
+      { id: 3, q: "Kelebihan utama dari penggunaan pita frekuensi 5 GHz dibandingkan 2.4 GHz adalah...", options: ["A. Jangkauan area yang jauh lebih luas", "B. Daya tembus dinding beton yang sangat tinggi", "C. Transfer data (throughput) lebih tinggi dan kanal lebih bersih", "D. Penggunaan daya listrik perangkat yang jauh lebih hemat", "E. Bebas dari redaman udara"], ans: "C" },
+      { id: 4, q: "Kanal non-overlapping standar di pita 2.4 GHz untuk kawasan Asia/Indonesia (Kanal 1-13) adalah...", options: ["A. Kanal 1, 2, dan 3", "B. Kanal 1, 6, dan 11", "C. Kanal 2, 4, dan 8", "D. Kanal 5, 10, dan 13", "E. Kanal 1, 7, dan 13"], ans: "B" },
+      { id: 5, q: "Perangkat rumah tangga berikut yang sering menjadi sumber interferensi utama pada pita 2.4 GHz adalah...", options: ["A. Kipas Angin", "B. Microwave Oven & Bluetooth", "C. Lampu LED", "D. Lemari Es", "E. Televisi Tabung"], ans: "B" },
+      { id: 6, q: "Fenomena berkurangnya kekuatan sinyal radio saat merambat melalui media atau menembus objek dinamakan...", options: ["A. Refraksi", "B. Atenuasi (Redaman)", "C. Difraksi", "D. Modulasi", "E. Multiplexing"], ans: "B" },
+      { id: 7, q: "Satuan standar yang digunakan untuk mengukur indikasi kekuatan sinyal radio yang diterima (RSSI) adalah...", options: ["A. Watt (W)", "B. Hertz (Hz)", "C. dBm (Decibel-milliwatts)", "D. Volt (V)", "E. Mbps"], ans: "C" },
+      { id: 8, q: "Manakah nilai RSSI berikut yang mengindikasikan kualitas sinyal Wi-Fi paling kuat dan sangat baik?", options: ["A. -30 dBm", "B. -70 dBm", "C. -85 dBm", "D. -95 dBm", "E. -110 dBm"], ans: "A" },
+      { id: 9, q: "Mengapa gelombang 5 GHz memiliki daya tembus penghalang fisik (seperti tembok) yang lebih lemah daripada 2.4 GHz?", options: ["A. Karena memiliki frekuensi lebih rendah", "B. Karena memiliki panjang gelombang lebih pendek sehingga mudah terserap material", "C. Karena menggunakan daya transmisi yang dibatasi hukum", "D. Karena modulasi sinyalnya selalu berupa garis lurus", "E. Karena menggunakan antena directional"], ans: "B" },
+      { id: 10, q: "Rasio antara kekuatan sinyal utama terhadap kekuatan kebisingan latar belakang (noise) disebut...", options: ["A. RSSI", "B. SNR (Signal-to-Noise Ratio)", "C. Bandwidth", "D. Latency", "E. Throughput"], ans: "B" },
+      { id: 11, q: "Lebar pita kanal standar (channel bandwidth) pada Wi-Fi 802.11n pita 2.4 GHz umumnya adalah...", options: ["A. 5 MHz", "B. 20 MHz", "C. 80 MHz", "D. 160 MHz", "E. 320 MHz"], ans: "B" },
+      { id: 12, q: "Berapa jumlah kanal bersih (non-overlapping) yang tersedia pada spektrum frekuensi 5 GHz?", options: ["A. Hanya 3 kanal", "B. 5 kanal", "C. Lebih dari 20 kanal", "D. 50 kanal", "E. Tidak ada kanal"], ans: "C" },
+      { id: 13, q: "Jika dua Access Point di letakkan bersebelahan menggunakan pita 2.4 GHz dengan Kanal 1 dan Kanal 2, maka akan terjadi...", options: ["A. Inter-channel bonding", "B. Co-Channel / Adjacent Channel Interference", "C. Peningkatan kecepatan 2x lipat", "D. Pembagian beban otomatis", "E. Sinyal menjadi kebal kebisingan"], ans: "B" },
+      { id: 14, q: "Peristiwa gelombang radio berbelok atau membentur sudut tajam dari sebuah objek fisik dinamakan...", options: ["A. Atenuasi", "B. Difraksi", "C. Absorpsi", "D. Interferensi", "E. Polarisasi"], ans: "B" },
+      { id: 15, q: "Istilah untuk area di mana perangkat klien tidak dapat menerima sinyal Wi-Fi sama sekali disebut...", options: ["A. Hotspot", "B. Blank Spot / Dead Zone", "C. Overlapping Zone", "D. Coverage Area", "E. Roaming Zone"], ans: "B" },
+      { id: 16, q: "Standar protokol Wi-Fi 5 (802.11ac) beroperasi khusus pada pita frekuensi...", options: ["A. 900 MHz", "B. 2.4 GHz saja", "C. 5 GHz saja", "D. Dual band bersamaan 900MHz & 2.4GHz", "E. 60 GHz"], ans: "C" },
+      { id: 17, q: "Untuk cakupan area luar ruangan (outdoor) yang sangat luas dengan sedikit sekat, frekuensi yang lebih direkomendasikan adalah...", options: ["A. 5 GHz", "B. 2.4 GHz", "C. 6 GHz", "D. 60 GHz", "E. Infrared"], ans: "B" },
+      { id: 18, q: "Gambar visualisasi gradasi warna yang menunjukkan sebaran kekuatan sinyal Wi-Fi dalam gedung dinamakan...", options: ["A. Topology Chart", "B. Heatmap", "C. Waveform Graph", "D. Spectrum Analyzer", "E. Constellation Diagram"], ans: "B" },
+      { id: 19, q: "Komponen pemancar nirkabel yang berfungsi mengubah sinyal listrik menjadi gelombang elektromagnetik adalah...", options: ["A. Router", "B. Switch", "C. Antena", "D. Modem", "E. Transceiver Optik"], ans: "C" },
+      { id: 20, q: "Fitur pada AP modern yang secara otomatis mengarahkan perangkat klien yang mendukung frekuensi 5 GHz ke pita 5 GHz dinamakan...", options: ["A. Band Steering", "B. Channel Bonding", "C. Beamforming", "D. Roaming Fast Handover", "E. Load Balancing"], ans: "A" }
+    ];
+
+    // State Simulasi
+    let sim1Data = {};
+    let sim2Data = {};
+    let sim3Data = {};
+    let sim4Data = {};
+    let apSim4Pos = { x: 0.35, y: 0.5 }; // Relative coords
+
+    // Canvas Render Engine 1: Attenuation Simulator
+    function runSim1() {
+      const canvas = document.getElementById('canvas-sim1');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const material = document.getElementById('sim1-material').value;
+      const tebal = parseInt(document.getElementById('sim1-tebal').value);
+      document.getElementById('sim1-tebal-val').innerText = `${tebal} cm`;
+
+      let loss24 = 2; // base loss
+      let loss5 = 4;
+      if (material === 'kaca') { loss24 += tebal * 0.2; loss5 += tebal * 0.4; }
+      if (material === 'kayu') { loss24 += tebal * 0.5; loss5 += tebal * 0.9; }
+      if (material === 'bata') { loss24 += tebal * 1.1; loss5 += tebal * 2.0; }
+      if (material === 'beton') { loss24 += tebal * 1.8; loss5 += tebal * 3.5; }
+
+      const rssi24 = Math.max(-95, Math.round(-40 - loss24));
+      const rssi5 = Math.max(-95, Math.round(-45 - loss5));
+
+      sim1Data = { material, tebal, rssi24, rssi5 };
+      document.getElementById('sim1-out').innerText = `2.4 GHz: ${rssi24} dBm | 5 GHz: ${rssi5} dBm`;
+
+      // Render Graphic
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Draw Wall
+      const wallWidth = (tebal / 50) * 60 + 15;
+      const wallX = w / 2 - wallWidth / 2;
+      ctx.fillStyle = material === 'beton' ? '#475569' : (material === 'bata' ? '#b45309' : (material === 'kayu' ? '#854d0e' : '#38bdf8'));
+      ctx.fillRect(wallX, 20, wallWidth, h - 40);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px Inter';
+      ctx.fillText(material.toUpperCase(), wallX + 5, 35);
+
+      // Draw Waves (2.4GHz - Amber)
+      ctx.beginPath();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      for (let x = 20; x < w - 20; x++) {
+        let amp = 20;
+        if (x > wallX + wallWidth) amp = Math.max(2, 20 * (1 - loss24 / 60));
+        const y = h / 3 + Math.sin((x) * 0.08) * amp;
+        if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Waves (5GHz - Cyan)
+      ctx.beginPath();
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 2;
+      for (let x = 20; x < w - 20; x++) {
+        let amp = 20;
+        if (x > wallX + wallWidth) amp = Math.max(2, 20 * (1 - loss5 / 60));
+        const y = (2 * h) / 3 + Math.sin((x) * 0.18) * amp;
+        if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Labels
+      ctx.fillStyle = '#f59e0b'; ctx.fillText(`2.4GHz: ${rssi24}dBm`, 20, 20);
+      ctx.fillStyle = '#06b6d4'; ctx.fillText(`5GHz: ${rssi5}dBm`, 20, h / 2 + 15);
+    }
+
+    // Canvas Render Engine 2: Channel Overlap
+    function runSim2() {
+      const canvas = document.getElementById('canvas-sim2');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const ch = parseInt(document.getElementById('sim2-channel').value);
+      const noiseType = document.getElementById('sim2-noise').value;
+      document.getElementById('sim2-ch-val').innerText = `Ch ${ch}`;
+
+      let noiseLevel = 10;
+      if (noiseType === 'ap_ch1' && Math.abs(ch - 1) < 4) noiseLevel += (4 - Math.abs(ch - 1)) * 20;
+      if (noiseType === 'ap_ch6' && Math.abs(ch - 6) < 4) noiseLevel += (4 - Math.abs(ch - 6)) * 20;
+      if (noiseType === 'microwave') noiseLevel += 45;
+
+      const snr = Math.max(5, 45 - noiseLevel);
+      const throughput = Math.round((snr / 40) * 150);
+      const snrBadge = document.getElementById('sim2-snr-badge');
+
+      if (snr > 25) {
+        snrBadge.className = "text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded";
+        snrBadge.innerText = `SNR: ${snr} dB (Sangat Baik)`;
+      } else if (snr > 15) {
+        snrBadge.className = "text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded";
+        snrBadge.innerText = `SNR: ${snr} dB (Sedang)`;
+      } else {
+        snrBadge.className = "text-xs font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded";
+        snrBadge.innerText = `SNR: ${snr} dB (Buruk/Interferensi)`;
+      }
+
+      sim2Data = { channel: ch, noise: noiseType, snr, throughput };
+      document.getElementById('sim2-out').innerText = `SNR: ${snr} dB | Est. Throughput: ${throughput} Mbps`;
+
+      // Draw Spectrum
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width; const h = canvas.height;
+
+      // Draw Channels 1-13 Base
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(20, h - 20); ctx.lineTo(w - 20, h - 20); ctx.stroke();
+
+      const chWidth = (w - 40) / 13;
+
+      // Draw Noise AP Spectrum if active
+      if (noiseType === 'ap_ch1' || noiseType === 'ap_ch6') {
+        const noiseCh = noiseType === 'ap_ch1' ? 1 : 6;
+        const cx = 20 + (noiseCh - 0.5) * chWidth;
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.3)';
+        ctx.beginPath(); ctx.ellipse(cx, h - 20, chWidth * 2, 40, 0, Math.PI, 0); ctx.fill();
+      }
+
+      // Main Channel Spectrum (Indigo)
+      const mainCx = 20 + (ch - 0.5) * chWidth;
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(mainCx, h - 20, chWidth * 2.2, 55, 0, Math.PI, 0); ctx.fill(); ctx.stroke();
+
+      // Axis ticks
+      ctx.fillStyle = '#94a3b8'; ctx.font = '9px Inter';
+      for (let i = 1; i <= 13; i++) {
+        ctx.fillText(`${i}`, 20 + (i - 0.5) * chWidth - 3, h - 5);
+      }
+    }
+
+    // Canvas Render Engine 3: Propagation & Bandwidth Sandbox
+    function runSim3() {
+      const canvas = document.getElementById('canvas-sim3');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const freq = document.getElementById('sim3-freq').value;
+      const jarak = parseInt(document.getElementById('sim3-jarak').value);
+      document.getElementById('sim3-jarak-val').innerText = `${jarak} m`;
+
+      let maxSpeed = freq === '5' ? 866 : 144;
+      let lossFactor = freq === '5' ? 0.045 : 0.018;
+
+      let rssi = Math.round(-35 - (20 * Math.log10(jarak) + lossFactor * jarak * 10));
+      let currentSpeed = Math.max(0, Math.round(maxSpeed * Math.pow(10, (rssi + 40) / 40)));
+      if (rssi < -82) currentSpeed = 0;
+
+      sim3Data = { freq, jarak, rssi, speed: currentSpeed };
+      document.getElementById('sim3-out').innerText = `Speed: ${currentSpeed} Mbps | RSSI: ${rssi} dBm`;
+
+      // Render Top-down Sandbox
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width; const h = canvas.height;
+
+      // AP Icon at left
+      ctx.fillStyle = '#6366f1'; ctx.beginPath(); ctx.arc(40, h / 2, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.font = '10px FontAwesome'; ctx.fillText('\uf1eb', 34, h / 2 + 3);
+
+      // Distance Map Line
+      const clientX = 40 + (jarak / 60) * (w - 80);
+      ctx.strokeStyle = '#475569'; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(40, h / 2); ctx.lineTo(clientX, h / 2); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Signal Waves Radius
+      ctx.strokeStyle = freq === '5' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(245, 158, 11, 0.4)';
+      const waveRadius = freq === '5' ? 80 : 160;
+      ctx.beginPath(); ctx.arc(40, h / 2, waveRadius, 0, Math.PI * 2); ctx.stroke();
+
+      // Client Laptop Icon
+      ctx.fillStyle = currentSpeed > 0 ? '#10b981' : '#f43f5e';
+      ctx.beginPath(); ctx.arc(clientX, h / 2, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.font = '10px Inter'; ctx.fillText('Klien', clientX - 12, h / 2 + 22);
+    }
+
+    // Canvas Render Engine 4: Interactive AP Planner
+    function runSim4() {
+      const canvas = document.getElementById('canvas-sim4');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const mode = document.getElementById('sim4-mode').value;
+      const power = parseInt(document.getElementById('sim4-power').value);
+
+      const w = canvas.width; const h = canvas.height;
+      const apX = apSim4Pos.x * w;
+      const apY = apSim4Pos.y * h;
+
+      // Coverage Calculation
+      let radius = (power / 20) * (mode === '5only' ? 80 : 140);
+      let blankSpotPercent = Math.max(5, Math.round(100 - (radius / w) * 180));
+
+      sim4Data = { mode, power, blankSpotPercent, apX: apSim4Pos.x, apY: apSim4Pos.y };
+      document.getElementById('sim4-out').innerText = `Blank Spot: ${blankSpotPercent}% | Sinyal Efektif Radius: ${Math.round(radius)}px`;
+      
+      const covBadge = document.getElementById('sim4-coverage-badge');
+      covBadge.innerText = `Cakupan: ${100 - blankSpotPercent}%`;
+      covBadge.className = (100 - blankSpotPercent) > 75 ? "text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded" : "text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded";
+
+      // Draw Floorplan Blueprint
+      ctx.clearRect(0, 0, w, h);
+
+      // Heatmap Gradient Radius
+      const grad = ctx.createRadialGradient(apX, apY, 5, apX, apY, radius);
+      grad.addColorStop(0, mode === '5only' ? 'rgba(6, 182, 212, 0.6)' : 'rgba(16, 185, 129, 0.6)');
+      grad.addColorStop(0.6, 'rgba(245, 158, 11, 0.3)');
+      grad.addColorStop(1, 'rgba(244, 63, 94, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(apX, apY, radius, 0, Math.PI * 2); ctx.fill();
+
+      // Building Layout Walls
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+      ctx.beginPath(); ctx.moveTo(w / 2, 10); ctx.lineTo(w / 2, h - 20); ctx.stroke(); // Divider Wall
+
+      // Labels Room
+      ctx.fillStyle = '#64748b'; ctx.font = '10px Inter';
+      ctx.fillText('Ruang Kelas A', 20, 25);
+      ctx.fillText('Ruang Kelas B (Sekat)', w / 2 + 10, 25);
+
+      // AP Drag Icon
+      ctx.fillStyle = '#4f46e5'; ctx.beginPath(); ctx.arc(apX, apY, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.font = '9px Inter'; ctx.fillText('AP', apX - 6, apY + 3);
+    }
+
+    function handleCanvasSim4Click(e) {
+      const canvas = document.getElementById('canvas-sim4');
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / canvas.width;
+      const y = (e.clientY - rect.top) / canvas.height;
+      apSim4Pos = { x, y };
+      runSim4();
+    }
+
+    // Record Simulation Log to Table
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 1) {
+        logEntry = {
+          modul: "Simulasi 1: Daya Tembus",
+          param: `Mat: ${sim1Data.material}, Tebal: ${sim1Data.tebal}cm`,
+          hasil: `2.4GHz: ${sim1Data.rssi24}dBm | 5GHz: ${sim1Data.rssi5}dBm`,
+          status: sim1Data.rssi24 > sim1Data.rssi5 ? "2.4 GHz Lebih Penetrasi" : "Sinyal Terhalang"
+        };
+      } else if (simNum === 2) {
+        logEntry = {
+          modul: "Simulasi 2: Channel Overlap",
+          param: `Kanal Utama: ${sim2Data.channel}, Noise: ${sim2Data.noise}`,
+          hasil: `SNR: ${sim2Data.snr} dB, Speed: ${sim2Data.throughput} Mbps`,
+          status: sim2Data.snr > 20 ? "Kanal Optimal" : "Interferensi Tinggi"
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "Simulasi 3: Jangkauan Sandbox",
+          param: `Pita: ${sim3Data.freq} GHz, Jarak: ${sim3Data.jarak} m`,
+          hasil: `Speed: ${sim3Data.speed} Mbps, RSSI: ${sim3Data.rssi} dBm`,
+          status: sim3Data.speed > 100 ? "Koneksi Cepat" : "Sinyal Lemah"
+        };
+      } else if (simNum === 4) {
+        logEntry = {
+          modul: "Simulasi 4: AP Heatmap",
+          param: `Mode: ${sim4Data.mode}, TX Power: ${sim4Data.power} dBm`,
+          hasil: `Blank Spot: ${sim4Data.blankSpotPercent}%`,
+          status: sim4Data.blankSpotPercent < 20 ? "Cakupan Sangat Baik" : "Butuh Tambahan AP"
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-100 text-emerald-800";
+        if (row.status.includes("Terhalang") || row.status.includes("Interferensi") || row.status.includes("Lemah") || row.status.includes("Tambahan")) {
+          badgeColor = "bg-rose-100 text-rose-800";
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-800">${row.modul}</td>
+          <td class="px-4 py-3 font-mono text-slate-600">${row.param}</td>
+          <td class="px-4 py-3 font-mono font-bold text-indigo-600">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-500 hover:text-rose-700 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        alert("Belum ada data pengamatan untuk di-export!");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Uji,Hasil Pengukuran,Status Kinerja\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Pengamatan_Gelombang_Radio_LKPD5.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-3 p-2.5 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-indigo-600 focus:ring-indigo-500">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-800 mb-3 flex items-start gap-2">
+            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2 rounded"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        alert("Harap lengkapi Identitas Peserta Didik terlebih dahulu!");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      let unanswered = 0;
+
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          unanswered++;
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 5: Gelombang Radio & Frekuensi Nirkabel";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+      
+      let desc = "Sangat Baik! Anda menguasai konsep frekuensi nirkabel dan gelombang radio dengan sempurna.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali poin daya tembus frekuensi 2.4 GHz vs 5 GHz dan konsep kanal.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi eksperimen simulasi dan baca kembali teori frekuensi.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-500"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal otomatis via Fetch. (Offline / CORS)`;
+      }
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(res => {
+          console.log("Data terkirim via google.script.run:", res);
+        }).processForm(payload);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetForm() {
+      if (confirm("Apakah Anda yakin ingin meriset seluruh isian dan data praktikum LKPD ini?")) {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      runSim1();
+      runSim2();
+      runSim3();
+      runSim4();
+
+      window.addEventListener('resize', () => {
+        runSim1();
+        runSim2();
+        runSim3();
+        runSim4();
+      });
+    };
+  </script>
+</body>
+</html>
