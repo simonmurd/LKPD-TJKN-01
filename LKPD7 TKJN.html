@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 7: Perencanaan & Site Survey Jaringan Nirkabel (WLAN)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); }
+    .sim-display-box { background-color: #0f172a; border-radius: 0.75rem; position: relative; overflow: hidden; }
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-teal-700 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+          <i class="fa-solid fa-map-location-dot text-3xl text-amber-300"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-widest text-teal-200 uppercase">Lembar Kerja Peserta Didik Interaktif</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">LKPD 7: Perencanaan & Site Survey WLAN</h1>
+          <p class="text-xs sm:text-sm text-teal-100 mt-1">Eksperimen Predictive Heatmap, Channel Planning (CCI/SINR), Active Roaming Walktest, & Capacity Planning</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-teal-800/80 px-4 py-2 rounded-xl text-sm border border-teal-500/30">
+        <i class="fa-solid fa-graduation-cap text-amber-300"></i>
+        <span class="font-medium" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-7 h-7 bg-amber-100 text-amber-700 rounded-lg text-sm font-bold">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-800 rounded-r-lg text-sm flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+        <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk membuka modul laboratorium dan uji kompetensi.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori Professional Site Survey & Channel Planning -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-teal-100 text-teal-700 rounded-lg text-sm font-bold">2</span>
+            Ringkasan Teori Professional: WLAN Site Survey & Capacity Planning
+          </h2>
+          <span class="text-xs bg-teal-50 text-teal-700 font-semibold px-3 py-1 rounded-full">RF Engineering & Survey Standard</span>
+        </div>
+
+        <!-- Metric & Benchmark Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          
+          <div class="card-hover bg-slate-50 border-t-4 border-teal-600 rounded-xl p-4 border border-slate-200">
+            <h3 class="font-bold text-teal-900 text-sm mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-gauge-high text-teal-600"></i> Metrik Kualitas Sinyal (RSSI & SNR)
+            </h3>
+            <ul class="text-xs text-slate-600 space-y-1.5">
+              <li><b>Sangat Baik (&ge; -65 dBm):</b> Ideal untuk Voice/Video Streaming.</li>
+              <li><b>Baik (-66 s.d. -72 dBm):</b> Layak untuk Web Browsing & Email.</li>
+              <li><b>Batas Minimum (-75 dBm):</b> Amandemen handoff/roaming klien.</li>
+              <li><b>SNR Ideal (&ge; 25 dB):</b> Sinyal jauh di atas noise floor (-95 dBm).</li>
+            </ul>
+          </div>
+
+          <div class="card-hover bg-slate-50 border-t-4 border-amber-500 rounded-xl p-4 border border-slate-200">
+            <h3 class="font-bold text-amber-900 text-sm mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-cube text-amber-600"></i> Benchmark Redaman Material Bangunan
+            </h3>
+            <ul class="text-xs text-slate-600 space-y-1.5">
+              <li><b>Kaca & Partition:</b> Redaman ringan (~1–3 dB).</li>
+              <li><b>Dinding Gypsum:</b> Redaman sedang (~3–5 dB).</li>
+              <li><b>Dinding Bata / Hebel:</b> Redaman tinggi (~6–10 dB).</li>
+              <li><b>Beton & Logam:</b> Redaman ekstrem (~15–25+ dB, Deadzone).</li>
+            </ul>
+          </div>
+
+          <div class="card-hover bg-slate-50 border-t-4 border-indigo-600 rounded-xl p-4 border border-slate-200">
+            <h3 class="font-bold text-indigo-900 text-sm mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-indigo-600"></i> Metodologi Site Survey WLAN
+            </h3>
+            <ul class="text-xs text-slate-600 space-y-1.5">
+              <li><b>Predictive Survey:</b> Simulasi perangkat lunak (CAD & Attenuation Model).</li>
+              <li><b>Passive Survey:</b> Scanning beacon RF tanpa terhubung ke AP.</li>
+              <li><b>Active Survey & Walktest:</b> Pengujian throughput (iPerf), latency, & roaming.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Table Attenuation Comparison -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+          <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-table text-teal-600"></i> Tabel Redaman Material terhadap Frekuensi 2.4 GHz vs 5 GHz
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-200 text-slate-700 uppercase text-[11px]">
+                  <th class="p-2 border border-slate-300">Jenis Material</th>
+                  <th class="p-2 border border-slate-300">Tebal Tipikal</th>
+                  <th class="p-2 border border-slate-300">Redaman 2.4 GHz (dB)</th>
+                  <th class="p-2 border border-slate-300">Redaman 5 GHz (dB)</th>
+                  <th class="p-2 border border-slate-300">Dampak pada Coverage Heatmap</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 bg-white">
+                <tr>
+                  <td class="p-2 border border-slate-200 font-semibold">Dinding Gypsum Double</td>
+                  <td class="p-2 border border-slate-200">10 cm</td>
+                  <td class="p-2 border border-slate-200 font-mono text-emerald-700">3.5 dB</td>
+                  <td class="p-2 border border-slate-200 font-mono text-amber-700">5.5 dB</td>
+                  <td class="p-2 border border-slate-200">Penetrasi sinyal sangat baik.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border border-slate-200 font-semibold">Dinding Bata Merah</td>
+                  <td class="p-2 border border-slate-200">15 cm</td>
+                  <td class="p-2 border border-slate-200 font-mono text-amber-700">7.0 dB</td>
+                  <td class="p-2 border border-slate-200 font-mono text-rose-700">12.0 dB</td>
+                  <td class="p-2 border border-slate-200">Terjadi penurunan RSSI signifikan di frekuensi 5 GHz.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border border-slate-200 font-semibold">Beton Bertulang (Reinforced)</td>
+                  <td class="p-2 border border-slate-200">20 cm</td>
+                  <td class="p-2 border border-slate-200 font-mono text-rose-700">18.0 dB</td>
+                  <td class="p-2 border border-slate-200 font-mono text-rose-800 font-bold">28.0 dB</td>
+                  <td class="p-2 border border-slate-200">Memicu munculnya Blank Spot / Deadzone secara total.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif Site Survey -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-teal-100 text-teal-700 rounded-lg text-sm font-bold">3</span>
+            Laboratorium Simulasi Site Survey & Perencanaan WLAN
+          </h2>
+          <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-3 py-1 rounded-full">4 Modul Eksperimen UI Interaktif</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: Predictive Heatmap Simulator -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-wifi text-teal-600"></i> Simulasi 1: Predictive Heatmap & Wall Attenuation
+                </h3>
+                <span id="sim1-badge" class="text-xs font-mono font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">Heatmap Simulation</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Klik area di bawah untuk memindahkan Access Point (AP). Amati redaman sinyal menembus dinding sekat.</p>
+
+              <!-- UI Display Container replaces Canvas -->
+              <div id="display-sim1" class="sim-display-box w-full h-44 mb-3 p-3 border border-slate-700 cursor-pointer select-none" onclick="handleSim1Click(event)">
+                <!-- Signal Heat Aura -->
+                <div id="sim1-aura" class="absolute rounded-full pointer-events-none transition-all duration-300" style="transform: translate(-50%, -50%); opacity: 0.4;"></div>
+                
+                <!-- Dinding Sekat -->
+                <div id="sim1-wall-elem" class="absolute top-2 bottom-2 w-3 bg-amber-600 rounded flex items-center justify-center text-[9px] font-bold text-white uppercase tracking-tighter z-10" style="left: 55%;">
+                  <span class="rotate-90">BATA</span>
+                </div>
+
+                <!-- Shadow Zone (Behind Wall) -->
+                <div id="sim1-shadow" class="absolute top-2 bottom-2 bg-slate-950 pointer-events-none z-0 transition-opacity duration-300" style="left: 55.5%; right: 10px; opacity: 0.5;"></div>
+
+                <!-- AP Icon -->
+                <div id="sim1-ap" class="absolute w-7 h-7 rounded-full bg-teal-500 border-2 border-white text-white text-[10px] font-extrabold flex items-center justify-center shadow-lg transition-all duration-300 z-20" style="left: 25%; top: 50%; transform: translate(-50%, -50%);">
+                  AP
+                </div>
+
+                <!-- Klien Point -->
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-20">
+                  <div class="w-6 h-6 rounded-full bg-rose-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center shadow-md animate-pulse">
+                    <i class="fa-solid fa-laptop text-[10px]"></i>
+                  </div>
+                  <span class="text-[9px] text-slate-300 font-semibold bg-slate-800/80 px-1.5 py-0.5 rounded">KLIEN</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Pita Frekuensi</label>
+                  <select id="sim1-band" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim1()">
+                    <option value="2.4">2.4 GHz (Jangkauan Luas)</option>
+                    <option value="5">5 GHz (High Bandwidth)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Bahan Dinding</label>
+                  <select id="sim1-wall" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim1()">
+                    <option value="gypsum">Gypsum Partition</option>
+                    <option value="bata" selected>Dinding Bata</option>
+                    <option value="beton">Beton Bertulang</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Daya Pemancar AP</label>
+                  <select id="sim1-txpower" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim1()">
+                    <option value="20">High (20 dBm)</option>
+                    <option value="14">Medium (14 dBm)</option>
+                    <option value="8">Low (8 dBm)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Hasil Sinyal Titik Klien (Ujung Ruang):</span>
+                <span id="sim1-out" class="font-bold text-slate-800">RSSI: -68 dBm | Loss Dinding: -10 dB | Status: BAIK</span>
+              </div>
+              <button onclick="catatSimulasi(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: CCI & Channel Planner -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-diagram-project text-amber-600"></i> Simulasi 2: Channel Planner & Interfensi (CCI/SINR)
+                </h3>
+                <span id="sim2-badge" class="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Channel Planning</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Atur alokasi kanal AP 1 & AP 2 untuk menganalisis efek Co-Channel Interference (CCI) dan SINR.</p>
+
+              <!-- UI Display Container replaces Canvas -->
+              <div id="display-sim2" class="sim-display-box w-full h-44 mb-3 p-3 border border-slate-700 flex items-center justify-center relative">
+                <!-- AP 1 Visual Card -->
+                <div id="sim2-ap1-box" class="absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 transition-all duration-500 z-10" style="left: 28%;">
+                  <div id="sim2-ap1-aura" class="absolute w-36 h-36 rounded-full bg-teal-500/20 border border-teal-500/40 pointer-events-none -z-10 animate-pulse"></div>
+                  <div class="w-8 h-8 rounded-full bg-teal-600 border-2 border-white text-white text-[10px] font-bold flex items-center justify-center shadow-lg">
+                    AP 1
+                  </div>
+                  <span id="sim2-ch1-label" class="text-[10px] font-bold text-teal-300 bg-slate-800/90 px-2 py-0.5 rounded border border-teal-500/30">Ch 1</span>
+                </div>
+
+                <!-- Interference Wave Area in Middle -->
+                <div id="sim2-interf-area" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 flex items-center justify-center">
+                  <div class="w-28 h-28 rounded-full bg-rose-500/30 border border-rose-500/60 animate-ping"></div>
+                </div>
+
+                <!-- AP 2 Visual Card -->
+                <div id="sim2-ap2-box" class="absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 transition-all duration-500 z-10" style="right: 28%;">
+                  <div id="sim2-ap2-aura" class="absolute w-36 h-36 rounded-full bg-amber-500/20 border border-amber-500/40 pointer-events-none -z-10 animate-pulse"></div>
+                  <div id="sim2-ap2-node" class="w-8 h-8 rounded-full bg-amber-600 border-2 border-white text-white text-[10px] font-bold flex items-center justify-center shadow-lg">
+                    AP 2
+                  </div>
+                  <span id="sim2-ch2-label" class="text-[10px] font-bold text-amber-300 bg-slate-800/90 px-2 py-0.5 rounded border border-amber-500/30">Ch 6</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Kanal AP 1</label>
+                  <select id="sim2-ch1" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim2()">
+                    <option value="1">Kanal 1</option>
+                    <option value="6">Kanal 6</option>
+                    <option value="11">Kanal 11</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Kanal AP 2</label>
+                  <select id="sim2-ch2" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim2()">
+                    <option value="1">Kanal 1</option>
+                    <option value="6" selected>Kanal 6</option>
+                    <option value="11">Kanal 11</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Jarak Antar-AP</label>
+                  <select id="sim2-dist" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim2()">
+                    <option value="close">Sangat Dekat (High Overlap)</option>
+                    <option value="medium" selected>Ideal Distance</option>
+                    <option value="far">Jauh (Low Overlap)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Analisis Interferensi & SINR:</span>
+                <span id="sim2-out" class="font-bold text-slate-800">Status: Non-Overlapping | SINR: 28 dB | Penalti Airtime: 0%</span>
+              </div>
+              <button onclick="catatSimulasi(2)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: Active Survey Walktest & Roaming Handoff -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-person-walking-luggage text-indigo-600"></i> Simulasi 3: Active Survey Walktest & Roaming
+                </h3>
+                <span id="sim3-badge" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Walktest Simulation</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Simulasi pergerakan walktest klien dari sel AP-A ke AP-B untuk menguji ambang batas handoff.</p>
+
+              <!-- UI Display Container replaces Canvas -->
+              <div id="display-sim3" class="sim-display-box w-full h-44 mb-3 p-3 border border-slate-700 relative flex items-center">
+                <!-- Track Line -->
+                <div class="absolute left-10 right-10 h-1 bg-slate-700 rounded border-t border-dashed border-slate-500"></div>
+
+                <!-- AP-A Node -->
+                <div class="absolute left-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-10">
+                  <div class="w-8 h-8 rounded-full bg-teal-600 border-2 border-white text-white text-[10px] font-bold flex items-center justify-center shadow-lg">
+                    AP-A
+                  </div>
+                  <span class="text-[9px] text-teal-300 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-teal-500/30">Rssi Peak</span>
+                </div>
+
+                <!-- AP-B Node -->
+                <div class="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-10">
+                  <div class="w-8 h-8 rounded-full bg-indigo-600 border-2 border-white text-white text-[10px] font-bold flex items-center justify-center shadow-lg">
+                    AP-B
+                  </div>
+                  <span class="text-[9px] text-indigo-300 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-indigo-500/30">Target Sel</span>
+                </div>
+
+                <!-- Active Moving Client Dot -->
+                <div id="sim3-client-node" class="absolute top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-20 transition-all duration-75" style="left: 15%;">
+                  <div id="sim3-client-badge" class="w-7 h-7 rounded-full bg-teal-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center shadow-xl">
+                    <i class="fa-solid fa-person-walking text-xs"></i>
+                  </div>
+                  <span id="sim3-client-rssi" class="text-[9px] font-bold text-white bg-slate-900/90 px-1.5 py-0.5 rounded border border-slate-600 whitespace-nowrap">-50 dBm</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Ambang Roaming</label>
+                  <select id="sim3-threshold" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim3()">
+                    <option value="-68">-68 dBm (Agresif)</option>
+                    <option value="-75" selected>-75 dBm (Standar)</option>
+                    <option value="-82">-82 dBm (Sticky Client)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Kecepatan Jalan</label>
+                  <select id="sim3-speed" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim3()">
+                    <option value="1">Lambat (Normal Walk)</option>
+                    <option value="2.5">Cepat (Fast Walk)</option>
+                  </select>
+                </div>
+                <div class="flex items-end">
+                  <button onclick="toggleWalktest()" id="btn-toggle-walk" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2 rounded-lg transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-play"></i> Start Walktest
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Status Terhubung & Handoff:</span>
+                <span id="sim3-out" class="font-bold text-slate-800">AP Aktif: AP-A | RSSI: -60 dBm | Event: In Range</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: Capacity Calculator & High-Density Planner -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-users text-rose-500"></i> Simulasi 4: Capacity Calculator & High-Density
+                </h3>
+                <span id="sim4-badge" class="text-xs font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">High Density</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Hitung beban airtime utilization dan kebutuhan jumlah AP berdasarkan kepadatan pengguna.</p>
+
+              <!-- UI Display Container replaces Canvas -->
+              <div id="display-sim4" class="sim-display-box w-full h-44 mb-3 p-4 border border-slate-700 flex flex-col justify-between">
+                <!-- Airtime Utilization Progress Bar -->
+                <div>
+                  <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                    <span>Beban Airtime Utilization</span>
+                    <span id="sim4-airtime-text" class="text-emerald-400 font-bold">45%</span>
+                  </div>
+                  <div class="w-full h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700 p-0.5">
+                    <div id="sim4-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 45%;"></div>
+                  </div>
+                </div>
+
+                <!-- Dynamic User Density Visual Grid -->
+                <div>
+                  <span class="block text-[10px] text-slate-400 mb-1">Kepadatan Pengguna Aktif (Visual Grid):</span>
+                  <div id="sim4-grid" class="grid grid-cols-10 sm:grid-cols-12 gap-1.5 max-h-16 overflow-hidden">
+                    <!-- Dynamic user icons generated by JS -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <label class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                    <span>Jumlah Klien</span>
+                    <span id="sim4-users-val" class="text-teal-600 font-bold">50 User</span>
+                  </label>
+                  <input type="range" class="w-full accent-teal-600 cursor-pointer mt-1" id="sim4-users" min="10" max="200" step="10" value="50" oninput="runSim4()">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Profil Traffic</label>
+                  <select id="sim4-traffic" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim4()">
+                    <option value="web">Web & Email (0.5 Mbps)</option>
+                    <option value="streaming" selected>Video HD Stream (3 Mbps)</option>
+                    <option value="heavy">Heavy Transfer (10 Mbps)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Generasi Wi-Fi</label>
+                  <select id="sim4-tech" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" onchange="runSim4()">
+                    <option value="wifi5">Wi-Fi 5 (802.11ac)</option>
+                    <option value="wifi6" selected>Wi-Fi 6 (802.11ax)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Analisis Kapasitas Sinyal:</span>
+                <span id="sim4-out" class="font-bold text-slate-800">Total Bandwidth: 150 Mbps | Airtime: 45% | Rec. AP: 2 Unit</span>
+              </div>
+              <button onclick="catatSimulasi(4)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-teal-100 text-teal-700 rounded-lg text-sm font-bold">4</span>
+              Tabel Pengamatan Praktikum Perencanaan & Site Survey WLAN
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan log eksperimen yang direkap secara otomatis dari modul simulasi interaktif.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-600" id="tbl-pengamatan">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Perencanaan & Survey</th>
+                <th class="px-4 py-3">Hasil Pengukuran / Kalkulasi</th>
+                <th class="px-4 py-3">Status / Rekomendasi Design</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-200 bg-white">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-teal-100 text-teal-700 rounded-lg text-sm font-bold">5</span>
+              Uji Kompetensi Perencanaan & Site Survey WLAN
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut untuk menguji pemahaman teori dan praktikum Anda.</p>
+          </div>
+          <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">20 Soal Pilihan Ganda</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Penyelesaian:</p>
+          <p>Pastikan semua soal uji kompetensi dan tabel pengamatan telah terisi lengkap sebelum menyelesaikan LKPD.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">LKPD 7 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nilai Akhir Uji Kompetensi</p>
+          <div class="text-5xl font-black text-teal-600 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil dikirim ke server guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-900 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-600 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
+
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
+
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selKelas.appendChild(opt);
+        });
+      } else {
+        selKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selNama = document.getElementById('sel-nama');
+
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selNama.appendChild(opt);
+        });
+      } else {
+        selNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
+        }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Bank Soal Uji Kompetensi LKPD 7: Site Survey & Channel Planning WLAN
+    const questionBank = [
+      { id: 1, q: "Metode site survey yang menggunakan perangkat lunak untuk mensimulasikan propagasi RF berdasarkan cetak biru (CAD/floorplan) dan redaman material tanpa berada di lokasi secara langsung disebut...", options: ["A. Active Walktest Survey", "B. Passive RF Survey", "C. Predictive Site Survey", "D. Post-deployment Survey", "E. Spectrum Analysis Survey"], ans: "C" },
+      { id: 2, q: "Nilai RSSI (Received Signal Strength Indicator) minimum yang umumnya menjadi standar industri untuk mendukung layanan Voice over Wi-Fi (VoWiFi) dan video streaming berkualitas tinggi adalah...", options: ["A. -30 dBm", "B. -67 dBm", "C. -85 dBm", "D. -95 dBm", "E. -105 dBm"], ans: "B" },
+      { id: 3, q: "Fenomena ketika dua Access Point yang berdekatan menggunakan kanal frekuensi yang sama persis sehingga menyebabkan perlambatan antrean data dinamakan...", options: ["A. Adjacent Channel Interference (ACI)", "B. Co-Channel Interference (CCI)", "C. Multipath Fading", "D. Thermal Noise Floor", "E. Signal Attenuation"], ans: "B" },
+      { id: 4, q: "Tiga kanal standar pada pita 2.4 GHz yang saling tidak tumpang tindih (non-overlapping channels) di wilayah standar FCC/ETSI adalah...", options: ["A. Kanal 1, 2, dan 3", "B. Kanal 1, 6, dan 11", "C. Kanal 3, 7, dan 12", "D. Kanal 6, 9, dan 14", "E. Kanal 2, 8, dan 13"], ans: "B" },
+      { id: 5, q: "Material bangunan manakah di bawah ini yang menghasilkan tingkat redaman (attenuation) paling besar terhadap sinyal radio nirkabel?", options: ["A. Kaca jendela polos", "B. Pintu kayu tipis", "C. Sekat Gypsum", "D. Beton Bertulang dan Cermin Logam", "E. Triplex kayu"], ans: "D" },
+      { id: 6, q: "Apa dampak utama dari pengaturan Transmit Power (TX Power) AP secara maksimum pada seluruh AP dalam gedung bertingkat?", options: ["A. Menghilangkan seluruh interferensi", "B. Menyebabkan Co-Channel Interference (CCI) dan masalah 'Sticky Client'", "C. Mempercepat koneksi internet hingga 10x lipat", "D. Mencegah jaringan Wi-Fi dibobol oleh hacker", "E. Menghemat konsumsi listrik AP"], ans: "B" },
+      { id: 7, q: "Pengujian lapangan yang dilakukan dengan menghubungkan perangkat klien secara aktif ke AP dan melakukan pengukuran throughput menggunakan iPerf dinamakan...", options: ["A. Passive Survey", "B. Predictive Survey", "C. Active Survey", "D. Spectrum Analysis", "E. Desain CAD"], ans: "C" },
+      { id: 8, q: "Nilai SNR (Signal-to-Noise Ratio) dihitung dari rumus...", options: ["A. RSSI dikurangi Noise Floor", "B. RSSI ditambah Transmit Power", "C. Noise Floor dibagi Frekuensi", "D. Throughput dikali Latency", "E. Kanal AP dikurangi Jumlah User"], ans: "A" },
+      { id: 9, q: "Jika RSSI yang diterima klien adalah -65 dBm dan Noise Floor lingkungan berada pada -92 dBm, berapakah nilai SNR-nya?", options: ["A. 27 dB", "B. -157 dB", "C. 157 dB", "D. -27 dB", "E. 57 dB"], ans: "A" },
+      { id: 10, q: "Istilah 'Sticky Client' dalam skenario roaming jaringan nirkabel merujuk pada kondisi di mana...", options: ["A. Perangkat klien terus berpindah AP setiap 1 detik", "B. Perangkat klien tetap bertahan pada AP lama yang sinyalnya sudah sangat lemah meskipun ada AP baru yang lebih dekat", "C. Perangkat klien terputus dari Wi-Fi dan tidak bisa terkoneksi lagi", "D. Klien mengonsumsi seluruh bandwidth jaringan", "E. Klien terhubung menggunakan kabel UTP"], ans: "B" },
+      { id: 11, q: "Fitur IEEE 802.11r yang berfungsi mempercepat proses autentikasi ulang saat klien melakukan roaming antar-AP dinamakan...", options: ["A. Fast BSS Transition (FT)", "B. Target Wake Time (TWT)", "C. Channel Bonding", "D. Band Steering", "E. Dynamic Frequency Selection (DFS)"], ans: "A" },
+      { id: 12, q: "Mengapa frekuensi 5 GHz lebih direkomendasikan untuk area High-Density (seperti aula atau stadion) dibanding 2.4 GHz?", options: ["A. Karena 5 GHz memiliki jangkauan 5 km", "B. Karena 5 GHz memiliki lebih banyak kanal non-overlapping dan spektrum yang lebih bersih", "C. Karena 5 GHz dapat menembus tembok tebal dengan sangat mudah", "D. Karena 5 GHz tidak membutuhkan Access Point", "E. Karena perangkat lama hanya bisa menangkap 5 GHz"], ans: "B" },
+      { id: 13, q: "Tujuan utama dari pembuatan visualisasi Heatmap dalam laporan Site Survey adalah...", options: ["A. Mengetahui suhu panas fisik router", "B. Menggambarkan sebaran tingkat kekuatan sinyal (RSSI) di seluruh area lokasi", "C. Menentukan kecepatan ISP bulanan", "D. Menghitung tagihan listrik Access Point", "E. Menghapus virus dari laptop klien"], ans: "B" },
+      { id: 14, q: "Rasio penggunaan waktu udara oleh paket data di dalam sebuah kanal nirkabel disebut...", options: ["A. Bandwidth Allocation", "B. Airtime Utilization", "C. Latency Jitter", "D. Packet Dropping", "E. Modulation Rate"], ans: "B" },
+      { id: 15, q: "Teknologi pada Wi-Fi 6 (802.11ax) yang memberikan 'warna' khusus pada header frame untuk mengabaikan interferensi dari BSS tetangga yang lemah dinamakan...", options: ["A. Spatial Reuse / BSS Coloring", "B. Beamforming", "C. Channel Bonding", "D. Orthogonal Frequency", "E. Frame Aggregation"], ans: "A" },
+      { id: 16, q: "Pada survey pasif (Passive Survey), informasi yang ditangkap oleh adapter laptop/survey tool adalah...", options: ["A. Mengirim file 1 GB ke server", "B. Mendengarkan Beacon Frame & Probe Response dari SSID terdekat", "C. Mengubah konfigurasi IP Address AP", "D. Mengukur kecepatan download riil ISP", "E. Melakukan reboot pada Access Point"], ans: "B" },
+      { id: 17, q: "Parameter SINR (Signal to Interference plus Noise Ratio) mengukur...", options: ["A. Kebisingan listrik AC", "B. Perbandingan kekuatan sinyal utama terhadap gabungan kebisingan latar dan interferensi AP lain", "C. Kecepatan kipas pendingin AP", "D. Panjang kabel LAN ke Switch", "E. Jumlah SSID yang tersembunyi"], ans: "B" },
+      { id: 18, q: "Untuk menghindari masalah Adjacent Channel Interference (ACI) pada 2.4 GHz, alokasi kanal yang HARUS DIHINDARI saat ada AP di Kanal 1 adalah...", options: ["A. Kanal 6", "B. Kanal 11", "C. Kanal 2 atau Kanal 3", "D. Kanal 1 (dengan jarak 50 meter)", "E. Mematikan 2.4 GHz"], ans: "C" },
+      { id: 19, q: "Dalam perencanaan ketersediaan kapasitas (Capacity Planning), faktor utama yang dihitung selain luas area coverage adalah...", options: ["A. Warna cat dinding", "B. Jumlah perangkat klien bersamaan dan kebutuhan bandwidth per aplikasi", "C. Merk saklar listrik", "D. Jenis OS pada server DNS", "E. Luas halaman parkir"], ans: "B" },
+      { id: 20, q: "Fitur 'Band Steering' pada controller WLAN enterprise berfungsi untuk...", options: ["A. Memaksa semua klien menggunakan frekuensi 2.4 GHz", "B. Mendorong perangkat klien dual-band agar terhubung ke pita 5 GHz / 6 GHz yang lebih efisien", "C. Mengunci IP Address klien secara permanen", "D. Mematikan sinyal Wi-Fi pada jam malam", "E. Membagi password Wi-Fi secara gratis"], ans: "B" }
+    ];
+
+    // Simulation State
+    let sim1Data = {};
+    let sim2Data = {};
+    let sim3Data = {};
+    let sim4Data = {};
+    let apSim1Pos = { x: 25, y: 50 }; // in percent
+    let walktestInterval = null;
+    let walktestPosX = 15; // in percent
+
+    // Simulation 1: Interactive Heatmap UI Engine
+    function runSim1() {
+      const band = document.getElementById('sim1-band').value;
+      const wall = document.getElementById('sim1-wall').value;
+      const txPower = parseInt(document.getElementById('sim1-txpower').value);
+
+      const apElem = document.getElementById('sim1-ap');
+      const auraElem = document.getElementById('sim1-aura');
+      const wallElem = document.getElementById('sim1-wall-elem');
+      const shadowElem = document.getElementById('sim1-shadow');
+
+      // Update AP Position
+      apElem.style.left = `${apSim1Pos.x}%`;
+      apElem.style.top = `${apSim1Pos.y}%`;
+
+      auraElem.style.left = `${apSim1Pos.x}%`;
+      auraElem.style.top = `${apSim1Pos.y}%`;
+
+      // Loss Wall calculation
+      let wallLoss = 4;
+      let wallColor = "bg-sky-600";
+      let wallText = "GYPSUM";
+
+      if (wall === 'bata') { wallLoss = 10; wallColor = "bg-amber-600"; wallText = "BATA"; }
+      if (wall === 'beton') { wallLoss = 22; wallColor = "bg-slate-600"; wallText = "BETON"; }
+      if (band === '5') wallLoss = Math.round(wallLoss * 1.5);
+
+      wallElem.className = `absolute top-2 bottom-2 w-3 ${wallColor} rounded flex items-center justify-center text-[9px] font-bold text-white uppercase tracking-tighter z-10`;
+      wallElem.innerHTML = `<span class="rotate-90">${wallText}</span>`;
+
+      // Aura size & color based on TX power & band
+      const baseRadius = (txPower / 20) * (band === '2.4' ? 240 : 170);
+      auraElem.style.width = `${baseRadius}px`;
+      auraElem.style.height = `${baseRadius}px`;
+      
+      if (band === '5') {
+        auraElem.style.background = 'radial-gradient(circle, rgba(6,182,212,0.8) 0%, rgba(16,185,129,0.3) 50%, rgba(15,23,42,0) 100%)';
+      } else {
+        auraElem.style.background = 'radial-gradient(circle, rgba(245,158,11,0.8) 0%, rgba(16,185,129,0.3) 50%, rgba(15,23,42,0) 100%)';
+      }
+
+      // Calculate RSSI
+      const isBehindWall = apSim1Pos.x < 55;
+      shadowElem.style.opacity = isBehindWall ? Math.min(0.85, wallLoss / 25) : 0.1;
+
+      const distX = 92 - apSim1Pos.x;
+      const distY = 50 - apSim1Pos.y;
+      const dist = Math.sqrt(distX * distX + distY * distY);
+
+      let rssi = Math.round(-38 - (dist * 0.7) * (band === '5' ? 1.3 : 1.0) - (isBehindWall ? wallLoss : 0) + (txPower - 14));
+      rssi = Math.max(-95, rssi);
+
+      let statusStr = "SANGAT BAIK";
+      if (rssi < -67) statusStr = "BAIK";
+      if (rssi < -75) statusStr = "CUKUP / ROAMING";
+      if (rssi < -85) statusStr = "POOR / DEADZONE";
+
+      sim1Data = { band, wall, txPower, rssi, wallLoss, statusStr };
+      document.getElementById('sim1-out').innerText = `RSSI: ${rssi} dBm | Loss Dinding: -${wallLoss} dB | Status: ${statusStr}`;
+    }
+
+    function handleSim1Click(e) {
+      const container = document.getElementById('display-sim1');
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      let pctX = Math.round((clickX / rect.width) * 100);
+      let pctY = Math.round((clickY / rect.height) * 100);
+
+      // Bound within playable indoor area
+      pctX = Math.max(8, Math.min(50, pctX));
+      pctY = Math.max(15, Math.min(85, pctY));
+
+      apSim1Pos.x = pctX;
+      apSim1Pos.y = pctY;
+      runSim1();
+    }
+
+    // Simulation 2: Interactive Channel Planner Engine
+    function runSim2() {
+      const ch1 = document.getElementById('sim2-ch1').value;
+      const ch2 = document.getElementById('sim2-ch2').value;
+      const dist = document.getElementById('sim2-dist').value;
+
+      const ap1Box = document.getElementById('sim2-ap1-box');
+      const ap2Box = document.getElementById('sim2-ap2-box');
+      const interfArea = document.getElementById('sim2-interf-area');
+
+      document.getElementById('sim2-ch1-label').innerText = `Ch ${ch1}`;
+      document.getElementById('sim2-ch2-label').innerText = `Ch ${ch2}`;
+
+      let posLeft = "28%";
+      let posRight = "28%";
+
+      if (dist === 'close') { posLeft = "38%"; posRight = "38%"; }
+      if (dist === 'far') { posLeft = "16%"; posRight = "16%"; }
+
+      ap1Box.style.left = posLeft;
+      ap2Box.style.right = posRight;
+
+      const isCCI = ch1 === ch2;
+      const isACI = Math.abs(parseInt(ch1) - parseInt(ch2)) < 5 && !isCCI;
+
+      let sinr = 30;
+      let penalty = 0;
+      if (isCCI) { sinr = dist === 'close' ? 10 : 18; penalty = dist === 'close' ? 50 : 25; }
+      if (isACI) { sinr = dist === 'close' ? 14 : 22; penalty = dist === 'close' ? 35 : 15; }
+
+      let statusText = "Non-Overlapping (Bersih)";
+      if (isCCI) statusText = "Co-Channel Interference (CCI)!";
+      if (isACI) statusText = "Adjacent Channel Interference (ACI)!";
+
+      if (isCCI || isACI) {
+        interfArea.style.opacity = dist === 'close' ? "1" : "0.5";
+      } else {
+        interfArea.style.opacity = "0";
+      }
+
+      sim2Data = { ch1, ch2, dist, sinr, penalty, statusText };
+      document.getElementById('sim2-out').innerText = `${statusText} | SINR: ${sinr} dB | Penalti Airtime: -${penalty}%`;
+    }
+
+    // Simulation 3: Interactive Walktest Engine
+    function toggleWalktest() {
+      const btn = document.getElementById('btn-toggle-walk');
+      if (walktestInterval) {
+        clearInterval(walktestInterval);
+        walktestInterval = null;
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Start Walktest';
+        btn.className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2 rounded-lg transition flex items-center justify-center gap-1";
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause Walktest';
+        btn.className = "w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs py-2 rounded-lg transition flex items-center justify-center gap-1";
+        walktestInterval = setInterval(() => {
+          const speed = parseFloat(document.getElementById('sim3-speed').value);
+          walktestPosX += 1.2 * speed;
+          if (walktestPosX > 85) walktestPosX = 15;
+          runSim3();
+        }, 80);
+      }
+    }
+
+    function runSim3() {
+      const threshold = parseInt(document.getElementById('sim3-threshold').value);
+      const clientNode = document.getElementById('sim3-client-node');
+      const clientBadge = document.getElementById('sim3-client-badge');
+      const rssiLabel = document.getElementById('sim3-client-rssi');
+
+      clientNode.style.left = `${walktestPosX}%`;
+
+      // Calculation relative to AP-A (left 15%) and AP-B (right 85%)
+      const distA = Math.abs(walktestPosX - 15);
+      const distB = Math.abs(walktestPosX - 85);
+
+      const rssiA = Math.round(-42 - (distA * 0.7));
+      const rssiB = Math.round(-42 - (distB * 0.7));
+
+      let activeAP = "AP-A";
+      let isHandoff = false;
+
+      if (rssiA < threshold && rssiB > rssiA) {
+        activeAP = "AP-B";
+        isHandoff = true;
+      } else if (distB < distA && rssiA < threshold) {
+        activeAP = "AP-B";
+      }
+
+      const activeRSSI = activeAP === "AP-A" ? rssiA : rssiB;
+      rssiLabel.innerText = `${activeRSSI} dBm (${activeAP})`;
+
+      if (activeAP === "AP-B") {
+        clientBadge.className = "w-7 h-7 rounded-full bg-indigo-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center shadow-xl animate-bounce";
+      } else {
+        clientBadge.className = "w-7 h-7 rounded-full bg-teal-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center shadow-xl";
+      }
+
+      sim3Data = { threshold, activeAP, activeRSSI, isHandoff };
+      document.getElementById('sim3-out').innerText = `AP Aktif: ${activeAP} | RSSI: ${activeRSSI} dBm | ${isHandoff ? 'HANDOFF ROAMING TRIGGERED!' : 'Normal Connection'}`;
+    }
+
+    // Simulation 4: Interactive Capacity Engine
+    function runSim4() {
+      const users = parseInt(document.getElementById('sim4-users').value);
+      document.getElementById('sim4-users-val').innerText = `${users} User`;
+
+      const profile = document.getElementById('sim4-traffic').value;
+      const tech = document.getElementById('sim4-tech').value;
+
+      let bwnPerUser = 0.5;
+      if (profile === 'streaming') bwnPerUser = 3.0;
+      if (profile === 'heavy') bwnPerUser = 10.0;
+
+      const totalBw = Math.round(users * bwnPerUser);
+      const capacityPerAP = tech === 'wifi6' ? 250 : 100;
+      const airtime = Math.min(100, Math.round((totalBw / capacityPerAP) * 100));
+      const recAP = Math.max(1, Math.ceil(totalBw / (capacityPerAP * 0.6)));
+
+      // Update Bar UI
+      const bar = document.getElementById('sim4-bar');
+      const textAirtime = document.getElementById('sim4-airtime-text');
+
+      bar.style.width = `${airtime}%`;
+      textAirtime.innerText = `${airtime}%`;
+
+      if (airtime > 80) {
+        bar.className = "h-full bg-rose-500 rounded-full transition-all duration-300";
+        textAirtime.className = "text-rose-400 font-bold";
+      } else if (airtime > 60) {
+        bar.className = "h-full bg-amber-500 rounded-full transition-all duration-300";
+        textAirtime.className = "text-amber-400 font-bold";
+      } else {
+        bar.className = "h-full bg-emerald-500 rounded-full transition-all duration-300";
+        textAirtime.className = "text-emerald-400 font-bold";
+      }
+
+      // Render Dynamic Grid Icons
+      const grid = document.getElementById('sim4-grid');
+      grid.innerHTML = '';
+      const visibleDots = Math.min(users, 36);
+
+      for (let i = 0; i < visibleDots; i++) {
+        const dot = document.createElement('div');
+        dot.className = `h-3 rounded-full flex items-center justify-center ${i < (visibleDots * (airtime / 100)) ? 'bg-teal-400 animate-pulse' : 'bg-slate-700'}`;
+        grid.appendChild(dot);
+      }
+
+      sim4Data = { users, profile, tech, totalBw, airtime, recAP };
+      document.getElementById('sim4-out').innerText = `Total BW: ${totalBw} Mbps | Airtime Util: ${airtime}% | Rec. AP: ${recAP} Unit`;
+    }
+
+    // Record Simulation Log to Table
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 1) {
+        logEntry = {
+          modul: "Simulasi 1: Predictive Heatmap",
+          param: `Band: ${sim1Data.band} GHz, Sekat: ${sim1Data.wall}, TX Power: ${sim1Data.txPower} dBm`,
+          hasil: `RSSI: ${sim1Data.rssi} dBm (Loss: -${sim1Data.wallLoss} dB)`,
+          status: sim1Data.statusStr
+        };
+      } else if (simNum === 2) {
+        logEntry = {
+          modul: "Simulasi 2: Channel Planner",
+          param: `AP1 Ch: ${sim2Data.ch1}, AP2 Ch: ${sim2Data.ch2}, Jarak: ${sim2Data.dist}`,
+          hasil: `SINR: ${sim2Data.sinr} dB, Penalti: -${sim2Data.penalty}%`,
+          status: sim2Data.statusText
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "Simulasi 3: Active Walktest",
+          param: `Amb. Roaming: ${sim3Data.threshold} dBm`,
+          hasil: `AP: ${sim3Data.activeAP}, RSSI: ${sim3Data.activeRSSI} dBm`,
+          status: sim3Data.isHandoff ? "Handoff Successful" : "Normal In-Range"
+        };
+      } else if (simNum === 4) {
+        logEntry = {
+          modul: "Simulasi 4: Capacity Planning",
+          param: `User: ${sim4Data.users}, Profile: ${sim4Data.profile}, Tech: ${sim4Data.tech.toUpperCase()}`,
+          hasil: `Total BW: ${sim4Data.totalBw} Mbps, Airtime: ${sim4Data.airtime}%`,
+          status: `Rekomendasi AP: ${sim4Data.recAP} Unit`
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+      showToast("Tercatat", "Hasil pengamatan berhasil ditambahkan ke tabel log.", "success");
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-100 text-emerald-800";
+        if (row.status.includes("Interference") || row.status.includes("DEADZONE") || row.status.includes("POOR")) {
+          badgeColor = "bg-rose-100 text-rose-800";
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-800">${row.modul}</td>
+          <td class="px-4 py-3 font-mono text-slate-600">${row.param}</td>
+          <td class="px-4 py-3 font-mono font-bold text-teal-600">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-500 hover:text-rose-700 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        showToast("Perhatian", "Belum ada data pengamatan untuk di-export!", "warning");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Perencanaan,Hasil Pengukuran,Status Design\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Site_Survey_WLAN_LKPD7.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil", "File CSV hasil pengamatan terunduh.", "success");
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-3 p-2.5 rounded-lg border border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50/30 cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-teal-600 focus:ring-teal-500">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-800 mb-3 flex items-start gap-2">
+            <span class="bg-teal-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2 rounded"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        showToast("Identitas Wajib", "Harap lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 7: Site Survey & Perencanaan WLAN";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai perencanaan site survey, mitigasi CCI, dan capacity planning WLAN.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali poin redaman material dan kanal non-overlapping.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi eksperimen simulasi site survey dan baca ringkasan teori.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-500"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal otomatis via Fetch (Offline).`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset LKPD", "Apakah Anda yakin ingin meriset seluruh isian dan data praktikum LKPD 7 ini?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir telah dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bg = "bg-slate-900 border-slate-700 text-white";
+      let icon = "fa-circle-info text-cyan-400";
+      if (type === 'success') { bg = "bg-slate-900 border-emerald-500/40 text-white"; icon = "fa-circle-check text-emerald-400"; }
+      if (type === 'warning') { bg = "bg-slate-900 border-amber-500/40 text-white"; icon = "fa-triangle-exclamation text-amber-400"; }
+
+      toast.className = `p-3.5 rounded-xl border shadow-xl flex items-start gap-3 text-xs min-w-[260px] max-w-xs transition transform translate-y-2 opacity-0 pointer-events-auto ${bg}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-bold mb-0.5">${title}</p>
+          <p class="text-slate-300 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('modal-confirm');
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const handleYes = () => { cleanup(); onConfirm(); };
+      const handleCancel = () => { cleanup(); };
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.removeEventListener('click', handleYes);
+        btnCancel.removeEventListener('click', handleCancel);
+      };
+
+      btnYes.addEventListener('click', handleYes);
+      btnCancel.addEventListener('click', handleCancel);
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      runSim1();
+      runSim2();
+      runSim3();
+      runSim4();
+    };
+  </script>
+</body>
+</html>

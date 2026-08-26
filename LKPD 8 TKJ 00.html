@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 8: Konfigurasi Access Point & Mode Operasi Wireless</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); }
+    .sim-display-box { background-color: #0f172a; border-radius: 0.75rem; position: relative; overflow: hidden; }
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-indigo-800 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+          <i class="fa-solid fa-wifi text-3xl text-amber-300"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-widest text-indigo-200 uppercase">Lembar Kerja Peserta Didik Interaktif</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">LKPD 8: Konfigurasi AP & Mode Operasi Wireless</h1>
+          <p class="text-xs sm:text-sm text-indigo-100 mt-1">Eksperimen Virtual Web GUI AP, Topology Sandbox (6 Mode), PtP Bridge Alignment, & MAC Filtering Lab</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-indigo-900/80 px-4 py-2 rounded-xl text-sm border border-indigo-500/30">
+        <i class="fa-solid fa-graduation-cap text-amber-300"></i>
+        <span class="font-medium" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-7 h-7 bg-amber-100 text-amber-700 rounded-lg text-sm font-bold">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-800 rounded-r-lg text-sm flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+        <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk membuka modul laboratorium dan uji kompetensi.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori & Parameter Konfigurasi -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">2</span>
+            Ringkasan Teori: Konfigurasi Access Point & 6 Mode Operasi
+          </h2>
+          <span class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-3 py-1 rounded-full">Wireless Networking Standard</span>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+          <b>Access Point (AP)</b> adalah perangkat keras jaringan nirkabel yang memancarkan sinyal gelombang frekuensi radio (RF) untuk menghubungkan perangkat klien (laptop, smartphone, tablet) ke jaringan lokal (LAN) berbasis kabel. Selain berfungsi sebagai pemancar standar, Access Point memiliki 6 mode operasi sesuai kebutuhan topologi.
+        </p>
+
+        <!-- Table 6 Operating Modes -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs mb-6">
+          <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-table text-indigo-600"></i> Tabel 6 Mode Operasi Wireless Utama
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-200 text-slate-700 uppercase text-[11px]">
+                  <th class="p-2.5 border border-slate-300">Mode Operasi</th>
+                  <th class="p-2.5 border border-slate-300">Alur Kerja Data</th>
+                  <th class="p-2.5 border border-slate-300">Fungsi Utama / Topologi</th>
+                  <th class="p-2.5 border border-slate-300">Fitur DHCP Server</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 bg-white">
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">AP Mode (Access Point)</td>
+                  <td class="p-2.5 border border-slate-200">Meneruskan data dari port LAN kabel ke pemancar nirkabel secara transparent (Bridge Layer 2).</td>
+                  <td class="p-2.5 border border-slate-200">Menambahkan cakupan Wi-Fi pada jaringan kabel yang sudah ada.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-rose-600">Disabled (Mengikut Router Utama)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">Wireless Router Mode</td>
+                  <td class="p-2.5 border border-slate-200">Menerima sinyal WAN dari modem/ISP pada port WAN, lalu membagikannya via Wi-Fi/LAN menggunakan NAT.</td>
+                  <td class="p-2.5 border border-slate-200">Sebagai gateway utama rumah/kantor kecil untuk berbagi koneksi internet ISP.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-emerald-600">Enabled (Membagikan IP Private)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">Repeater / Extender Mode</td>
+                  <td class="p-2.5 border border-slate-200">Menangkap sinyal Wi-Fi dari AP Utama lalu memancarkan kembali sinyal tersebut.</td>
+                  <td class="p-2.5 border border-slate-200">Perluasan jangkauan sinyal (coverage extension) tanpa menarik kabel LAN tambahan.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-rose-600">Disabled (IP dialokasikan AP Utama)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">Wireless Client Station Mode</td>
+                  <td class="p-2.5 border border-slate-200">Berfungsi seperti Wi-Fi Card/Adapter nirkabel. Menangkap sinyal Wi-Fi dan meneruskannya ke port LAN fisik.</td>
+                  <td class="p-2.5 border border-slate-200">Menghubungkan perangkat wired (Smart TV, PC, DVR CCTV) ke jaringan nirkabel.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-rose-600">Disabled</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">WISP Mode (Wireless ISP)</td>
+                  <td class="p-2.5 border border-slate-200">Menangkap sinyal Wi-Fi luar (Hotspot/ISP) sebagai sumber WAN, lalu membuat sub-jaringan baru via NAT.</td>
+                  <td class="p-2.5 border border-slate-200">Menghubungkan jaringan lokal rumah ke pemancar Wi-Fi berlangganan luar tanpa kabel.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-emerald-600">Enabled (Membuat Subnet Separate)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-indigo-900">Bridge Mode (PtP / PtMP)</td>
+                  <td class="p-2.5 border border-slate-200">Menghubungkan dua atau lebih segmen jaringan LAN kabel secara nirkabel (Point-to-Point).</td>
+                  <td class="p-2.5 border border-slate-200">Koneksi nirkabel antargedung (misal: Gedung A ke Gedung B) yang terpisah jarak fisik.</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-rose-600">Disabled</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key Parameters Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card-hover bg-slate-50 border-t-4 border-indigo-600 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-indigo-900 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-id-card text-indigo-600"></i> SSID & Security Protocol
+            </h4>
+            <p class="text-xs text-slate-600">
+              <b>SSID:</b> Identitas/nama jaringan nirkabel. <b>Security:</b> Enkripsi WPA2/WPA3-Personal (AES) untuk mengamankan komunikasi data dari pembajakan.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-50 border-t-4 border-amber-500 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-amber-900 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-amber-600"></i> Channel & Bandwidth (Width)
+            </h4>
+            <p class="text-xs text-slate-600">
+              Pemilihan frekuensi (Kanal 1, 6, 11 pada 2.4 GHz) dan lebar pita (20 MHz / 40 MHz) untuk memaksimalkan throughput serta mencegah interferensi.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-50 border-t-4 border-emerald-600 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-emerald-900 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-emerald-600"></i> Tx Power & MAC Filtering
+            </h4>
+            <p class="text-xs text-slate-600">
+              <b>Tx Power:</b> Daya pancar radio (dBm/mW). <b>MAC Filtering:</b> Kontrol akses berbasis alamat fisik (Allowlist / Denylist) untuk mencegah penyusup.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif LKPD 8 -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">3</span>
+            Laboratorium Simulasi Konfigurasi & Mode Operasi Wireless
+          </h2>
+          <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-3 py-1 rounded-full">4 Modul Simulasi UI Interaktif</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: Web GUI Virtual AP Configurator -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-laptop-code text-indigo-600"></i> Simulasi 1: Web GUI Virtual AP Configurator
+                </h3>
+                <span class="text-xs font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Admin GUI</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Atur parameter Access Point pada panel admin virtual, lalu klik "Apply & Reboot" untuk menguji respons klien.</p>
+
+              <!-- Display Box -->
+              <div id="display-sim1" class="sim-display-box w-full h-48 mb-3 p-3 border border-slate-700 flex flex-col justify-between">
+                <div class="flex justify-between items-center bg-slate-800/90 p-2 rounded-lg border border-slate-700">
+                  <span class="text-[10px] font-mono text-indigo-300"><i class="fa-solid fa-gear mr-1"></i> AP Status: <span id="sim1-gui-status" class="text-emerald-400 font-bold">ONLINE</span></span>
+                  <span class="text-[10px] font-mono text-slate-400" id="sim1-active-ssids">SSID: Lab-Teknik-WiFi</span>
+                </div>
+
+                <div class="flex items-center justify-around my-2">
+                  <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 border-2 border-white text-white text-xs font-bold flex items-center justify-center shadow-lg">
+                      <i class="fa-solid fa-tower-cell text-lg"></i>
+                    </div>
+                    <span class="text-[9px] text-slate-300 font-semibold mt-1">Virtual AP</span>
+                  </div>
+
+                  <div id="sim1-link-line" class="h-0.5 w-24 bg-dashed border-t-2 border-dashed border-emerald-400 animate-pulse"></div>
+
+                  <div class="flex flex-col items-center">
+                    <div id="sim1-client-icon" class="w-10 h-10 rounded-xl bg-emerald-600 border-2 border-white text-white text-xs font-bold flex items-center justify-center shadow-lg">
+                      <i class="fa-solid fa-mobile-screen-button text-lg"></i>
+                    </div>
+                    <span id="sim1-client-label" class="text-[9px] text-slate-300 font-semibold mt-1">Smartphone</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-2 rounded text-[10px] font-mono text-slate-300 flex justify-between">
+                  <span>Enkripsi: <b id="sim1-disp-sec" class="text-amber-400">WPA2-AES</b></span>
+                  <span>Kanal: <b id="sim1-disp-ch" class="text-indigo-400">Ch 6 (20MHz)</b></span>
+                  <span>Speed: <b id="sim1-disp-speed" class="text-emerald-400">144 Mbps</b></span>
+                </div>
+              </div>
+
+              <!-- Form Admin Controls -->
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">SSID Name</label>
+                  <input type="text" id="sim1-ssid" value="Lab-Teknik-WiFi" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Security Protocol</label>
+                  <select id="sim1-sec" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="WPA2">WPA2-Personal (AES)</option>
+                    <option value="WPA3">WPA3-Personal (SAE)</option>
+                    <option value="OPEN">OPEN (Tanpa Sandi)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Channel Frequency</label>
+                  <select id="sim1-ch" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="1">Kanal 1 (2.4 GHz)</option>
+                    <option value="6" selected>Kanal 6 (2.4 GHz)</option>
+                    <option value="11">Kanal 11 (2.4 GHz)</option>
+                    <option value="6-overlap">Kanal 6 (Tetangga Berbentrokan)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Channel Width</label>
+                  <select id="sim1-width" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="20">20 MHz (Stabil)</option>
+                    <option value="40">40 MHz (High Speed)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <button onclick="runSim1()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-rotate-right"></i> Apply & Reboot
+              </button>
+              <button onclick="catatSimulasi(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: Mode Operasi Wireless Topology Sandbox -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-sitemap text-amber-600"></i> Simulasi 2: Mode Operasi Topology Sandbox
+                </h3>
+                <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">6 Operational Modes</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Pilih salah satu mode operasi untuk melihat alur lalu lintas paket data & status alokasi IP Address.</p>
+
+              <!-- Sandbox Visual Container -->
+              <div id="display-sim2" class="sim-display-box w-full h-48 mb-3 p-3 border border-slate-700 flex flex-col justify-between">
+                <div class="flex justify-between items-center text-[10px] text-slate-300 font-mono">
+                  <span>ISP Modem: <b class="text-emerald-400">192.168.1.1</b></span>
+                  <span id="sim2-mode-tag" class="bg-amber-500/30 text-amber-300 border border-amber-500/50 px-2 py-0.5 rounded font-bold">AP Mode</span>
+                </div>
+
+                <!-- Interactive Topology Flow Icons -->
+                <div class="flex items-center justify-between px-2 my-2 text-center">
+                  <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-lg bg-slate-700 border border-slate-500 text-white text-xs flex items-center justify-center">
+                      <i class="fa-solid fa-globe text-sky-400"></i>
+                    </div>
+                    <span class="text-[9px] text-slate-400 mt-1">ISP / WAN</span>
+                  </div>
+
+                  <div id="sim2-line-1" class="h-0.5 flex-1 bg-slate-600 mx-1 relative">
+                    <div id="sim2-packet-1" class="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-amber-400 hidden"></div>
+                  </div>
+
+                  <div class="flex flex-col items-center">
+                    <div id="sim2-ap-node" class="w-9 h-9 rounded-lg bg-indigo-600 border-2 border-white text-white text-xs flex items-center justify-center shadow-md">
+                      <i class="fa-solid fa-wifi"></i>
+                    </div>
+                    <span id="sim2-ap-label" class="text-[9px] text-indigo-300 font-bold mt-1">AP Device</span>
+                  </div>
+
+                  <div id="sim2-line-2" class="h-0.5 flex-1 bg-slate-600 mx-1 relative">
+                    <div id="sim2-packet-2" class="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-emerald-400 hidden"></div>
+                  </div>
+
+                  <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-700 border border-slate-500 text-white text-xs flex items-center justify-center">
+                      <i class="fa-solid fa-laptop text-emerald-300"></i>
+                    </div>
+                    <span class="text-[9px] text-slate-400 mt-1">End Client</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-2 rounded text-[10px] font-mono text-slate-300 flex justify-between">
+                  <span>DHCP AP: <b id="sim2-dhcp-status" class="text-rose-400">Disabled</b></span>
+                  <span>IP Klien: <b id="sim2-client-ip" class="text-emerald-400">192.168.1.105 (Via ISP)</b></span>
+                  <span>NAT/Routing: <b id="sim2-nat-status" class="text-slate-400">No NAT (Bridge L2)</b></span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Mode Operasi Access Point</label>
+                <select id="sim2-mode" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim2()">
+                  <option value="ap">1. Access Point (AP) Mode - Transparent L2 Bridge</option>
+                  <option value="router">2. Wireless Router Mode - Gateway & NAT Active</option>
+                  <option value="repeater">3. Repeater / Extender Mode - Wi-Fi Range Extension</option>
+                  <option value="client">4. Wireless Client Station Mode - Wi-Fi to Wired Adapter</option>
+                  <option value="wisp">5. WISP Mode - Wireless ISP WAN + NAT Local</option>
+                  <option value="bridge">6. PtP Bridge Mode - Building-to-Building Link</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <button onclick="simulatePacketSim2()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-play"></i> Simulate Packet Flow
+              </button>
+              <button onclick="catatSimulasi(2)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: PtP Wireless Bridge Alignment Simulator -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-tower-cell text-teal-600"></i> Simulasi 3: Point-to-Point (PtP) Alignment Simulator
+                </h3>
+                <span class="text-xs font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">PtP Alignment</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Posisikan kelurusan antena (Azimuth) & tinggi tiang untuk menembus hambatan Zona Fresnel.</p>
+
+              <!-- Display Box -->
+              <div id="display-sim3" class="sim-display-box w-full h-48 mb-3 p-3 border border-slate-700 flex flex-col justify-between relative">
+                <!-- Visual RF Beam Line -->
+                <div id="sim3-rf-beam" class="absolute top-1/2 left-10 right-10 h-1 bg-emerald-400 shadow-[0_0_12px_#34d399] transition-all duration-300 -translate-y-1/2"></div>
+                
+                <!-- Obstacle in Middle -->
+                <div id="sim3-obstacle-node" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none transition-all">
+                  <i class="fa-solid fa-tree text-2xl text-emerald-600" id="sim3-obs-icon"></i>
+                  <span class="text-[8px] text-slate-400 font-mono">Pohon High</span>
+                </div>
+
+                <!-- Tower A -->
+                <div class="absolute left-4 bottom-8 flex flex-col items-center">
+                  <div class="w-5 h-16 bg-slate-600 border border-slate-400 flex flex-col justify-between items-center py-1 rounded-t">
+                    <div id="sim3-ant-a" class="w-4 h-4 rounded-full bg-indigo-500 border border-white text-[8px] flex items-center justify-center font-bold text-white transition-all">A</div>
+                  </div>
+                  <span class="text-[9px] text-slate-300 font-bold mt-0.5">Gedung A</span>
+                </div>
+
+                <!-- Tower B -->
+                <div class="absolute right-4 bottom-8 flex flex-col items-center">
+                  <div class="w-5 h-16 bg-slate-600 border border-slate-400 flex flex-col justify-between items-center py-1 rounded-t">
+                    <div id="sim3-ant-b" class="w-4 h-4 rounded-full bg-indigo-500 border border-white text-[8px] flex items-center justify-center font-bold text-white transition-all">B</div>
+                  </div>
+                  <span class="text-[9px] text-slate-300 font-bold mt-0.5">Gedung B</span>
+                </div>
+
+                <div class="z-10 bg-slate-900/90 p-2 rounded text-[10px] font-mono text-slate-300 flex justify-between mt-auto">
+                  <span>RSSI Sinyal: <b id="sim3-rssi" class="text-emerald-400">-52 dBm</b></span>
+                  <span>Fresnel Clearance: <b id="sim3-fresnel" class="text-emerald-400">100% (Clear)</b></span>
+                  <span>Throughput: <b id="sim3-speed" class="text-emerald-400">300 Mbps</b></span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Sudut Azimuth Antena</label>
+                  <select id="sim3-angle" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim3()">
+                    <option value="0" selected>0° (Presisi Lurus)</option>
+                    <option value="15">15° (Miring Sedikit)</option>
+                    <option value="35">35° (Miring Parah)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Tinggi Tiang Tower</label>
+                  <select id="sim3-height" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim3()">
+                    <option value="20" selected>20 Meter (Tinggi)</option>
+                    <option value="12">12 Meter (Sedang)</option>
+                    <option value="6">6 Meter (Rendah)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Rintangan Jalur</label>
+                  <select id="sim3-obstacle" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim3()">
+                    <option value="none">Bebas Hambatan (LOS)</option>
+                    <option value="tree" selected>Pohon Rindang (LOS Terhalang)</option>
+                    <option value="building">Bangunan Beton (Deadzone)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Status PtP Link:</span>
+                <span id="sim3-out" class="font-bold text-slate-800">Koneksi Sangat Baik & Presisi</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: Wireless Security & MAC Filtering Lab -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-shield-halved text-rose-600"></i> Simulasi 4: Wireless Security & MAC Filtering Lab
+                </h3>
+                <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Security Lab</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Atur aturan MAC Address Filtering (Allowlist/Denylist) lalu uji koneksi 4 perangkat klien secara bersamaan.</p>
+
+              <!-- Display Grid Clients -->
+              <div id="display-sim4" class="sim-display-box w-full h-48 mb-3 p-3 border border-slate-700 flex flex-col justify-between">
+                <div class="flex justify-between items-center text-[10px] text-slate-300 font-mono">
+                  <span>Filter Mode: <b id="sim4-mode-disp" class="text-amber-400">Allowlist Only</b></span>
+                  <span>Passkey: <b class="text-emerald-400">Correct (P@ssw0rd)</b></span>
+                </div>
+
+                <!-- 4 Clients Visual Grid -->
+                <div class="grid grid-cols-2 gap-2 my-1">
+                  <!-- Client A -->
+                  <div id="sim4-card-a" class="p-2 rounded bg-slate-800 border border-slate-700 flex items-center justify-between text-[10px]">
+                    <div>
+                      <p class="font-bold text-white">Laptop A <span class="text-[8px] text-slate-400 font-mono">(AA:11)</span></p>
+                      <span id="sim4-status-a" class="text-[9px] text-emerald-400 font-bold">Connected</span>
+                    </div>
+                    <i id="sim4-icon-a" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                  </div>
+
+                  <!-- Client B -->
+                  <div id="sim4-card-b" class="p-2 rounded bg-slate-800 border border-slate-700 flex items-center justify-between text-[10px]">
+                    <div>
+                      <p class="font-bold text-white">HP B <span class="text-[8px] text-slate-400 font-mono">(BB:22)</span></p>
+                      <span id="sim4-status-b" class="text-[9px] text-emerald-400 font-bold">Connected</span>
+                    </div>
+                    <i id="sim4-icon-b" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+                  </div>
+
+                  <!-- Client C -->
+                  <div id="sim4-card-c" class="p-2 rounded bg-slate-800 border border-slate-700 flex items-center justify-between text-[10px]">
+                    <div>
+                      <p class="font-bold text-white">Smart TV C <span class="text-[8px] text-slate-400 font-mono">(CC:33)</span></p>
+                      <span id="sim4-status-c" class="text-[9px] text-rose-400 font-bold">Access Denied</span>
+                    </div>
+                    <i id="sim4-icon-c" class="fa-solid fa-circle-xmark text-rose-400 text-base"></i>
+                  </div>
+
+                  <!-- Client D (Hacker/Unknown) -->
+                  <div id="sim4-card-d" class="p-2 rounded bg-slate-800 border border-slate-700 flex items-center justify-between text-[10px]">
+                    <div>
+                      <p class="font-bold text-white">Asing D <span class="text-[8px] text-slate-400 font-mono">(XX:99)</span></p>
+                      <span id="sim4-status-d" class="text-[9px] text-rose-400 font-bold">Access Denied</span>
+                    </div>
+                    <i id="sim4-icon-d" class="fa-solid fa-circle-xmark text-rose-400 text-base"></i>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-1.5 rounded text-[10px] font-mono text-slate-300 text-center">
+                  <span id="sim4-summary text-slate-300">Hasil: 2 Terhubung, 2 Ditolak Keamanan MAC</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Metode MAC Address Filter</label>
+                  <select id="sim4-macmode" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim4()">
+                    <option value="allow">Allowlist (Hanya Izinkan MAC Terdaftar)</option>
+                    <option value="deny">Denylist (Blokir MAC Terdaftar)</option>
+                    <option value="disabled">Disabled (Matikan Filtering)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Daftar MAC Terdaftar di AP</label>
+                  <select id="sim4-list" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim4()">
+                    <option value="ab">MAC AA:11 & BB:22</option>
+                    <option value="c">Hanya MAC CC:33</option>
+                    <option value="none">Kosong (Tidak Ada MAC)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[11px] text-slate-400">Keamanan Akses Klien:</span>
+                <span id="sim4-out" class="font-bold text-slate-800">Allowlist Aktif (2 Klien Legal Terhubung)</span>
+              </div>
+              <button onclick="catatSimulasi(4)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">4</span>
+              Tabel Pengamatan Praktikum Konfigurasi Access Point
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan log eksperimen yang direkap secara otomatis dari modul simulasi interaktif di atas.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-600" id="tbl-pengamatan">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Konfigurasi AP</th>
+                <th class="px-4 py-3">Hasil / Alur Komunikasi Data</th>
+                <th class="px-4 py-3">Status Evaluasi Topologi</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-200 bg-white">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold">5</span>
+              Uji Kompetensi Konfigurasi Access Point & Mode Operasi
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut untuk menguji pemahaman teori dan praktikum Anda.</p>
+          </div>
+          <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">20 Soal Pilihan Ganda</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Penyelesaian:</p>
+          <p>Pastikan semua soal uji kompetensi dan tabel pengamatan telah terisi lengkap sebelum menyelesaikan LKPD.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">LKPD 8 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nilai Akhir Uji Kompetensi</p>
+          <div class="text-5xl font-black text-indigo-600 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil dikirim ke server guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-900 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-600 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
+
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
+
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selKelas.appendChild(opt);
+        });
+      } else {
+        selKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selNama = document.getElementById('sel-nama');
+
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selNama.appendChild(opt);
+        });
+      } else {
+        selNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
+        }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-amber-50 text-amber-700 font-medium px-3 py-1 rounded-full border border-amber-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Bank Soal Uji Kompetensi LKPD 8: Konfigurasi AP & Mode Operasi Wireless
+    const questionBank = [
+      { id: 1, q: "Perangkat keras jaringan nirkabel yang berfungsi memancarkan sinyal gelombang radio (RF) untuk menghubungkan perangkat klien ke LAN kabel dinamakan...", options: ["A. Network Interface Card (NIC)", "B. Access Point (AP)", "C. Layer 3 Switch", "D. Fiber Optic Patch Panel", "E. Coaxial Splitter"], ans: "B" },
+      { id: 2, q: "Pada mode 'Access Point (AP Mode)', alur lalu lintas data meneruskan paket secara transparent pada OSI Layer berapa dan bagaimana status DHCP Server-nya?", options: ["A. Layer 3 (Routing) & DHCP Server Enabled", "B. Layer 2 (Bridge) & DHCP Server Disabled", "C. Layer 1 (Physical) & NAT Enabled", "D. Layer 7 (Application) & DHCP Server Active", "E. Layer 4 (Transport) & Static Routing"], ans: "B" },
+      { id: 3, q: "Mode operasi manakah yang menerima sinyal internet WAN dari modem ISP pada port WAN fisik, lalu membagikannya ke klien via Wi-Fi/LAN menggunakan NAT?", options: ["A. Wireless Client Station Mode", "B. Wireless Router Mode", "C. PtP Bridge Mode", "D. Repeater Mode", "E. Passive Survey Mode"], ans: "B" },
+      { id: 4, q: "Jika sebuah sekolah ingin memperluas jangkauan Wi-Fi ke ruang guru tanpa menarik kabel UTP tambahan dari gedung utama, mode operasi AP yang paling tepat adalah...", options: ["A. Wireless Router Mode", "B. Repeater / Extender Mode", "C. WISP Mode", "D. Client Station Mode", "E. Access Point Standard Mode"], ans: "B" },
+      { id: 5, q: "Perangkat Smart TV tua di ruang rapat hanya memiliki port LAN RJ-45 tanpa kartu Wi-Fi internal. Mode operasi AP yang dipasang untuk menghubungkan Smart TV tersebut ke Wi-Fi kantor adalah...", options: ["A. Wireless Client Station Mode", "B. Repeater Extender Mode", "C. Wireless Router Mode", "D. WISP Mode", "E. Access Point Mode"], ans: "A" },
+      { id: 6, q: "Seseorang ingin menghubungkan jaringan rumahnya ke pemancar Wi-Fi Hotspot luar berlangganan, namun menginginkan seluruh perangkat rumahnya berada pada sub-jaringan private lokal terpisah via NAT. Mode operasi yang tepat adalah...", options: ["A. Access Point Mode", "B. Repeater Mode", "C. WISP (Wireless ISP) Mode", "D. PtP Bridge Mode", "E. Client Station Mode"], ans: "C" },
+      { id: 7, q: "Mode operasi 'Bridge Mode (Point-to-Point / PtP)' secara umum digunakan untuk fungsi topologi...", options: ["A. Menghubungkan 100 smartphone di dalam satu aula gedung", "B. Menghubungkan dua segmen jaringan LAN kabel antargedung yang terpisah jarak fisik secara nirkabel", "C. Membagikan IP Address otomatis ke perangkat HP", "D. Mencegah interferensi kanal frekuensi 2.4 GHz", "E. Memblokir situs web berbahaya"], ans: "B" },
+      { id: 8, q: "String nama identitas unik jaringan nirkabel yang dipancarkan ke publik agar dapat dideteksi oleh perangkat HP atau Laptop dinamakan...", options: ["A. MAC Address", "B. BSSID", "C. SSID (Service Set Identifier)", "D. WPA Key", "E. Subnet Mask"], ans: "C" },
+      { id: 9, q: "Protokol enkripsi keamanan Wi-Fi standar industri modern saat ini yang menggunakan algoritma AES adalah...", options: ["A. WEP (Wired Equivalent Privacy)", "B. Open System Authentication", "C. WPA2/WPA3-Personal (AES)", "D. DES 64-bit", "E. MAC Filtering Open"], ans: "C" },
+      { id: 10, q: "Tiga kanal frekuensi standar yang terbebas dari tumpang tindih sinyal (non-overlapping channels) pada pita radio 2.4 GHz adalah...", options: ["A. Kanal 1, 6, dan 11", "B. Kanal 1, 2, dan 3", "C. Kanal 3, 7, dan 12", "D. Kanal 6, 8, dan 14", "E. Kanal 2, 5, dan 9"], ans: "A" },
+      { id: 11, q: "Mengapa pengaturan lebar pita (Channel Width) 40 MHz pada frekuensi 2.4 GHz berisiko menurunkan stabilitas jaringan di area padat?", options: ["A. Karena 40 MHz mematikan enkripsi WPA2 secara otomatis", "B. Karena memakan lebih banyak spektrum kanal sehingga sangat rawan mengalami Co-Channel & Adjacent Interference", "C. Karena membuat daya pancar AP menjadi 0 dBm", "D. Karena perangkat smartphone tidak bisa membaca sinyal 40 MHz", "E. Karena menghapus alokasi IP DHCP"], ans: "B" },
+      { id: 12, q: "Fitur keamanan pada Access Point yang membatasi hak akses perangkat berdasarkan alamat fisik unik kartu jaringan dinamakan...", options: ["A. SSID Broadcast Disable", "B. MAC Address Filtering", "C. Tx Power Adjustment", "D. Band Steering", "E. Port Forwarding"], ans: "B" },
+      { id: 13, q: "Apa yang terjadi jika sebuah HP mencoba terhubung ke Wi-Fi dengan kata sandi yang benar, namun fitur MAC Address Filtering di AP berada pada mode 'Allowlist' dan MAC HP tersebut belum terdaftar?", options: ["A. HP langsung terhubung dengan kecepatan maksimum", "B. HP berhasil terhubung tetapi IP-nya 0.0.0.0", "C. Koneksi ditolak / Access Denied meskipun password benar", "D. AP secara otomatis melakukan restart", "E. Password Wi-Fi terhapus secara otomatis"], ans: "C" },
+      { id: 14, q: "Parameter 'Tx Power (Transmit Power)' pada konfigurasi Access Point berfungsi untuk mengatur...", options: ["A. Jumlah kata sandi yang dapat dibuat", "B. Besaran daya pemancar radio (dBm / mW) yang menentukan luas area jangkauan sinyal", "C. Alokasi kapasitas IP DHCP Server", "D. Kecepatan DNS Resolver ISP", "E. Pemilihan nama SSID rahasia"], ans: "B" },
+      { id: 15, q: "Dalam skenario Point-to-Point (PtP) nirkabel antargedung, konsep 'Zona Fresnel (Fresnel Zone)' merujuk pada...", options: ["A. Panjang kabel LAN dari switch ke PoE injector", "B. Area elips di sekitar garis lurus transmisi gelombang radio yang harus bebas dari rintangan agar sinyal tidak mengalami pembiasan/redaman", "C. Merek antena outdoor yang digunakan", "D. Jumlah user HP yang dapat terhubung bersamaan", "E. Jenis sistem operasi yang terpasang di router"], ans: "B" },
+      { id: 16, q: "Dua parameter sudut arah kelurusan fisik antena outdoor yang harus diselaraskan saat melakukan alignment koneksi PtP adalah...", options: ["A. SSID dan Passkey", "B. Azimuth (Horisontal) dan Elevation (Vertikal)", "C. Latency dan Throughput", "D. WPA2 dan WPA3", "E. Channel Width dan Transmit Power"], ans: "B" },
+      { id: 17, q: "Mengapa pada mode Repeater, DHCP Server di Access Point sekunder HARUS dimatikan (Disabled)?", options: ["A. Agar AP sekunder tidak mengalami overheating", "B. Untuk mencegah terjadinya konflik bentrokan IP Address (Rogue DHCP) dan memastikan IP dialokasikan oleh Router Utama", "C. Karena Repeater tidak membutuhkan koneksi internet", "D. Agar sinyal Wi-Fi berubah menjadi frekuensi 5 GHz", "E. Karena mode Repeater hanya bekerja tanpa IP Address"], ans: "B" },
+      { id: 18, q: "Manakah perbedaan mendasar antara AP Mode dengan Wireless Router Mode?", options: ["A. AP Mode melakukan NAT dan Routing, sedangkan Router Mode berfungsi sebagai transparent L2 bridge", "B. AP Mode berfungsi sebagai transparent L2 bridge tanpa NAT, sedangkan Router Mode melakukan Routing, NAT, dan membagikan IP via DHCP", "C. AP Mode membutuhkan kabel FO, sedangkan Router Mode hanya nirkabel", "D. AP Mode tidak memancarkan Wi-Fi, sedangkan Router Mode memancarkan Wi-Fi", "E. AP Mode tidak memiliki alamat MAC Address"], ans: "B" },
+      { id: 19, q: "Jika dua unit Access Point yang berdekatan diset menggunakan Kanal 6 secara bersamaan di area yang sama, masalah transmisi yang timbul adalah...", options: ["A. Co-Channel Interference (CCI)", "B. Cross-talk Cable Attenuation", "C. Bandwidth Doubling Error", "D. Thermal Noise Overload", "E. Loss Optical Power"], ans: "A" },
+      { id: 20, q: "Apa tindakan pertama yang paling efisien dilakukan administrator jaringan jika terjadi perlambatan sinyal Wi-Fi akibat interferensi dengan AP tetangga pada frekuensi 2.4 GHz?", options: ["A. Mengganti kabel LAN dari Cat5e ke Cat6", "B. Memindahkan kanal frekuensi AP ke kanal non-overlapping yang bersih (misal dari Kanal 6 ke Kanal 1 atau 11)", "C. Mengubah nama SSID menjadi huruf kapital semua", "D. Mematikan fitur MAC Filtering", "E. Menambah kapasitas RAM pada PC server"], ans: "B" }
+    ];
+
+    // Simulation States
+    let sim1Data = {};
+    let sim2Data = {};
+    let sim3Data = {};
+    let sim4Data = {};
+
+    // Simulation 1: Web GUI Virtual AP Configurator Engine
+    function runSim1() {
+      const ssid = document.getElementById('sim1-ssid').value || 'Lab-Teknik-WiFi';
+      const sec = document.getElementById('sim1-sec').value;
+      const ch = document.getElementById('sim1-ch').value;
+      const width = document.getElementById('sim1-width').value;
+
+      document.getElementById('sim1-active-ssids').innerText = `SSID: ${ssid}`;
+      document.getElementById('sim1-disp-sec').innerText = sec === 'OPEN' ? 'OPEN (No Sec)' : (sec === 'WPA3' ? 'WPA3-SAE' : 'WPA2-AES');
+      
+      let speedText = width === '40' ? '300 Mbps' : '144 Mbps';
+      let chText = `Ch ${ch.replace('-overlap', '')} (${width}MHz)`;
+      
+      if (ch === '6-overlap') {
+        speedText = '24 Mbps (Interferensi High)';
+        document.getElementById('sim1-disp-speed').className = 'text-rose-400 font-bold';
+      } else {
+        document.getElementById('sim1-disp-speed').className = 'text-emerald-400 font-bold';
+      }
+
+      document.getElementById('sim1-disp-ch').innerText = chText;
+      document.getElementById('sim1-disp-speed').innerText = speedText;
+
+      const clientIcon = document.getElementById('sim1-client-icon');
+      const clientLabel = document.getElementById('sim1-client-label');
+      const linkLine = document.getElementById('sim1-link-line');
+
+      if (sec === 'OPEN') {
+        clientIcon.className = "w-10 h-10 rounded-xl bg-amber-500 border-2 border-white text-white text-xs font-bold flex items-center justify-center shadow-lg";
+        clientLabel.innerText = "Smartphone (Unsecured)";
+        linkLine.className = "h-0.5 w-24 bg-amber-400 border-t-2 border-dashed border-amber-400 animate-pulse";
+      } else {
+        clientIcon.className = "w-10 h-10 rounded-xl bg-emerald-600 border-2 border-white text-white text-xs font-bold flex items-center justify-center shadow-lg";
+        clientLabel.innerText = "Smartphone (Connected)";
+        linkLine.className = "h-0.5 w-24 bg-emerald-400 border-t-2 border-dashed border-emerald-400 animate-pulse";
+      }
+
+      sim1Data = { ssid, sec, ch, width, speedText };
+      showToast("Virtual AP Applied", `AP Reboot Selesai. SSID: ${ssid}, Mode: ${sec}`, "success");
+    }
+
+    // Simulation 2: Mode Operasi Topology Sandbox
+    function runSim2() {
+      const mode = document.getElementById('sim2-mode').value;
+      const modeTag = document.getElementById('sim2-mode-tag');
+      const dhcpStatus = document.getElementById('sim2-dhcp-status');
+      const clientIp = document.getElementById('sim2-client-ip');
+      const natStatus = document.getElementById('sim2-nat-status');
+      const apLabel = document.getElementById('sim2-ap-label');
+
+      if (mode === 'ap') {
+        modeTag.innerText = "1. AP Mode (Bridge)";
+        dhcpStatus.innerText = "Disabled"; dhcpStatus.className = "text-rose-400";
+        clientIp.innerText = "192.168.1.105 (Via ISP)"; clientIp.className = "text-emerald-400";
+        natStatus.innerText = "No NAT (Transparent L2)";
+        apLabel.innerText = "Access Point";
+      } else if (mode === 'router') {
+        modeTag.innerText = "2. Wireless Router Mode";
+        dhcpStatus.innerText = "Enabled (Local)"; dhcpStatus.className = "text-emerald-400";
+        clientIp.innerText = "192.168.0.10 (Subnet AP)"; clientIp.className = "text-indigo-400";
+        natStatus.innerText = "NAT Active (WAN-LAN)";
+        apLabel.innerText = "Wi-Fi Router";
+      } else if (mode === 'repeater') {
+        modeTag.innerText = "3. Repeater Mode";
+        dhcpStatus.innerText = "Disabled (Follow Main)"; dhcpStatus.className = "text-rose-400";
+        clientIp.innerText = "192.168.1.112 (Via Main AP)"; clientIp.className = "text-emerald-400";
+        natStatus.innerText = "No NAT (Rebroadcast)";
+        apLabel.innerText = "Repeater Extender";
+      } else if (mode === 'client') {
+        modeTag.innerText = "4. Client Station Mode";
+        dhcpStatus.innerText = "Disabled"; dhcpStatus.className = "text-rose-400";
+        clientIp.innerText = "192.168.1.120 (Via LAN Port)"; clientIp.className = "text-emerald-400";
+        natStatus.innerText = "No NAT (Wi-Fi Adapter)";
+        apLabel.innerText = "Client Adapter";
+      } else if (mode === 'wisp') {
+        modeTag.innerText = "5. WISP Mode";
+        dhcpStatus.innerText = "Enabled (Private Subnet)"; dhcpStatus.className = "text-emerald-400";
+        clientIp.innerText = "10.0.0.15 (Local WISP)"; clientIp.className = "text-amber-400";
+        natStatus.innerText = "NAT Active (Wireless WAN)";
+        apLabel.innerText = "WISP Router";
+      } else if (mode === 'bridge') {
+        modeTag.innerText = "6. PtP Bridge Mode";
+        dhcpStatus.innerText = "Disabled"; dhcpStatus.className = "text-rose-400";
+        clientIp.innerText = "192.168.1.200 (Trunk LAN)"; clientIp.className = "text-emerald-400";
+        natStatus.innerText = "No NAT (L2 PtP Bridge)";
+        apLabel.innerText = "PtP Bridge AP";
+      }
+
+      sim2Data = { mode, modeText: modeTag.innerText, dhcp: dhcpStatus.innerText, ip: clientIp.innerText, nat: natStatus.innerText };
+    }
+
+    function simulatePacketSim2() {
+      const p1 = document.getElementById('sim2-packet-1');
+      const p2 = document.getElementById('sim2-packet-2');
+
+      p1.classList.remove('hidden');
+      p2.classList.remove('hidden');
+
+      p1.style.left = "0%";
+      p2.style.left = "0%";
+
+      let pos = 0;
+      const interval = setInterval(() => {
+        pos += 10;
+        p1.style.left = `${pos}%`;
+        p2.style.left = `${pos}%`;
+
+        if (pos >= 90) {
+          clearInterval(interval);
+          p1.classList.add('hidden');
+          p2.classList.add('hidden');
+          showToast("Simulasi Paket", `Alur data sukses melewati topologi ${sim2Data.modeText}`, "info");
+        }
+      }, 40);
+    }
+
+    // Simulation 3: PtP Alignment Simulator Engine
+    function runSim3() {
+      const angle = document.getElementById('sim3-angle').value;
+      const height = document.getElementById('sim3-height').value;
+      const obstacle = document.getElementById('sim3-obstacle').value;
+
+      const rfBeam = document.getElementById('sim3-rf-beam');
+      const obsIcon = document.getElementById('sim3-obs-icon');
+      const obsNode = document.getElementById('sim3-obstacle-node');
+
+      const rssiEl = document.getElementById('sim3-rssi');
+      const fresnelEl = document.getElementById('sim3-fresnel');
+      const speedEl = document.getElementById('sim3-speed');
+      const outEl = document.getElementById('sim3-out');
+
+      // Adjust obstacle visual
+      if (obstacle === 'none') {
+        obsNode.style.opacity = '0.2';
+        obsIcon.className = 'fa-solid fa-minus text-2xl text-slate-500';
+      } else if (obstacle === 'tree') {
+        obsNode.style.opacity = '1';
+        obsIcon.className = 'fa-solid fa-tree text-2xl text-emerald-500';
+      } else {
+        obsNode.style.opacity = '1';
+        obsIcon.className = 'fa-solid fa-building text-2xl text-slate-400';
+      }
+
+      let rssi = -52;
+      let fresnel = 100;
+      let speed = 300;
+      let statusText = "Koneksi Sangat Baik & Presisi (Full Throughput)";
+
+      // Misalignment penalty
+      if (angle === '15') { rssi -= 12; speed -= 100; }
+      if (angle === '35') { rssi -= 28; speed -= 220; }
+
+      // Height / Obstacle penalty
+      if (height === '12' && obstacle !== 'none') { fresnel = 50; rssi -= 10; speed -= 80; }
+      if (height === '6' && obstacle !== 'none') { fresnel = 10; rssi -= 25; speed -= 150; }
+
+      if (obstacle === 'building' && height !== '20') {
+        rssi = -88; fresnel = 0; speed = 0;
+        statusText = "DEADZONE! Terhalang Bangunan Beton.";
+      }
+
+      // Beam rotation visual
+      rfBeam.style.transform = `translateY(-50%) rotate(${angle / 4}deg)`;
+      if (rssi < -80 || speed === 0) {
+        rfBeam.className = "absolute top-1/2 left-10 right-10 h-1 bg-rose-500 shadow-[0_0_12px_#f43f5e] transition-all duration-300";
+      } else if (rssi < -68) {
+        rfBeam.className = "absolute top-1/2 left-10 right-10 h-1 bg-amber-400 shadow-[0_0_12px_#fbbf24] transition-all duration-300";
+      } else {
+        rfBeam.className = "absolute top-1/2 left-10 right-10 h-1 bg-emerald-400 shadow-[0_0_12px_#34d399] transition-all duration-300";
+      }
+
+      rssiEl.innerText = `${rssi} dBm`;
+      fresnelEl.innerText = `${fresnel}% (${fresnel > 60 ? 'Clear' : 'Blocked'})`;
+      speedEl.innerText = `${speed} Mbps`;
+      outEl.innerText = statusText;
+
+      sim3Data = { angle, height, obstacle, rssi, fresnel, speed, statusText };
+    }
+
+    // Simulation 4: Wireless Security & MAC Filtering Lab Engine
+    function runSim4() {
+      const macmode = document.getElementById('sim4-macmode').value;
+      const list = document.getElementById('sim4-list').value;
+      const modeDisp = document.getElementById('sim4-mode-disp');
+
+      modeDisp.innerText = macmode === 'allow' ? 'Allowlist Mode' : (macmode === 'deny' ? 'Denylist Mode' : 'Disabled');
+
+      // Clients: A (AA:11), B (BB:22), C (CC:33), D (XX:99)
+      let resA = true, resB = true, resC = true, resD = true;
+
+      if (macmode === 'allow') {
+        if (list === 'ab') { resA = true; resB = true; resC = false; resD = false; }
+        else if (list === 'c') { resA = false; resB = false; resC = true; resD = false; }
+        else { resA = false; resB = false; resC = false; resD = false; }
+      } else if (macmode === 'deny') {
+        if (list === 'ab') { resA = false; resB = false; resC = true; resD = true; }
+        else if (list === 'c') { resA = true; resB = true; resC = false; resD = true; }
+        else { resA = true; resB = true; resC = true; resD = true; }
+      } else {
+        resA = true; resB = true; resC = true; resD = true;
+      }
+
+      updateClientCard('a', resA);
+      updateClientCard('b', resB);
+      updateClientCard('c', resC);
+      updateClientCard('d', resD);
+
+      const connCount = [resA, resB, resC, resD].filter(Boolean).length;
+      const outText = `${macmode.toUpperCase()} Filter: ${connCount} Perangkat Terhubung, ${4 - connCount} Ditolak`;
+      document.getElementById('sim4-out').innerText = outText;
+
+      sim4Data = { macmode, list, connCount, blockedCount: 4 - connCount, outText };
+    }
+
+    function updateClientCard(clientId, isAllowed) {
+      const statusEl = document.getElementById(`sim4-status-${clientId}`);
+      const iconEl = document.getElementById(`sim4-icon-${clientId}`);
+
+      if (isAllowed) {
+        statusEl.innerText = "Connected";
+        statusEl.className = "text-[9px] text-emerald-400 font-bold";
+        iconEl.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+      } else {
+        statusEl.innerText = "Access Denied";
+        statusEl.className = "text-[9px] text-rose-400 font-bold";
+        iconEl.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
+      }
+    }
+
+    // Record Simulation Log to Table
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 1) {
+        logEntry = {
+          modul: "Simulasi 1: Web GUI AP Configurator",
+          param: `SSID: ${sim1Data.ssid}, Sec: ${sim1Data.sec}, Ch: ${sim1Data.ch}`,
+          hasil: `Channel Width: ${sim1Data.width}MHz, Rate: ${sim1Data.speedText}`,
+          status: sim1Data.ch.includes('overlap') ? "Interferensi Tinggi" : "Konfigurasi Optimal"
+        };
+      } else if (simNum === 2) {
+        logEntry = {
+          modul: "Simulasi 2: Mode Operasi Sandbox",
+          param: `Mode: ${sim2Data.modeText}`,
+          hasil: `DHCP AP: ${sim2Data.dhcp}, IP Klien: ${sim2Data.ip}`,
+          status: `NAT Status: ${sim2Data.nat}`
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "Simulasi 3: PtP Bridge Alignment",
+          param: `Sudut: ${sim3Data.angle}°, Tinggi: ${sim3Data.height}m, Rintangan: ${sim3Data.obstacle}`,
+          hasil: `RSSI: ${sim3Data.rssi} dBm, Fresnel: ${sim3Data.fresnel}%`,
+          status: sim3Data.statusText
+        };
+      } else if (simNum === 4) {
+        logEntry = {
+          modul: "Simulasi 4: Wireless Security & MAC Filter",
+          param: `Mode Filter: ${sim4Data.macmode.toUpperCase()}, Target List: ${sim4Data.list}`,
+          hasil: `Connected: ${sim4Data.connCount} Klien, Denied: ${sim4Data.blockedCount} Klien`,
+          status: sim4Data.outText
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+      showToast("Tercatat", "Hasil pengamatan berhasil ditambahkan ke tabel log.", "success");
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-100 text-emerald-800";
+        if (row.status.includes("DEADZONE") || row.status.includes("Interferensi") || row.status.includes("Denied")) {
+          badgeColor = "bg-rose-100 text-rose-800";
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-800">${row.modul}</td>
+          <td class="px-4 py-3 font-mono text-slate-600">${row.param}</td>
+          <td class="px-4 py-3 font-mono font-bold text-indigo-600">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-500 hover:text-rose-700 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        showToast("Perhatian", "Belum ada data pengamatan untuk di-export!", "warning");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Konfigurasi,Hasil Pengukuran,Status Evaluasi\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Konfigurasi_AP_LKPD8.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil", "File CSV hasil pengamatan terunduh.", "success");
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-3 p-2.5 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-indigo-600 focus:ring-indigo-500">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-800 mb-3 flex items-start gap-2">
+            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2 rounded"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        showToast("Identitas Wajib", "Harap lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 8: Konfigurasi Access Point & Mode Operasi Wireless";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai konfigurasi parameter Access Point dan 6 mode operasi wireless.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali perbedaan alur kerja DHCP & NAT pada tiap mode operasi AP.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi eksperimen simulasi Web GUI AP dan baca ringkasan teori LKPD 8.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-500"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal otomatis via Fetch (Offline).`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset LKPD", "Apakah Anda yakin ingin meriset seluruh isian dan data praktikum LKPD 8 ini?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir telah dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bg = "bg-slate-900 border-slate-700 text-white";
+      let icon = "fa-circle-info text-cyan-400";
+      if (type === 'success') { bg = "bg-slate-900 border-emerald-500/40 text-white"; icon = "fa-circle-check text-emerald-400"; }
+      if (type === 'warning') { bg = "bg-slate-900 border-amber-500/40 text-white"; icon = "fa-triangle-exclamation text-amber-400"; }
+
+      toast.className = `p-3.5 rounded-xl border shadow-xl flex items-start gap-3 text-xs min-w-[260px] max-w-xs transition transform translate-y-2 opacity-0 pointer-events-auto ${bg}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-bold mb-0.5">${title}</p>
+          <p class="text-slate-300 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('modal-confirm');
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const handleYes = () => { cleanup(); onConfirm(); };
+      const handleCancel = () => { cleanup(); };
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.removeEventListener('click', handleYes);
+        btnCancel.removeEventListener('click', handleCancel);
+      };
+
+      btnYes.addEventListener('click', handleYes);
+      btnCancel.addEventListener('click', handleCancel);
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      runSim1();
+      runSim2();
+      runSim3();
+      runSim4();
+    };
+  </script>
+</body>
+</html>
