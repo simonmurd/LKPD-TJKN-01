@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 11: Pengukuran, Pengujian Sinyal & Troubleshooting Optik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); }
+    .sim-display-box { background-color: #0b0f17; border-radius: 0.75rem; position: relative; overflow: hidden; }
+    .glow-laser-red { box-shadow: 0 0 20px rgba(244, 63, 94, 0.6); }
+    .glow-neon-blue { box-shadow: 0 0 18px rgba(56, 189, 248, 0.5); }
+    .glow-neon-orange { box-shadow: 0 0 18px rgba(251, 146, 60, 0.5); }
+    .glow-neon-green { box-shadow: 0 0 18px rgba(74, 222, 128, 0.5); }
+    .vfl-pulse { animation: pulse-laser 0.8s infinite alternate; }
+    @keyframes pulse-laser {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; filter: drop-shadow(0 0 12px #f43f5e); }
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-slate-900 border-b border-slate-800 text-white shadow-2xl no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-slate-800 p-3 rounded-2xl border border-slate-700/80 shadow-inner">
+          <i class="fa-solid fa-microscope text-3xl text-rose-500"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-widest text-slate-400 uppercase font-mono-code">Clean Diagnostic Studio &bull; Precision UI</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">LKPD 11: Pengukuran & Troubleshooting Optik</h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Attenuation Analysis, Visual Fault Locator (VFL), OLS/OPM Terminal, OTDR Trace, & Bending Loss Gauge</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl text-sm border border-slate-800">
+        <i class="fa-solid fa-graduation-cap text-rose-400"></i>
+        <span class="font-medium text-slate-300" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 relative overflow-hidden backdrop-blur-md">
+      <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+          <span class="flex items-center justify-center w-7 h-7 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-bold">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-slate-800 text-rose-400 font-medium px-3 py-1 rounded-full border border-slate-700" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-rose-950/40 border-l-4 border-rose-500 text-rose-200 rounded-r-lg text-sm flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-rose-400 text-lg"></i>
+        <span>Pilih Sekolah, Kelas, dan Nama Anda untuk mengakses studio diagnosis optik & instrumen laboratorium.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 focus:ring-2 focus:ring-rose-500 outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 focus:ring-2 focus:ring-rose-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 focus:ring-2 focus:ring-rose-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori & Parameter Pengukuran -->
+      <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 backdrop-blur-md">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-bold">2</span>
+            Ringkasan Teori: Pengukuran, Redaman & Troubleshooting Optik
+          </h2>
+          <span class="text-xs bg-slate-800 text-slate-300 font-mono-code px-3 py-1 rounded-full border border-slate-700">ITU-T G.652 & IEEE Standard</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+          Pengujian dan diagnosis jaringan fiber optik bertujuan memastikan tingkat redaman sinyal (<i class="font-mono-code text-rose-400">Attenuation Loss</i>) berada di dalam margin anggaran daya (<i class="font-mono-code text-rose-400">Power Budget</i>). Pengukuran redaman dihitung berdasarkan formula dasar selisih daya pemancar dan daya terima:
+        </p>
+
+        <!-- Dynamic Structural Comparison Table -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs mb-6 font-mono-code">
+          <h3 class="font-bold text-slate-200 mb-3 flex items-center gap-2 font-sans">
+            <i class="fa-solid fa-list-check text-rose-400"></i> Matriks Alat Ukur & Metode Troubleshooting Optik
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-slate-300 uppercase text-[11px] border-b border-slate-800">
+                  <th class="p-2.5 border border-slate-800">Instrumen Pengukuran</th>
+                  <th class="p-2.5 border border-slate-800">Panjang Gelombang ($\lambda$)</th>
+                  <th class="p-2.5 border border-slate-800">Fungsi Utama / Aplikasi</th>
+                  <th class="p-2.5 border border-slate-800">Output Data & Satuan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300">
+                <tr>
+                  <td class="p-2.5 border border-slate-800 font-bold text-rose-400">Visual Fault Locator (VFL)</td>
+                  <td class="p-2.5 border border-slate-800">$650\,\text{nm}$ (Merah Tampak)</td>
+                  <td class="p-2.5 border border-slate-800">Deteksi visual kebocoran cahaya, patahan patchcord, & microbending dekat.</td>
+                  <td class="p-2.5 border border-slate-800 text-amber-400">Visual Glow Spot ($0 - 5\,\text{km}$)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-800 font-bold text-sky-400">OLS + OPM (Light Meter)</td>
+                  <td class="p-2.5 border border-slate-800">$1310\,\text{nm} / 1550\,\text{nm}$</td>
+                  <td class="p-2.5 border border-slate-800">Pengukuran Insertion Loss total pada link fiber end-to-end.</td>
+                  <td class="p-2.5 border border-slate-800 text-sky-400">Daya $\text{Rx (dBm)}$ & Loss ($\text{dB}$)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-800 font-bold text-orange-400">OTDR (Reflectometer)</td>
+                  <td class="p-2.5 border border-slate-800">$1310\,\text{nm} / 1550\,\text{nm}$</td>
+                  <td class="p-2.5 border border-slate-800">Pemetaan grafik jarak vs redaman, analisis titik splice, konektor & putus.</td>
+                  <td class="p-2.5 border border-slate-800 text-orange-400">Grafik Trace Event ($\text{Km}, \text{dB}$)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key Parameter Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans">
+          <div class="card-hover bg-slate-950/80 border-t-2 border-rose-500 rounded-xl p-4 border border-slate-800">
+            <h4 class="font-bold text-rose-400 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-rose-500"></i> Formulasi Total Redaman
+            </h4>
+            <p class="text-xs text-slate-400 font-mono-code">
+              $$\text{Loss (dB)} = \text{Tx Power (dBm)} - \text{Rx Power (dBm)}$$
+              Standar SMF: $1310\,\text{nm} \approx 0.35\,\text{dB/km}$, $1550\,\text{nm} \approx 0.20\,\text{dB/km}$.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-950/80 border-t-2 border-sky-500 rounded-xl p-4 border border-slate-800">
+            <h4 class="font-bold text-sky-400 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-sky-500"></i> Karakteristik Event OTDR
+            </h4>
+            <p class="text-xs text-slate-400">
+              <b>Splice:</b> Penurunan berundak (step drop). <b>Connector:</b> Lonjakan pantulan (reflective spike). <b>Fiber Break:</b> Drop total ke garis noise dasar.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-950/80 border-t-2 border-amber-500 rounded-xl p-4 border border-slate-800">
+            <h4 class="font-bold text-amber-400 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-circle-notch text-amber-500"></i> Macrobending Sensitivity
+            </h4>
+            <p class="text-xs text-slate-400">
+              Tekukan kabel dengan radius $< 30\,\text{mm}$ memicu pembiasan keluar melintasi cladding. Gelombang $1550\,\text{nm}$ lebih sensitif rugi tekukan dibanding $1310\,\text{nm}$.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif Modul 11 -->
+      <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 backdrop-blur-md">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-bold">3</span>
+            Studio Simulasi & Diagnosis Optik Interaktif
+          </h2>
+          <span class="text-xs bg-rose-950/80 text-rose-300 font-semibold px-3 py-1 rounded-full border border-rose-800">4 Precision Laboratories</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: VFL Light Leak Scanner -->
+          <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-bullseye text-rose-500"></i> 1. VFL Light Leak Scanner
+                </h3>
+                <span class="text-[10px] font-mono-code font-bold bg-rose-950 text-rose-300 px-2 py-0.5 rounded border border-rose-800">Precision Laser $650\,\text{nm}$</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">Aktifkan laser merah VFL dan geser kursor pemindai sepanjang jalur kabel untuk menemukan koordinat pendaran cahaya (glow spot).</p>
+
+              <!-- VFL Display Studio -->
+              <div id="display-sim1" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <!-- Status Bar HUD -->
+                <div class="z-10 flex justify-between items-center bg-slate-900/90 p-2 rounded-lg border border-slate-800 font-mono-code text-[10px]">
+                  <span class="text-slate-300">Laser: <b id="sim1-laser-state" class="text-rose-500">Continuous Laser (CW)</b></span>
+                  <span class="text-slate-300">Target Fault: <b id="sim1-target-type" class="text-amber-400">Macrobend @ 55m</b></span>
+                </div>
+
+                <!-- SVG Optical Cable Path Visualizer -->
+                <div class="relative my-auto w-full h-20 bg-slate-900/50 rounded-lg border border-slate-800/80 overflow-hidden flex items-center px-4">
+                  <svg id="sim1-svg" class="w-full h-full" viewBox="0 0 400 60">
+                    <!-- Optical Fiber Line -->
+                    <line x1="20" y1="30" x2="380" y2="30" stroke="#334155" stroke-width="4" stroke-linecap="round" />
+                    <!-- Laser Light Beam inside Fiber -->
+                    <line id="sim1-laser-beam" x1="20" y1="30" x2="380" y2="30" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 8px #f43f5e)" />
+                    <!-- Fault Light Bleeding Spot -->
+                    <circle id="sim1-glow-spot" cx="240" cy="30" r="10" fill="#f43f5e" opacity="0.8" filter="drop-shadow(0 0 15px #f43f5e)" />
+                    <!-- Inspector Scanner Probe Drop -->
+                    <line id="sim1-probe-line" x1="240" y1="5" x2="240" y2="55" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2" />
+                    <circle id="sim1-probe-head" cx="240" cy="30" r="5" fill="#38bdf8" />
+                  </svg>
+                </div>
+
+                <!-- Live Coordinate Inspector Output -->
+                <div class="z-10 bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Posisi Inspektor: <b id="sim1-pos-disp" class="text-sky-400">55.0 m</b></span>
+                  <span>Kebocoran Cahaya: <b id="sim1-leak-status" class="text-rose-400">GLOW SPOT DETECTED!</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Mode Laser VFL</label>
+                  <div class="flex gap-1">
+                    <button id="btn-vfl-cw" onclick="setVFLMode('CW')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-mono-code text-[10px] font-bold py-1.5 rounded transition">CW (Steady)</button>
+                    <button id="btn-vfl-pulse" onclick="setVFLMode('PULSE')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-[10px] font-bold py-1.5 rounded transition">PULSE (2Hz)</button>
+                    <button id="btn-vfl-off" onclick="setVFLMode('OFF')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-[10px] font-bold py-1.5 rounded transition">OFF</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Skenario Gangguan Fisik Kabel</label>
+                  <select id="sim1-fault-select" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-200 outline-none focus:ring-1 focus:ring-rose-500" onchange="runSim1()">
+                    <option value="macrobend">Macrobending Loss (Titik 55m)</option>
+                    <option value="microbend">Microbending / Stress (Titik 25m)</option>
+                    <option value="break">Fiber Break / Kabel Putus (Titik 80m)</option>
+                    <option value="normal">Kabel Normal (Tidak Ada Bocor)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1 flex justify-between font-mono-code">
+                  <span>Interactive Slider Inspector Probe:</span>
+                  <span id="sim1-slider-val" class="text-sky-400 font-bold">55 m</span>
+                </label>
+                <input type="range" id="sim1-inspector-slider" min="0" max="100" value="55" class="w-full accent-sky-500" oninput="runSim1()">
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-slate-300 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-500">Hasil Pemindaian VFL:</span>
+                <span id="sim1-out-summary" class="font-bold text-rose-400 font-mono-code">Kebocoran cahaya ditemukan pada koordinat 55m</span>
+              </div>
+              <button onclick="catatSimulasi(1)" class="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: OLS & OPM Attenuation Diagnostic Terminal -->
+          <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-gauge-high text-sky-400"></i> 2. OLS & OPM Attenuation Meter
+                </h3>
+                <span class="text-[10px] font-mono-code font-bold bg-sky-950 text-sky-300 px-2 py-0.5 rounded border border-sky-800">Clean Diagnostic Terminal</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">Atur gelombang pancar OLS ($\text{Tx}$) dan hitung daya terima OPM ($\text{Rx}$) serta akumulasi redaman total link.</p>
+
+              <!-- Diagnostic Terminal Dashboard UI -->
+              <div id="display-sim2" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between">
+                <div class="grid grid-cols-2 gap-2 h-full">
+                  <!-- OLS Panel -->
+                  <div class="bg-slate-900/90 rounded-lg border border-slate-800 p-2.5 flex flex-col justify-between font-mono-code">
+                    <div>
+                      <div class="text-[9px] text-slate-500 uppercase font-bold tracking-wider mb-1"><i class="fa-solid fa-tower-broadcast mr-1"></i> OLS Transmit (Tx)</div>
+                      <div class="text-xs font-bold text-sky-400" id="sim2-ols-wl-disp">1310 nm Laser</div>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-slate-400">Daya Pancar ($\text{Tx}$):</span>
+                      <div class="text-xl font-extrabold text-slate-100" id="sim2-tx-disp">-5.00 <span class="text-xs text-slate-400 font-normal">dBm</span></div>
+                    </div>
+                  </div>
+
+                  <!-- OPM Readout Panel -->
+                  <div class="bg-slate-900/90 rounded-lg border border-slate-800 p-2.5 flex flex-col justify-between font-mono-code relative">
+                    <div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider"><i class="fa-solid fa-plug-circle-check mr-1"></i> OPM Receiver (Rx)</span>
+                        <span id="sim2-opm-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-[8px] font-bold px-1.5 py-0.5 rounded">NORMAL</span>
+                      </div>
+                      <div class="text-xs font-bold text-slate-300" id="sim2-opm-wl-disp">1310 nm Calibrated</div>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-slate-400">Daya Terima ($\text{Rx}$):</span>
+                      <div class="text-xl font-extrabold text-emerald-400" id="sim2-rx-disp">-12.35 <span class="text-xs text-slate-400 font-normal">dBm</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Live Loss Calculation Output Card -->
+                <div class="mt-2 bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between items-center border border-slate-800">
+                  <span>Rumus Redaman: <b class="text-slate-400">Loss = Tx - Rx</b></span>
+                  <span>Total Loss Link: <b id="sim2-loss-disp" class="text-amber-400 text-xs font-bold">7.35 dB</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Panjang Gelombang OLS</label>
+                  <div class="flex gap-1">
+                    <button id="btn-wl-1310" onclick="setWavelength(1310)" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-mono-code text-xs font-bold py-1.5 rounded transition">1310 nm</button>
+                    <button id="btn-wl-1550" onclick="setWavelength(1550)" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-xs font-bold py-1.5 rounded transition">1550 nm</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1 flex justify-between font-mono-code">
+                    <span>Panjang Kabel Link:</span>
+                    <span id="sim2-dist-val" class="text-sky-400 font-bold">15 km</span>
+                  </label>
+                  <input type="range" id="sim2-dist-slider" min="1" max="40" value="15" class="w-full accent-sky-500" oninput="runSim2()">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Jumlah Sambungan Splice</label>
+                  <input type="number" id="sim2-splice-input" min="0" max="10" value="3" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono-code text-slate-200 outline-none" onchange="runSim2()">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1">Jumlah Pasangan Konektor</label>
+                  <input type="number" id="sim2-conn-input" min="2" max="8" value="2" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs font-mono-code text-slate-200 outline-none" onchange="runSim2()">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-slate-300 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-500">Evaluasi Power Budget:</span>
+                <span id="sim2-out-summary" class="font-bold text-emerald-400 font-mono-code">Sinyal Normal (Di atas sensitivitas Rx)</span>
+              </div>
+              <button onclick="catatSimulasi(2)" class="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: Interactive OTDR Trace Analyzer -->
+          <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-chart-area text-orange-400"></i> 3. Interactive OTDR Trace Analyzer
+                </h3>
+                <span class="text-[10px] font-mono-code font-bold bg-orange-950 text-orange-300 px-2 py-0.5 rounded border border-orange-800">Reflectometer Graph</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">Geser Marker A (Biru) dan Marker B (Oranye) untuk menganalisis lokasi event gangguan serta rata-rata loss per km.</p>
+
+              <!-- OTDR Clean Graph Canvas Display Box -->
+              <div id="display-sim3" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <!-- SVG OTDR Graph Renderer -->
+                <svg id="sim3-svg" class="w-full h-full" viewBox="0 0 360 140">
+                  <!-- Axis Lines -->
+                  <line x1="30" y1="10" x2="30" y2="120" stroke="#334155" stroke-width="1" />
+                  <line x1="30" y1="120" x2="350" y2="120" stroke="#334155" stroke-width="1" />
+
+                  <!-- OTDR Trace Curve -->
+                  <!-- Start at 0km (30px), spike at 30,10; slope to 3.5km (140px); step drop; slope to 7.0km (250px); spike & drop; slope to 8.5km (300px); break drop to 110 -->
+                  <path id="sim3-trace-path" d="M 30 120 L 30 20 L 40 35 L 140 50 L 140 60 L 250 75 L 250 55 L 255 85 L 300 95 L 300 120 L 350 120" fill="none" stroke="#f97316" stroke-width="2" filter="drop-shadow(0 0 5px #f97316)" />
+
+                  <!-- Event Markers/Tags -->
+                  <g font-family="JetBrains Mono" font-size="7" font-weight="bold">
+                    <!-- Event 1: Splice -->
+                    <circle cx="140" cy="55" r="3" fill="#38bdf8" />
+                    <text x="125" y="45" fill="#38bdf8">Splice -0.4dB</text>
+
+                    <!-- Event 2: Connector -->
+                    <circle cx="250" cy="70" r="3" fill="#f59e0b" />
+                    <text x="235" y="45" fill="#f59e0b">Conn Spike</text>
+
+                    <!-- Event 3: Fiber Break -->
+                    <circle cx="300" cy="115" r="3" fill="#f43f5e" />
+                    <text x="280" y="110" fill="#f43f5e">Break @8.5km</text>
+                  </g>
+
+                  <!-- Marker A Line (Blue) -->
+                  <line id="sim3-marker-a" x1="100" y1="10" x2="100" y2="120" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3" />
+                  <!-- Marker B Line (Orange) -->
+                  <line id="sim3-marker-b" x1="280" y1="10" x2="280" y2="120" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3" />
+                </svg>
+
+                <div class="z-10 bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Marker A: <b id="sim3-ma-disp" class="text-sky-400">2.2 km</b></span>
+                  <span>Marker B: <b id="sim3-mb-disp" class="text-orange-400">7.8 km</b></span>
+                  <span>$\Delta \text{Jarak}$: <b id="sim3-ddist-disp" class="text-emerald-400">5.6 km</b></span>
+                  <span>$\Delta \text{Loss}$: <b id="sim3-dloss-disp" class="text-amber-400">2.8 dB</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1 flex justify-between font-mono-code">
+                    <span class="text-sky-400">Posisi Marker A:</span>
+                    <span id="sim3-ma-val" class="text-sky-400 font-bold">2.2 km</span>
+                  </label>
+                  <input type="range" id="sim3-ma-slider" min="0" max="10" step="0.1" value="2.2" class="w-full accent-sky-500" oninput="runSim3()">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-400 mb-1 flex justify-between font-mono-code">
+                    <span class="text-orange-400">Posisi Marker B:</span>
+                    <span id="sim3-mb-val" class="text-orange-400 font-bold">7.8 km</span>
+                  </label>
+                  <input type="range" id="sim3-mb-slider" min="0" max="10" step="0.1" value="7.8" class="w-full accent-orange-500" oninput="runSim3()">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-slate-300 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-500">Summary Data Card OTDR:</span>
+                <span id="sim3-out-summary" class="font-bold text-orange-400 font-mono-code">Fiber Break terdeteksi presisi pada 8.5 km</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: Bending Radius & Attenuation Stress Lab -->
+          <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-circle-notch text-emerald-400"></i> 4. Bending Radius & Stress Lab
+                </h3>
+                <span class="text-[10px] font-mono-code font-bold bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">Minimalist Bending Gauge</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">Ubah radius tekukan fisik serat optik dan amati pembiasan vektor foton keluar cladding serta akumulasi rugi sinyal.</p>
+
+              <!-- Vector Visualizer Display Box -->
+              <div id="display-sim4" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <div class="flex justify-between items-center text-[10px] font-mono-code text-slate-400">
+                  <span>Radius Tekukan: <b id="sim4-radius-disp" class="text-emerald-400">30 mm (Safe)</b></span>
+                  <span>Macrobending Loss: <b id="sim4-loss-val-disp" class="text-slate-100">0.00 dB</b></span>
+                </div>
+
+                <!-- Bending Arc SVG Visualizer -->
+                <div class="relative my-auto w-full h-24 flex items-center justify-center">
+                  <svg id="sim4-svg" class="w-full h-full" viewBox="0 0 300 80">
+                    <!-- Outer Fiber Cladding Arc -->
+                    <path id="sim4-fiber-arc" d="M 20 40 Q 150 40 280 40" fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round" />
+                    <!-- Inner Light Wave Core Arc -->
+                    <path id="sim4-core-arc" d="M 20 40 Q 150 40 280 40" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" filter="drop-shadow(0 0 6px #38bdf8)" />
+                    
+                    <!-- Escaping Photon Vector Arrows -->
+                    <g id="sim4-vectors" opacity="0">
+                      <line x1="150" y1="35" x2="150" y2="10" stroke="#f43f5e" stroke-width="2" marker-end="url(#arrow)" />
+                      <line x1="130" y1="37" x2="120" y2="15" stroke="#f43f5e" stroke-width="2" />
+                      <line x1="170" y1="37" x2="180" y2="15" stroke="#f43f5e" stroke-width="2" />
+                    </g>
+                  </svg>
+                </div>
+
+                <div class="bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Daya Sinyal Terpancar: <b id="sim4-gauge-text" class="text-emerald-400">100% (Sempurna)</b></span>
+                  <span>Risiko Kerusakan: <b id="sim4-risk-disp" class="text-emerald-400">Aman</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="mb-3">
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1 flex justify-between font-mono-code">
+                  <span>Radius Pembengkokan ($R$):</span>
+                  <span id="sim4-radius-slider-val" class="text-emerald-400 font-bold">30 mm</span>
+                </label>
+                <input type="range" id="sim4-radius-slider" min="2" max="30" value="30" class="w-full accent-emerald-500" oninput="runSim4()">
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-xs text-slate-300 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-500">Status Pembengkokan:</span>
+                <span id="sim4-out-summary" class="font-bold text-emerald-400 font-mono-code">Radius aman di atas batas toleransi fisik</span>
+              </div>
+              <button onclick="catatSimulasi(4)" class="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 backdrop-blur-md">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-bold">4</span>
+              Tabel Pengamatan & Diagnostic Log
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Rekapitulasi otomatis hasil pengujian instrumen laboratorium optik.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-emerald-400"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs text-slate-300" id="tbl-pengamatan">
+            <thead class="bg-slate-950 text-slate-400 uppercase font-mono-code text-[11px] border-b border-slate-800">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Pengujian</th>
+                <th class="px-4 py-3">Hasil Pengukuran / Readout</th>
+                <th class="px-4 py-3">Status Diagnostic Log</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-800 bg-slate-900/50">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 backdrop-blur-md">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-bold">5</span>
+              Uji Kompetensi Troubleshooting & Pengukuran Optik
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut untuk mengevaluasi pemahaman instrumen optik Anda.</p>
+          </div>
+          <span class="text-xs font-semibold bg-rose-950 text-rose-300 px-3 py-1 rounded-full border border-rose-800">20 Soal Pilihan Ganda</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-xs text-slate-400">
+          <p class="font-semibold text-slate-200">Petunjuk Finalization:</p>
+          <p>Pastikan identitas, log pengamatan, dan seluruh jawaban uji kompetensi telah terisi penuh.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-semibold text-xs hover:bg-slate-800 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-800 transform transition-all text-slate-100">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-100">LKPD 11 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-400 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-6 p-4 bg-slate-950 rounded-xl border border-slate-800">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nilai Akhir Diagnostic Evaluasi</p>
+          <div class="text-5xl font-black text-rose-400 my-2 font-mono-code" id="modal-score">0</div>
+          <p class="text-xs text-slate-300" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-400 flex items-center justify-center gap-2 font-mono-code">
+          <i class="fa-solid fa-circle-check text-emerald-400"></i> Terkirim ke server laboratorium guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition">Tutup</button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-800 text-center text-slate-100">
+      <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-100 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-400 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
+
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
+
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selKelas.appendChild(opt);
+        });
+      } else {
+        selKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selNama = document.getElementById('sel-nama');
+
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selNama.appendChild(opt);
+        });
+      } else {
+        selNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
+        }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-950 text-emerald-400 font-medium px-3 py-1 rounded-full border border-emerald-800";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-slate-800 text-rose-400 font-medium px-3 py-1 rounded-full border border-slate-700";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Bank Soal Uji Kompetensi LKPD 11
+    const questionBank = [
+      { id: 1, q: "Pengukuran redaman total sinyal optik (attenuation loss) pada saluran kabel serat optik umumnya dihitung dalam satuan...", options: ["A. Watt (W)", "B. Desibel (dB)", "C. Volt (V)", "D. Hertz (Hz)", "E. Ohm (Ω)"], ans: "B" },
+      { id: 2, q: "Rumus dasar yang digunakan untuk menghitung total redaman sinyal optik antara pemancar (Tx) dan penerima (Rx) adalah...", options: ["A. Loss (dB) = Tx Power (dBm) - Rx Power (dBm)", "B. Loss (dB) = Tx Power (dBm) + Rx Power (dBm)", "C. Loss (dB) = Rx Power (dBm) / Tx Power (dBm)", "D. Loss (dB) = Tx Power (dBm) × Jarak (Km)", "E. Loss (dB) = 10 × log(Tx / Rx)"], ans: "A" },
+      { id: 3, q: "Fungsi utama dari alat Visual Fault Locator (VFL) dalam pengujian jaringan fiber optik adalah...", options: ["A. Mengukur daya pancar SFP secara digital", "B. Mendeteksi lokasi kebocoran cahaya, patahan patchcord, dan microbending secara visual", "C. Menghitung indeks bias core secara presisi", "D. Menyambung dua kabel optik dengan suhu tinggi", "E. Mengukur kecepatan transmisi data Gbps"], ans: "B" },
+      { id: 4, q: "Panjang gelombang sinar laser tampak yang dipancarkan oleh instrumen VFL umumnya beroperasi pada...", options: ["A. 850 nm", "B. 1310 nm", "C. 1550 nm", "D. 650 nm (Laser Merah Tampak)", "E. 1625 nm"], ans: "D" },
+      { id: 5, q: "Perangkat yang berfungsi memancarkan daya cahaya optik secara konstan dan stabil untuk pengujian redaman saluran dinamakan...", options: ["A. Optical Power Meter (OPM)", "B. Optical Light Source (OLS)", "C. Visual Fault Locator (VFL)", "D. Fiber Cleaver", "E. OTDR Trace Analyzer"], ans: "B" },
+      { id: 6, q: "Perangkat yang digunakan untuk mengukur besarnya daya sinyal optik yang diterima pada ujung kabel dinamakan...", options: ["A. Optical Power Meter (OPM)", "B. Fusion Splicer", "C. Optical Light Source (OLS)", "D. Visual Fault Locator (VFL)", "E. OTDR"], ans: "A" },
+      { id: 7, q: "Pada panjang gelombang 1550 nm, nilai standar redaman kabel Single-Mode Fiber (SMF) rata-rata berkisar sebesar...", options: ["A. 0.35 dB/km", "B. 0.20 dB/km", "C. 1.00 dB/km", "D. 3.50 dB/km", "E. 0.05 dB/km"], ans: "B" },
+      { id: 8, q: "Mengapa pengujian redaman pada panjang gelombang 1550 nm lebih sensitif terhadap bending loss dibanding 1310 nm?", options: ["A. Karena 1550 nm memiliki daya pancar lebih kecil", "B. Karena Mode Field Diameter (MFD) pada 1550 nm lebih besar sehingga cahaya mudah keluar saat tertekuk", "C. Karena 1550 nm menggunakan kabel jenis Multi-Mode", "D. Karena 1550 nm tidak mengalami pemantulan sempurna", "E. Karena kecepatan cahaya melambat pada 1550 nm"], ans: "B" },
+      { id: 9, q: "Fungsi utama dari instrumen Optical Time-Domain Reflectometer (OTDR) adalah...", options: ["A. Mengukur tegangan listrik pada modem ONT", "B. Memetakan grafik jarak vs redaman serta mengidentifikasi lokasi event sambungan dan gangguan sepanjang kabel", "C. Membersihkan ferrule konektor yang kotor", "D. Memotong inti kaca secara presisi $90^\circ$", "E. Mengukur suhu perangkat SFP Transceiver"], ans: "B" },
+      { id: 10, q: "Karakteristik grafik OTDR saat menemukan sambungan lebur (splice loss) yang kurang sempurna ditunjukkan oleh...", options: ["A. Lonjakan tajam ke atas (spike reflection)", "B. Penurunan berundak mendadak (step drop loss)", "C. Grafik naik secara linier", "D. Drop total langsung ke dasar garis noise", "E. Garis gelombang sinus konstan"], ans: "B" },
+      { id: 11, q: "Lonjakan tajam ke atas (reflective spike) pada grafik OTDR menandakan adanya fenomena...", options: ["A. Rayleigh Backscattering", "B. Fresnel Reflection akibat konektor atau celah udara", "C. Patahan kabel total", "D. Microbending loss", "E. Redaman konstan serat"], ans: "B" },
+      { id: 12, q: "Penurunan grafik OTDR secara vertikal hingga menyentuh dasar garis noise menandakan event...", options: ["A. Fiber Break (Kabel Putus Total)", "B. Sambungan Splice Sangat Bagus", "C. Kebocoran Sinyal Ringan", "D. Penambahan Jarak Kabel", "E. Peningkatan Daya Laser"], ans: "A" },
+      { id: 13, q: "Prinsip kerja OTDR didasarkan pada analisis sinyal yang dipantulkan kembali akibat fenomena fisika...", options: ["A. Total Internal Reflection saja", "B. Rayleigh Scattering & Fresnel Reflection", "C. Chromatic Dispersion & Polarization", "D. Refraksi Kritis Hukum Snellius", "E. Absorption Thermal Effect"], ans: "B" },
+      { id: 14, q: "Fitur Marker A dan Marker B pada tampilan grafik OTDR berfungsi khusus untuk...", options: ["A. Mengatur intensitas sinar VFL", "B. Mengukur jarak presisi dan besar redaman (loss) di antara dua titik lokasi pengujian", "C. Mengubah panjang gelombang laser secara otomatis", "D. Memotong sinyal yang terlalu kuat", "E. Menghapus event kabel putus"], ans: "B" },
+      { id: 15, q: "Batas radius pembengkokan kabel optik (minimum bending radius) standar yang aman umumnya adalah...", options: ["A. $\ge 30\,\text{mm}$ (atau $20\times$ diameter luar kabel)", "B. $\le 2\,\text{mm}$", "C. Tepat $5\,\text{mm}$", "D. Bebas dibengkokkan hingga $0\,\text{mm}$", "E. $\ge 500\,\text{mm}$"], ans: "A" },
+      { id: 16, q: "Fenomena Macrobending Loss terjadi apabila...", options: ["A. Kabel ditarik secara lurus tanpa lekukan", "B. Kabel dibengkokkan secara fisik dengan radius yang terlalu kecil melampaui batas toleransi", "C. Suhu ruangan laboratorium terlalu dingin", "D. Konektor dibersihkan menggunakan alkohol", "E. Daya OLS dinaikkan ke level maksimum"], ans: "B" },
+      { id: 17, q: "Jika daya pancar OLS $=-5.00\,\text{dBm}$ dan daya terima OPM $=-18.35\,\text{dBm}$, berapakah total redaman (loss) saluran optik tersebut?", options: ["A. $23.35\,\text{dB}$", "B. $13.35\,\text{dB}$", "C. $-13.35\,\text{dB}$", "D. $5.00\,\text{dB}$", "E. $18.35\,\text{dB}$"], ans: "B" },
+      { id: 18, q: "Status daya terima OPM sebesar $-32.00\,\text{dBm}$ pada jaringan GPON FTTH menunjukkan kategori...", options: ["A. Normal / Excellent Signal", "B. High Gain Power", "C. Critical / Out of Power Budget (Sinyal Terlalu Lemah)", "D. Fiber Break Total", "E. SFP Overload"], ans: "C" },
+      { id: 19, q: "Salah satu penyebab utama timbulnya nilai insertion loss yang tinggi pada titik konektor adalah...", options: ["A. Ujung ferrule kotor, tergores, atau terjadi celah udara (air gap)", "B. Penggunaan kabel Single-Mode standar", "C. Panjang gelombang OLS diatur ke 1310 nm", "D. Penguncian konektor LC dipasang rapat", "E. Kabel terlindung oleh steel armor"], ans: "A" },
+      { id: 20, q: "Metode troubleshooting paling cepat untuk menemukan lokasi titik lekukan ekstrem patchcord di dalam rak ODF adalah...", options: ["A. Menggunakan OTDR jarak $100\,\text{km}$", "B. Menggunakan VFL dan mengamati pendaran titik merah (glow spot)", "C. Mengganti seluruh kabel ODF", "D. Mengukur tegangan listrik OPM", "E. Memotong patchcord menjadi dua bagian"], ans: "B" }
+    ];
+
+    // Simulation States
+    let vflMode = 'CW'; // CW, PULSE, OFF
+    let olsWavelength = 1310; // 1310 or 1550
+    let sim1Data = {}, sim2Data = {}, sim3Data = {}, sim4Data = {};
+
+    // Simulation 1: VFL Scanner
+    function setVFLMode(mode) {
+      vflMode = mode;
+      document.getElementById('btn-vfl-cw').className = mode === 'CW' ? "flex-1 bg-rose-600 hover:bg-rose-700 text-white font-mono-code text-[10px] font-bold py-1.5 rounded transition" : "flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-[10px] font-bold py-1.5 rounded transition";
+      document.getElementById('btn-vfl-pulse').className = mode === 'PULSE' ? "flex-1 bg-rose-600 hover:bg-rose-700 text-white font-mono-code text-[10px] font-bold py-1.5 rounded transition" : "flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-[10px] font-bold py-1.5 rounded transition";
+      document.getElementById('btn-vfl-off').className = mode === 'OFF' ? "flex-1 bg-rose-600 hover:bg-rose-700 text-white font-mono-code text-[10px] font-bold py-1.5 rounded transition" : "flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-[10px] font-bold py-1.5 rounded transition";
+      runSim1();
+    }
+
+    function runSim1() {
+      const faultType = document.getElementById('sim1-fault-select').value;
+      const inspectorPos = parseInt(document.getElementById('sim1-inspector-slider').value);
+      document.getElementById('sim1-slider-val').innerText = `${inspectorPos} m`;
+      document.getElementById('sim1-pos-disp').innerText = `${inspectorPos}.0 m`;
+
+      let targetPos = 55;
+      let targetName = "Macrobend @ 55m";
+      if (faultType === 'microbend') { targetPos = 25; targetName = "Microbend @ 25m"; }
+      if (faultType === 'break') { targetPos = 80; targetName = "Fiber Break @ 80m"; }
+      if (faultType === 'normal') { targetPos = -999; targetName = "Tidak Ada Fault"; }
+
+      document.getElementById('sim1-target-type').innerText = targetName;
+
+      const laserBeam = document.getElementById('sim1-laser-beam');
+      const glowSpot = document.getElementById('sim1-glow-spot');
+      const probeLine = document.getElementById('sim1-probe-line');
+      const probeHead = document.getElementById('sim1-probe-head');
+      const laserStateDisp = document.getElementById('sim1-laser-state');
+
+      // Convert meter to SVG coordinate (range 0-100m -> 20-380px)
+      const svgProbeX = 20 + (inspectorPos / 100) * 360;
+      probeLine.setAttribute('x1', svgProbeX);
+      probeLine.setAttribute('x2', svgProbeX);
+      probeHead.setAttribute('cx', svgProbeX);
+
+      if (vflMode === 'OFF') {
+        laserBeam.setAttribute('opacity', '0');
+        glowSpot.setAttribute('opacity', '0');
+        laserStateDisp.innerText = "Laser Standby (OFF)";
+        document.getElementById('sim1-leak-status').innerText = "VFL OFF";
+        document.getElementById('sim1-out-summary').innerText = "Laser VFL dinonaktifkan";
+        return;
+      }
+
+      laserBeam.setAttribute('opacity', '1');
+      if (vflMode === 'PULSE') {
+        laserBeam.classList.add('vfl-pulse');
+        glowSpot.classList.add('vfl-pulse');
+        laserStateDisp.innerText = "PULSE Flashing (2Hz)";
+      } else {
+        laserBeam.classList.remove('vfl-pulse');
+        glowSpot.classList.remove('vfl-pulse');
+        laserStateDisp.innerText = "Continuous Laser (CW)";
+      }
+
+      // Position fault spot on SVG
+      if (faultType !== 'normal') {
+        const svgFaultX = 20 + (targetPos / 100) * 360;
+        glowSpot.setAttribute('cx', svgFaultX);
+        glowSpot.setAttribute('opacity', '0.9');
+
+        // Inspector match detection (tolerance +/- 3m)
+        if (Math.abs(inspectorPos - targetPos) <= 3) {
+          document.getElementById('sim1-leak-status').innerText = "GLOW SPOT DETECTED!";
+          document.getElementById('sim1-leak-status').className = "text-rose-400 font-bold animate-pulse";
+          document.getElementById('sim1-out-summary').innerText = `Kebocoran cahaya ditemukan presisi pada ${targetPos}m`;
+        } else {
+          document.getElementById('sim1-leak-status').innerText = "Scanning Path...";
+          document.getElementById('sim1-leak-status').className = "text-slate-400 font-bold";
+          document.getElementById('sim1-out-summary').innerText = `Pindahkan probe mendekati koordinat ${targetPos}m`;
+        }
+      } else {
+        glowSpot.setAttribute('opacity', '0');
+        document.getElementById('sim1-leak-status').innerText = "No Light Leak";
+        document.getElementById('sim1-leak-status').className = "text-emerald-400 font-bold";
+        document.getElementById('sim1-out-summary').innerText = "Kabel optik normal, sinyal terperangkap sempurna";
+      }
+
+      sim1Data = { vflMode, faultType, inspectorPos, targetPos, summary: document.getElementById('sim1-out-summary').innerText };
+    }
+
+    // Simulation 2: OLS & OPM Terminal
+    function setWavelength(wl) {
+      olsWavelength = wl;
+      document.getElementById('btn-wl-1310').className = wl === 1310 ? "flex-1 bg-sky-600 hover:bg-sky-700 text-white font-mono-code text-xs font-bold py-1.5 rounded transition" : "flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-xs font-bold py-1.5 rounded transition";
+      document.getElementById('btn-wl-1550').className = wl === 1550 ? "flex-1 bg-sky-600 hover:bg-sky-700 text-white font-mono-code text-xs font-bold py-1.5 rounded transition" : "flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono-code text-xs font-bold py-1.5 rounded transition";
+      runSim2();
+    }
+
+    function runSim2() {
+      const dist = parseInt(document.getElementById('sim2-dist-slider').value);
+      const splices = parseInt(document.getElementById('sim2-splice-input').value) || 0;
+      const connectors = parseInt(document.getElementById('sim2-conn-input').value) || 2;
+
+      document.getElementById('sim2-dist-val').innerText = `${dist} km`;
+      document.getElementById('sim2-ols-wl-disp').innerText = `${olsWavelength} nm Laser`;
+      document.getElementById('sim2-opm-wl-disp').innerText = `${olsWavelength} nm Calibrated`;
+
+      const txPower = -5.00; // Fixed Tx baseline
+      const rate = olsWavelength === 1310 ? 0.35 : 0.20; // dB/km
+      const spliceLoss = splices * 0.10;
+      const connLoss = connectors * 0.30;
+      const totalLoss = Math.round(((dist * rate) + spliceLoss + connLoss) * 100) / 100;
+      const rxPower = Math.round((txPower - totalLoss) * 100) / 100;
+
+      document.getElementById('sim2-tx-disp').innerText = `${txPower.toFixed(2)} dBm`;
+      document.getElementById('sim2-rx-disp').innerText = `${rxPower.toFixed(2)} dBm`;
+      document.getElementById('sim2-loss-disp').innerText = `${totalLoss.toFixed(2)} dB`;
+
+      const opmBadge = document.getElementById('sim2-opm-badge');
+      let statusSummary = "";
+
+      if (rxPower >= -20.0) {
+        opmBadge.className = "bg-emerald-950 text-emerald-400 border border-emerald-800 text-[8px] font-bold px-1.5 py-0.5 rounded";
+        opmBadge.innerText = "EXCELLENT";
+        statusSummary = "Sinyal sangat kuat (Margin Power Budget Sangat Aman)";
+      } else if (rxPower >= -27.0) {
+        opmBadge.className = "bg-amber-950 text-amber-400 border border-amber-800 text-[8px] font-bold px-1.5 py-0.5 rounded";
+        opmBadge.innerText = "WARNING";
+        statusSummary = "Sinyal mendekati batas sensitivitas Rx (Margin Tipis)";
+      } else {
+        opmBadge.className = "bg-rose-950 text-rose-400 border border-rose-800 text-[8px] font-bold px-1.5 py-0.5 rounded glow-laser-red";
+        opmBadge.innerText = "CRITICAL / LOW";
+        statusSummary = "Sinyal terlalu lemah! Potensi RTO / Packet Loss";
+      }
+
+      document.getElementById('sim2-out-summary').innerText = statusSummary;
+      sim2Data = { olsWavelength, dist, splices, connectors, txPower, rxPower, totalLoss, summary: statusSummary };
+    }
+
+    // Simulation 3: OTDR Trace
+    function runSim3() {
+      const mA = parseFloat(document.getElementById('sim3-ma-slider').value);
+      const mB = parseFloat(document.getElementById('sim3-mb-slider').value);
+
+      document.getElementById('sim3-ma-val').innerText = `${mA.toFixed(1)} km`;
+      document.getElementById('sim3-mb-val').innerText = `${mB.toFixed(1)} km`;
+      document.getElementById('sim3-ma-disp').innerText = `${mA.toFixed(1)} km`;
+      document.getElementById('sim3-mb-disp').innerText = `${mB.toFixed(1)} km`;
+
+      const deltaDist = Math.abs(Math.round((mB - mA) * 10) / 10);
+      const deltaLoss = Math.abs(Math.round((deltaDist * 0.35 + (mB > 3.5 && mA < 3.5 ? 0.4 : 0)) * 100) / 100);
+
+      document.getElementById('sim3-ddist-disp').innerText = `${deltaDist.toFixed(1)} km`;
+      document.getElementById('sim3-dloss-disp').innerText = `${deltaLoss.toFixed(2)} dB`;
+
+      // Update Markers on SVG Graph
+      const svgX_A = 30 + (mA / 10) * 320;
+      const svgX_B = 30 + (mB / 10) * 320;
+
+      document.getElementById('sim3-marker-a').setAttribute('x1', svgX_A);
+      document.getElementById('sim3-marker-a').setAttribute('x2', svgX_A);
+      document.getElementById('sim3-marker-b').setAttribute('x1', svgX_B);
+      document.getElementById('sim3-marker-b').setAttribute('x2', svgX_B);
+
+      let summaryText = `Analisis span ${deltaDist.toFixed(1)} km dengan redaman ${deltaLoss.toFixed(2)} dB`;
+      if (mA <= 8.5 && mB >= 8.5) {
+        summaryText = "Fiber Break terdeteksi presisi pada lokasi 8.5 km!";
+      }
+
+      document.getElementById('sim3-out-summary').innerText = summaryText;
+      sim3Data = { mA, mB, deltaDist, deltaLoss, summary: summaryText };
+    }
+
+    // Simulation 4: Bending Radius Lab
+    function runSim4() {
+      const radius = parseInt(document.getElementById('sim4-radius-slider').value);
+      document.getElementById('sim4-radius-slider-val').innerText = `${radius} mm`;
+
+      let lossVal = 0.00;
+      let gaugeText = "100% (Sempurna)";
+      let riskText = "Aman";
+      let summaryText = "Radius aman di atas batas toleransi fisik";
+
+      const fiberArc = document.getElementById('sim4-fiber-arc');
+      const coreArc = document.getElementById('sim4-core-arc');
+      const vectors = document.getElementById('sim4-vectors');
+
+      // Quadratic curve bending calculation (Q 150 Y)
+      // Radius 30mm -> Y=40 (flat), Radius 2mm -> Y=5 (sharp curve)
+      const curveY = 40 - Math.round(((30 - radius) / 28) * 35);
+      const dPath = `M 20 40 Q 150 ${curveY} 280 40`;
+      fiberArc.setAttribute('d', dPath);
+      coreArc.setAttribute('d', dPath);
+
+      if (radius < 15) {
+        lossVal = Math.round(Math.pow((15 - radius), 1.6) * 10) / 100;
+        gaugeText = `${Math.max(10, 100 - Math.round(lossVal * 8))}% (Sinyal Bocor)`;
+        riskText = "Macrobending Warning";
+        summaryText = `Redaman tekukan sebesar +${lossVal.toFixed(2)} dB pada cladding`;
+        vectors.setAttribute('opacity', '0.8');
+      } else {
+        vectors.setAttribute('opacity', '0');
+      }
+
+      if (radius <= 5) {
+        riskText = "KRITIS / SERAT CRACK";
+        summaryText = "Tekukan ekstrem! Risiko serat kaca patah permanent";
+      }
+
+      document.getElementById('sim4-radius-disp').innerText = `${radius} mm (${riskText})`;
+      document.getElementById('sim4-loss-val-disp').innerText = `+${lossVal.toFixed(2)} dB`;
+      document.getElementById('sim4-gauge-text').innerText = gaugeText;
+      document.getElementById('sim4-risk-disp').innerText = riskText;
+      document.getElementById('sim4-out-summary').innerText = summaryText;
+
+      sim4Data = { radius, lossVal, riskText, summary: summaryText };
+    }
+
+    // Record Simulation Log to Table
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 1) {
+        logEntry = {
+          modul: "1. VFL Light Leak Scanner",
+          param: `Mode: ${sim1Data.vflMode}, Fault Target: ${sim1Data.targetPos}m`,
+          hasil: `Probe Pos: ${sim1Data.inspectorPos}m`,
+          status: sim1Data.summary
+        };
+      } else if (simNum === 2) {
+        logEntry = {
+          modul: "2. OLS & OPM Terminal",
+          param: `$\lambda$: ${sim2Data.olsWavelength}nm, Jarak: ${sim2Data.dist}km, Splice: ${sim2Data.splices}`,
+          hasil: `Rx: ${sim2Data.rxPower}dBm, Loss: ${sim2Data.totalLoss}dB`,
+          status: sim2Data.summary
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "3. OTDR Trace Analyzer",
+          param: `Marker A: ${sim3Data.mA}km, Marker B: ${sim3Data.mB}km`,
+          hasil: `$\Delta \text{Jarak}$: ${sim3Data.deltaDist}km, $\Delta \text{Loss}$: ${sim3Data.deltaLoss}dB`,
+          status: sim3Data.summary
+        };
+      } else if (simNum === 4) {
+        logEntry = {
+          modul: "4. Bending Radius Lab",
+          param: `Radius Pembengkokan: ${sim4Data.radius}mm`,
+          hasil: `Macrobending Loss: +${sim4Data.lossVal}dB`,
+          status: sim4Data.summary
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+      showToast("Tercatat", "Hasil diagnostic log berhasil disimpan ke tabel.", "success");
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-950 text-emerald-400 border border-emerald-800";
+        if (row.status.includes("CRITICAL") || row.status.includes("lemah") || row.status.includes("patah") || row.status.includes("Break")) {
+          badgeColor = "bg-rose-950 text-rose-400 border border-rose-800";
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900 border-b border-slate-800 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500 font-mono-code">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-200">${row.modul}</td>
+          <td class="px-4 py-3 font-mono-code text-slate-400 text-[11px]">${row.param}</td>
+          <td class="px-4 py-3 font-mono-code font-bold text-rose-400">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono-code font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-400 hover:text-rose-300 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        showToast("Perhatian", "Belum ada data pengamatan untuk di-export!", "warning");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Pengujian,Hasil Pengukuran,Status Log\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "LKPD11_Diagnostic_Log.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil", "File CSV log diagnostic terunduh.", "success");
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-3 p-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-rose-500/50 hover:bg-slate-900 cursor-pointer transition text-xs font-medium text-slate-300">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-rose-500 focus:ring-rose-500">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-200 mb-3 flex items-start gap-2">
+            <span class="bg-rose-600 text-white font-mono-code text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2 rounded font-mono-code"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        showToast("Identitas Wajib", "Lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'bg-rose-950', 'text-rose-300');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-950', 'text-emerald-300', 'border', 'border-emerald-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Benar! Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-950', 'text-rose-300', 'border', 'border-rose-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400 mr-1"></i> Salah. Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-950', 'text-rose-300', 'border', 'border-rose-800');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 11: Pengukuran, Pengujian Sinyal & Troubleshooting Optik";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai instrumen OLS/OPM, VFL, OTDR, dan analisis redaman.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali bentuk grafik OTDR dan pengaruh macrobending loss.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi simulasi OTDR Trace Analyzer dan OPM Meter.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-rose-400"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Offline mode / Gagal otomatis via Fetch.`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset LKPD", "Apakah Anda yakin ingin meriset seluruh isian LKPD 11 ini?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bg = "bg-slate-900 border-slate-700 text-white";
+      let icon = "fa-circle-info text-sky-400";
+      if (type === 'success') { bg = "bg-slate-900 border-emerald-500/40 text-white"; icon = "fa-circle-check text-emerald-400"; }
+      if (type === 'warning') { bg = "bg-slate-900 border-amber-500/40 text-white"; icon = "fa-triangle-exclamation text-amber-400"; }
+
+      toast.className = `p-3.5 rounded-xl border shadow-2xl flex items-start gap-3 text-xs min-w-[260px] max-w-xs transition transform translate-y-2 opacity-0 pointer-events-auto ${bg}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-bold mb-0.5">${title}</p>
+          <p class="text-slate-300 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('modal-confirm');
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const handleYes = () => { cleanup(); onConfirm(); };
+      const handleCancel = () => { cleanup(); };
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.removeEventListener('click', handleYes);
+        btnCancel.removeEventListener('click', handleCancel);
+      };
+
+      btnYes.addEventListener('click', handleYes);
+      btnCancel.addEventListener('click', handleCancel);
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      runSim1();
+      runSim2();
+      runSim3();
+      runSim4();
+    };
+  </script>
+</body>
+</html>

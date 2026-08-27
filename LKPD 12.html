@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 12: Perancangan & Arsitektur Jaringan FTTH</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.04); }
+    
+    /* Studio Clean Canvas Grid */
+    .grid-bg-pattern {
+      background-color: #ffffff;
+      background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+      background-size: 16px 16px;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
+
+  <!-- Clean Studio Header Section -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+          <i class="fa-solid fa-network-wired text-2xl text-slate-700"></i>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Lembar Kerja Peserta Didik Interaktif</span>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">LKPD 12: Perancangan & Arsitektur Jaringan FTTH</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Topologi PON, ODN Architecture Builder, Splitter Attenuation, Power Budget, & Troubleshooting Studio</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs border border-slate-200">
+        <i class="fa-solid fa-graduation-cap text-slate-600"></i>
+        <span class="font-medium text-slate-700" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-white rounded-2xl border border-slate-200 p-6 relative shadow-sm">
+      <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-800 rounded-l-2xl"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-slate-100 text-slate-600 font-medium px-3 py-1 rounded-full border border-slate-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-amber-50/60 border border-amber-200 text-amber-800 rounded-xl text-xs flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm"></i>
+        <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk mengaktifkan modul laboratorium praktikum FTTH.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori & Arsitektur FTTH -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">2</span>
+            Ringkasan Teori: Arsitektur ODN Jaringan FTTH (Fiber to the Home)
+          </h2>
+          <span class="text-[11px] bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-full border border-slate-200">ITU-T G.984 GPON Standard</span>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed mb-5">
+          Jaringan <b>FTTH (Fiber to the Home)</b> memanfaatkan teknologi <b>PON (Passive Optical Network)</b>, yaitu arsitektur titik-ke-banyak titik (Point-to-Multipoint) tanpa komponen aktif bersumber daya listrik di sepanjang jalur transmisi distribusi optik (ODN).
+        </p>
+
+        <!-- Dynamic Structural Table -->
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden text-xs mb-5">
+          <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 font-bold text-slate-800 flex items-center justify-between">
+            <span><i class="fa-solid fa-sitemap text-slate-600 mr-1.5"></i> Hirarki Perangkat ODN (Optical Distribution Network)</span>
+            <span class="text-[10px] text-slate-400 font-normal">Sentral CO $\rightarrow$ Rumah Pelanggan</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100/70 text-slate-600 font-semibold text-[11px]">
+                  <th class="p-2.5 border-b border-slate-200">Perangkat ODN</th>
+                  <th class="p-2.5 border-b border-slate-200">Singkatan & Fungsi Utama</th>
+                  <th class="p-2.5 border-b border-slate-200">Lokasi Fisik</th>
+                  <th class="p-2.5 border-b border-slate-200">Karakteristik Optik / Redaman</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Optical Line Terminal</td>
+                  <td class="p-2.5"><b class="text-slate-900">OLT</b> - Modul pemancar/penerima aktif utama jaringan optik.</td>
+                  <td class="p-2.5">Central Office (Sentral)</td>
+                  <td class="p-2.5 font-mono">Tx Power: +2.0 dBm s/d +7.0 dBm</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Fiber Distribution Frame</td>
+                  <td class="p-2.5"><b class="text-slate-900">FDF</b> - Rak manajemen terminasi core dari OLT ke kabel feeder.</td>
+                  <td class="p-2.5">Ruang Sentral CO</td>
+                  <td class="p-2.5 font-mono">Conn Loss: $\approx 0.25\text{ dB}$</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Optical Distribution Cabinet</td>
+                  <td class="p-2.5"><b class="text-slate-900">ODC</b> - Rumah tempat Passive Splitter Primer (1:4 / 1:8).</td>
+                  <td class="p-2.5">Kabinet Outdoor (Pinggir Jalan)</td>
+                  <td class="p-2.5 font-mono">Splitter 1:4 Loss: $\approx 7.25\text{ dB}$</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Optical Distribution Point</td>
+                  <td class="p-2.5"><b class="text-slate-900">ODP</b> - Kotak terminasi kabel distribusi & Splitter Sekunder.</td>
+                  <td class="p-2.5">Tiang Lisrik / Wall Mount</td>
+                  <td class="p-2.5 font-mono">Splitter 1:8 Loss: $\approx 10.5\text{ dB}$</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Roset Optik / OTP</td>
+                  <td class="p-2.5"><b class="text-slate-900">Roset</b> - Titik terminasi akhir drop cable di dinding rumah.</td>
+                  <td class="p-2.5">Dalam Rumah Pelanggan</td>
+                  <td class="p-2.5 font-mono">Conn Loss: $\approx 0.25\text{ dB}$</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-slate-900">Optical Network Terminal</td>
+                  <td class="p-2.5"><b class="text-slate-900">ONT</b> - Perangkat modem aktif penerima sinyal optik pengguna.</td>
+                  <td class="p-2.5">Samping Perangkat Pengguna</td>
+                  <td class="p-2.5 font-mono">Rx Sensitivity: $-8\text{ dBm}$ s/d $-28\text{ dBm}$</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+            <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator text-slate-600"></i> Formulasi Link Power Budget
+            </h4>
+            <p class="text-slate-600 leading-relaxed">
+              $$\text{Loss Total} = (\text{Jarak} \times \alpha) + (N_{\text{splice}} \times L_{\text{splice}}) + (N_{\text{conn}} \times L_{\text{conn}}) + L_{\text{splitter}}$$
+              Dimana redaman serat $\alpha \approx 0.35\text{ dB/km}$ (1310 nm), $L_{\text{splice}} \approx 0.1\text{ dB}$, $L_{\text{conn}} \approx 0.25\text{ dB}$.
+            </p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+            <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-slate-600"></i> Power Margin & Threshold Limits
+            </h4>
+            <p class="text-slate-600 leading-relaxed">
+              $\text{Margin} = P_{\text{rx}} - \text{Sensitivity Threshold} (-28\text{ dBm})$. Standard aman jaringan mensyaratkan <b>Power Margin $\ge 3\text{ dB}$</b> dengan level daya terima ONT ideal pada <b>$-18\text{ dBm}$ s/d $-24\text{ dBm}$</b>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif Modul 12 -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">3</span>
+              Laboratorium Simulasi Interaktif FTTH
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Uji topologi ODN, visualisasi redaman splitter, kalkulator parametrik link budget, dan diagnostik gangguan.</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-700 font-semibold px-3 py-1 rounded-full border border-slate-200">4 Clean White Studio Modules</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: ODN Topology Canvas -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-diagram-project text-slate-700"></i> Simulasi 1: ODN Topology Canvas
+                </h3>
+                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Drag & Drop Builder</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Susun urutan perangkat hirarki ODN dari sentral OLT hingga ONT pelanggan secara urut.</p>
+
+              <!-- Component Palette -->
+              <div class="flex flex-wrap gap-1.5 mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span class="w-full text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Palet Node Perangkat (Klik untuk Menambahkan):</span>
+                <button onclick="addNodeToCanvas('OLT')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-server mr-1 text-slate-500"></i> OLT</button>
+                <button onclick="addNodeToCanvas('FDF')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-box-archive mr-1 text-slate-500"></i> FDF</button>
+                <button onclick="addNodeToCanvas('ODC')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-dumpster mr-1 text-slate-500"></i> ODC</button>
+                <button onclick="addNodeToCanvas('Splitter')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-code-fork mr-1 text-slate-500"></i> Splitter</button>
+                <button onclick="addNodeToCanvas('ODP')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-boxes-packing mr-1 text-slate-500"></i> ODP</button>
+                <button onclick="addNodeToCanvas('Roset/ONT')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs"><i class="fa-solid fa-house-signal mr-1 text-slate-500"></i> Roset/ONT</button>
+              </div>
+
+              <!-- Canvas Area -->
+              <div id="sim1-canvas" class="grid-bg-pattern w-full min-h-[160px] p-4 rounded-xl border border-slate-200 flex items-center justify-start gap-2 overflow-x-auto relative mb-3">
+                <span id="canvas-placeholder" class="text-xs text-slate-400 mx-auto italic">Canvas kosong. Klik tombol di palet atas untuk memasang urutan ODN.</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="flex items-center gap-2">
+                <button onclick="testTopology()" class="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3.5 py-1.5 rounded-lg transition shadow-2xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-check"></i> Uji Topologi
+                </button>
+                <button onclick="clearCanvas()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium text-xs px-2.5 py-1.5 rounded-lg transition">
+                  <i class="fa-solid fa-rotate-left"></i> Clear
+                </button>
+              </div>
+              <span id="sim1-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 text-slate-600">Belum Diuji</span>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: Passive Splitter Attenuation Visualizer -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-code-fork text-slate-700"></i> Simulasi 2: Splitter Attenuation Visualizer
+                </h3>
+                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Ratio Calculator</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Pilih rasio splitter pasif untuk melihat pembagian daya transmisi secara otomatis.</p>
+
+              <!-- Ratio Selector Segment -->
+              <div class="mb-4">
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Rasio Passive Splitter:</label>
+                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 justify-between gap-1">
+                  <button onclick="setSplitterRatio('1:2')" id="btn-ratio-12" class="ratio-btn flex-1 py-1 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-2xs border border-slate-200">1:2</button>
+                  <button onclick="setSplitterRatio('1:4')" id="btn-ratio-14" class="ratio-btn flex-1 py-1 text-xs font-medium rounded-lg text-slate-600">1:4</button>
+                  <button onclick="setSplitterRatio('1:8')" id="btn-ratio-18" class="ratio-btn flex-1 py-1 text-xs font-medium rounded-lg text-slate-600">1:8</button>
+                  <button onclick="setSplitterRatio('1:16')" id="btn-ratio-116" class="ratio-btn flex-1 py-1 text-xs font-medium rounded-lg text-slate-600">1:16</button>
+                  <button onclick="setSplitterRatio('1:32')" id="btn-ratio-132" class="ratio-btn flex-1 py-1 text-xs font-medium rounded-lg text-slate-600">1:32</button>
+                </div>
+              </div>
+
+              <!-- Branch Power Tree Display Box -->
+              <div class="bg-slate-50 rounded-xl border border-slate-200 p-3 mb-3">
+                <div class="flex justify-between items-center text-xs font-mono-code mb-2 border-b border-slate-200 pb-2">
+                  <span>Input Tx Power: <b class="text-slate-900">+2.00 dBm</b></span>
+                  <span>Loss Splitter: <b id="sim2-loss-val" class="text-amber-600">3.50 dB</b></span>
+                </div>
+                <!-- Tree Branches Preview -->
+                <div id="sim2-tree-container" class="space-y-1.5 max-h-[110px] overflow-y-auto pr-1">
+                  <!-- JS Dynamic Branches -->
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Daya Keluaran Port Cabang:</span>
+                <span id="sim2-output-power-summary" class="font-bold font-mono-code text-slate-900">-1.50 dBm per port</span>
+              </div>
+              <button onclick="catatSimulasi(2)" class="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: Link Power Budget Dashboard -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-calculator text-slate-700"></i> Simulasi 3: Link Power Budget Dashboard
+                </h3>
+                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Precision Margin</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Masukkan parameter fisik link FTTH untuk menghitung total redaman dan margin daya secara real-time.</p>
+
+              <!-- Parametric Input Form -->
+              <div class="grid grid-cols-2 gap-2.5 mb-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Panjang Kabel (km)</label>
+                  <input type="number" id="sim3-dist" value="10" min="0.1" max="40" step="0.5" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-mono text-slate-800 focus:bg-white outline-none" oninput="runSim3()">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Jumlah Splice Sambungan</label>
+                  <input type="number" id="sim3-splice" value="4" min="0" max="20" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-mono text-slate-800 focus:bg-white outline-none" oninput="runSim3()">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Jumlah Konektor</label>
+                  <input type="number" id="sim3-conn" value="4" min="0" max="10" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 font-mono text-slate-800 focus:bg-white outline-none" oninput="runSim3()">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Splitter Total Loss (dB)</label>
+                  <select id="sim3-splitter" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 font-mono text-slate-800 focus:bg-white outline-none" onchange="runSim3()">
+                    <option value="17.5" selected>1:32 Splitter (17.5 dB)</option>
+                    <option value="14.1">1:16 Splitter (14.1 dB)</option>
+                    <option value="10.5">1:8 Splitter (10.5 dB)</option>
+                    <option value="7.25">1:4 Splitter (7.25 dB)</option>
+                    <option value="3.5">1:2 Splitter (3.5 dB)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Realtime Mathematical Summary Card -->
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3 text-xs">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-slate-500">Loss Total Link:</span>
+                  <span id="sim3-loss-total" class="font-mono font-bold text-slate-900 text-sm">22.40 dB</span>
+                </div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-slate-500">Daya Diterima ONT ($P_{\text{rx}}$):</span>
+                  <span id="sim3-prx" class="font-mono font-bold text-slate-900 text-sm">-20.40 dBm</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-200 pt-1 mt-1">
+                  <span class="text-slate-500">Power Margin:</span>
+                  <span id="sim3-margin" class="font-mono font-bold text-emerald-700">7.60 dB</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400 text-[10px]">Status Link:</span>
+                <span id="sim3-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">PASS</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: FTTH Troubleshooting Scenario Game -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-user-gear text-slate-700"></i> Simulasi 4: Diagnostik Gangguan FTTH
+                </h3>
+                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">Troubleshooting Game</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Kasus: Pelanggan mengalami indikator alarm merah (LOS Red Light) pada modem ONT.</p>
+
+              <!-- Node Switcher Tabs -->
+              <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] mb-3 overflow-x-auto">
+                <button onclick="setDiagNode(0)" id="diag-node-0" class="diag-tab flex-1 min-w-[60px] py-1 font-semibold rounded-lg bg-white text-slate-900 shadow-2xs">OLT</button>
+                <button onclick="setDiagNode(1)" id="diag-node-1" class="diag-tab flex-1 min-w-[60px] py-1 font-medium text-slate-600">ODC</button>
+                <button onclick="setDiagNode(2)" id="diag-node-2" class="diag-tab flex-1 min-w-[60px] py-1 font-medium text-slate-600">ODP</button>
+                <button onclick="setDiagNode(3)" id="diag-node-3" class="diag-tab flex-1 min-w-[60px] py-1 font-medium text-slate-600">Drop Core</button>
+                <button onclick="setDiagNode(4)" id="diag-node-4" class="diag-tab flex-1 min-w-[60px] py-1 font-medium text-slate-600">ONT</button>
+              </div>
+
+              <!-- Virtual Measurement Panel -->
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3 text-xs">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-bold text-slate-800" id="diag-location-title">Titik Pengukuran: Sentral OLT</span>
+                  <div class="flex gap-1">
+                    <button onclick="setDiagTool('OPM')" id="tool-opm-btn" class="px-2 py-0.5 rounded bg-slate-800 text-white font-mono text-[10px]">OPM Mode</button>
+                    <button onclick="setDiagTool('VFL')" id="tool-vfl-btn" class="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-mono text-[10px]">VFL Laser</button>
+                  </div>
+                </div>
+
+                <div id="diag-screen-box" class="bg-white border border-slate-200 rounded-lg p-3 text-center min-h-[70px] flex flex-col items-center justify-center">
+                  <span class="text-slate-400 text-[10px]">Pembacaan Instrumen OPM:</span>
+                  <span id="diag-meter-readout" class="text-lg font-extrabold font-mono text-slate-900">+2.50 dBm</span>
+                  <span id="diag-meter-desc" class="text-[10px] text-emerald-600 font-medium">Sinyal Laser OLT Normal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Identifikasi & Perbaikan:</span>
+                <span id="sim4-status-text" class="font-bold text-amber-700">Lakukan Uji di Tiap Node</span>
+              </div>
+              <button onclick="openTroubleshootModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-wrench"></i> Eksekusi Perbaikan
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">4</span>
+              Tabel Pengamatan Praktikum Arsitektur FTTH
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan log eksperimen yang direkap secara otomatis dari modul laboratorium simulasi di atas.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-medium text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-600" id="tbl-pengamatan">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Konfigurasi / Pengujian</th>
+                <th class="px-4 py-3">Hasil / Pengukuran Kinerja</th>
+                <th class="px-4 py-3">Status Evaluasi Architecture</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-100 bg-white">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">5</span>
+              Uji Kompetensi Perancangan & Arsitektur Jaringan FTTH
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut untuk menguji pemahaman teori dan praktikum Anda.</p>
+          </div>
+          <span class="text-xs font-semibold bg-slate-100 text-slate-800 px-3 py-1 rounded-full border border-slate-200">20 Soal Pilihan Ganda</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Penyelesaian:</p>
+          <p>Pastikan seluruh soal uji kompetensi dan tabel pengamatan telah terisi lengkap sebelum mengirim LKPD.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 transform transition-all">
+      <div class="text-center">
+        <div class="w-14 h-14 bg-slate-100 text-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold border border-slate-200">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">LKPD 12 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nilai Akhir Uji Kompetensi</p>
+          <div class="text-5xl font-black text-slate-900 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i> Data berhasil dikirim ke server guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Troubleshooting Repair Action Modal -->
+  <div id="modal-troubleshoot" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-toolbox text-slate-700"></i> Pilih Tindakan Perbaikan Gangguan
+        </h3>
+        <button onclick="closeTroubleshootModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-600 mb-4">Berdasarkan hasil pengukuran OPM/VFL, tentukan analisis titik kerusakan dan solusi tindakan teknisi yang paling presisi:</p>
+
+      <div class="space-y-2 mb-5 text-xs">
+        <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+          <input type="radio" name="repair-option" value="opt1" class="mt-0.5 accent-slate-900">
+          <div>
+            <span class="font-bold text-slate-900 block">Ganti Modul OLT di Central Office</span>
+            <span class="text-slate-500 text-[11px]">Mengganti SFP OLT yang dianggap lemah dayanya.</span>
+          </div>
+        </label>
+        <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+          <input type="radio" name="repair-option" value="opt2" class="mt-0.5 accent-slate-900">
+          <div>
+            <span class="font-bold text-slate-900 block">Splicing Ulang / Ganti Drop Core Terjepit</span>
+            <span class="text-slate-500 text-[11px]">Memperbaiki serat Drop Cable yang mengalami kebocoran/tekukan parah antara ODP dan Roset.</span>
+          </div>
+        </label>
+        <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+          <input type="radio" name="repair-option" value="opt3" class="mt-0.5 accent-slate-900">
+          <div>
+            <span class="font-bold text-slate-900 block">Ganti Modem ONT Pelanggan</span>
+            <span class="text-slate-500 text-[11px]">Mengganti unit modem ONT karena dicurigai rusak internal.</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeTroubleshootModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">Batal</button>
+        <button onclick="submitRepairAction()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl">Terapkan Perbaikan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 text-center">
+      <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl border border-amber-200">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-900 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-600 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
+
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
+
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selKelas.appendChild(opt);
+        });
+      } else {
+        selKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selNama = document.getElementById('sel-nama');
+
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selNama.appendChild(opt);
+        });
+      } else {
+        selNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
+        }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-slate-100 text-slate-600 font-medium px-3 py-1 rounded-full border border-slate-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Question Bank: 20 Items for FTTH Network Architecture
+    const questionBank = [
+      { id: 1, q: "Perangkat pemancar aktif utama yang berada di Central Office (Sentral) sebagai penyedia layanan FTTH dinamakan...", options: ["A. ODP", "B. ODC", "C. OLT (Optical Line Terminal)", "D. ONT", "E. Roset Optik"], ans: "C" },
+      { id: 2, q: "Fungsi utama dari Optical Distribution Cabinet (ODC) dalam jaringan FTTH adalah...", options: ["A. Mengubah sinyal cahaya menjadi sinyal listrik modem", "B. Tempat penyambungan kabel feeder dan rumah bagi Passive Splitter Primer", "C. Memancarkan sinyal Wi-Fi ke rumah pelanggan", "D. Mengukur panjang gelombang optik secara otomatis", "E. Menyimpan cadangan baterai sentral"], ans: "B" },
+      { id: 3, q: "Perangkat distribusi pasif yang umumnya dipasang di tiang listrik atau dinding luar dekat area pemukiman pelanggan dinamakan...", options: ["A. ODP (Optical Distribution Point)", "B. FDF", "C. Central Office", "D. Main Frame", "E. Patch Panel"], ans: "A" },
+      { id: 4, q: "Fungsi dari titik terminasi Roset Optik / OTP yang terpasang di dinding rumah pelanggan adalah...", options: ["A. Tempat percabangan kabel feeder utama", "B. Titik temu terminasi Drop Cable dengan Patchcord menuju ONT", "C. Mengatur IP Address router pelanggan", "D. Menyuplai daya listrik untuk modem", "E. Menguatkan sinyal optik secara aktif"], ans: "B" },
+      { id: 5, q: "Mengapa teknologi Passive Optical Network (PON) sangat efisien digunakan pada jaringan FTTH?", options: ["A. Karena membutuhkan perangkat penguat sinyal bertenaga listrik setiap 1 km", "B. Karena tidak memerlukan komponen aktif bersumber daya listrik di jalur distribusi optik", "C. Karena hanya bisa digunakan untuk 1 pelanggan saja", "D. Karena tidak menggunakan serat optik kaca", "E. Karena sinyalnya dipancarkan lewat udara"], ans: "B" },
+      { id: 6, q: "Berapakah estimasi redaman bawaan (Insertion Loss) standar untuk Splitter Passive rasio 1:2?", options: ["A. $\\approx 0.5\\ \\text{dB}$", "B. $\\approx 3.5\\ \\text{dB}$", "C. $\\approx 7.25\\ \\text{dB}$", "D. $\\approx 14.1\\ \\text{dB}$", "E. $\\approx 20.0\\ \\text{dB}$"], ans: "B" },
+      { id: 7, q: "Berapakah estimasi redaman bawaan standar untuk Passive Splitter rasio 1:32?", options: ["A. $\\approx 3.5\\ \\text{dB}$", "B. $\\approx 7.25\\ \\text{dB}$", "C. $\\approx 10.5\\ \\text{dB}$", "D. $\\approx 17.5\\ \\text{dB}$", "E. $\\approx 30.0\\ \\text{dB}$"], ans: "D" },
+      { id: 8, q: "Berdasarkan standar ITU-T G.984 GPON, batas ambang sensitivitas daya terima minimum ($P_{\\text{rx}}$) modem ONT agar tidak mengalami Loss of Signal (LOS) adalah...", options: ["A. $-10\\ \\text{dBm}$", "B. $-15\\ \\text{dBm}$", "C. $-28\\ \\text{dBm}$", "D. $-40\\ \\text{dBm}$", "E. $+5\\ \\text{dBm}$"], ans: "C" },
+      { id: 9, q: "Rentang level daya penerimaan ($P_{\\text{rx}}$) yang paling ideal pada port ONT pelanggan untuk performa jaringan terandal adalah...", options: ["A. $+2.0\\ \\text{dBm}$ s/d $+5.0\\ \\text{dBm}$", "B. $-5.0\\ \\text{dBm}$ s/d $-10.0\\ \\text{dBm}$", "C. $-18.0\\ \\text{dBm}$ s/d $-24.0\\ \\text{dBm}$", "D. $-30.0\\ \\text{dBm}$ s/d $-35.0\\ \\text{dBm}$", "E. $0\\ \\text{dBm}$ tepat"], ans: "C" },
+      { id: 10, q: "Manakah formula kalkulasi total redaman saluran (Link Power Budget) yang benar?", options: ["A. $\\text{Loss Total} = (\\text{Jarak} \\times \\alpha) + (N_{\\text{splice}} \\times L_{\\text{splice}}) + (N_{\\text{conn}} \\times L_{\\text{conn}}) + L_{\\text{splitter}}$", "B. $\\text{Loss Total} = \\text{Jarak} + N_{\\text{splice}} + N_{\\text{conn}}$", "C. $\\text{Loss Total} = P_{\\text{tx}} \\times P_{\\text{rx}}$", "D. $\\text{Loss Total} = L_{\\text{splitter}} - \\alpha$", "E. $\\text{Loss Total} = (N_{\\text{splice}} \\times L_{\\text{conn}}) / \\text{Jarak}$"], ans: "A" },
+      { id: 11, q: "Jika panjang saluran kabel FTTH adalah 10 km (redaman $\\alpha = 0.35\\ \\text{dB/km}$), terdapat 4 sambungan splice ($0.1\\ \\text{dB/splice}$), 4 konektor ($0.25\\ \\text{dB/conn}$), dan splitter 1:16 ($14.1\\ \\text{dB}$), berapakah total redaman link tersebut?", options: ["A. $12.5\\ \\text{dB}$", "B. $15.5\\ \\text{dB}$", "C. $19.0\\ \\text{dB}$", "D. $25.0\\ \\text{dB}$", "E. $30.0\\ \\text{dB}$"], ans: "C" },
+      { id: 12, q: "Jika daya pancar Tx Power OLT adalah $+2.0\\ \\text{dBm}$ dan total redaman link (Loss Total) adalah $19.0\\ \\text{dB}$, berapakah nilai daya terima ($P_{\\text{rx}}$) di modem ONT?", options: ["A. $+21.0\\ \\text{dBm}$", "B. $-17.0\\ \\text{dBm}$", "C. $-21.0\\ \\text{dBm}$", "D. $-19.0\\ \\text{dBm}$", "E. $+17.0\\ \\text{dBm}$"], ans: "B" },
+      { id: 13, q: "Berapa nilai Power Margin minimum yang dipersyaratkan dalam perancangan link budget optik sebagai batas cadangan keamanan?", options: ["A. $\\ge 0.5\\ \\text{dB}$", "B. $\\ge 1.0\\ \\text{dB}$", "C. $\\ge 3.0\\ \\text{dB}$", "D. $\\ge 10.0\\ \\text{dB}$", "E. $\\ge 20.0\\ \\text{dB}$"], ans: "C" },
+      { id: 14, q: "Urutan urut arsitektur jaringan ODN dari pusat ke pelanggan rumah yang tepat adalah...", options: ["A. ONT $\\rightarrow$ Roset $\\rightarrow$ ODP $\\rightarrow$ ODC $\\rightarrow$ OLT", "B. OLT $\\rightarrow$ FDF $\\rightarrow$ ODC $\\rightarrow$ Splitter $\\rightarrow$ ODP $\\rightarrow$ Roset $\\rightarrow$ ONT", "C. ODC $\\rightarrow$ OLT $\\rightarrow$ ODP $\\rightarrow$ FDF $\\rightarrow$ ONT", "D. OLT $\\rightarrow$ ODP $\\rightarrow$ ODC $\\rightarrow$ Roset $\\rightarrow$ ONT", "E. Roset $\\rightarrow$ ODP $\\rightarrow$ OLT $\\rightarrow$ ONT"], ans: "B" },
+      { id: 15, q: "Kabel optik berserat 1 atau 2 core yang ditarik khusus dari ODP tiang menuju ke roset di dalam rumah pelanggan dinamakan...", options: ["A. Feeder Cable", "B. Trunk Cable", "C. Drop Cable / Drop Core", "D. Backbone Cable", "E. Patchcord Armored"], ans: "C" },
+      { id: 16, q: "Alat pengujian optik portabel yang memancarkan sinar laser merah tampak untuk mendeteksi tekukan makro atau serat putus pada Drop Cable dinamakan...", options: ["A. Optical Power Meter (OPM)", "B. Visual Fault Locator (VFL)", "C. Fusion Splicer", "D. OTDR", "E. Optical Light Source"], ans: "B" },
+      { id: 17, q: "Instrumen ukur optik yang dipakai teknisi untuk mengukur level kuat sinyal daya optik (dBm) secara presisi pada port ODP/ONT dinamakan...", options: ["A. Optical Power Meter (OPM)", "B. Visual Fault Locator (VFL)", "C. Cleaver", "D. Stripper", "E. Multi Tester Listrik"], ans: "A" },
+      { id: 18, q: "Indikator lampu LED 'LOS' berwarna merah berkedip pada perangkat modem ONT pelanggan menandakan kondisi...", options: ["A. Sambungan Wi-Fi terhubung sempurna", "B. Modem tidak menerima sinyal optik / redaman melebihi batas $-28\\ \\text{dBm}$", "C. Tegangan listrik modem terlalu tinggi", "D. Kabel LAN belum terpasang", "E. Firmware ONT sedang diupdate"], ans: "B" },
+      { id: 19, q: "Konektor optik berwarna hijau dengan sudut kemiringan $8^\\circ$ yang paling dominan dipakai pada perangkat ODP dan drop cable FTTH adalah...", options: ["A. SC/UPC (Biru)", "B. SC/APC (Hijau)", "C. FC/UPC", "D. ST/PC", "E. LC/UPC"], ans: "B" },
+      { id: 20, q: "Jenis pemeliharaan yang dilakukan teknisi saat menemukan drop cable pelanggan tertekuk ekstrem yang memicu redaman tinggi adalah...", options: ["A. Mengganti daya listrik sentral", "B. Merapikan jalur kabel / splicing ulang serat yang tertekuk atau putus", "C. Mengganti nama SSID Wi-Fi", "D. Mematikan OLT sentral", "E. Mengubah IP Router"], ans: "B" }
+    ];
+
+    // Simulation Data States
+    let sim1CanvasNodes = [];
+    let sim2CurrentRatio = '1:2';
+    let sim3Params = { dist: 10, splice: 4, conn: 4, splitter: 17.5 };
+    let sim4State = { currentNode: 0, currentTool: 'OPM', repaired: false };
+
+    // SIMULATION 1: ODN Canvas Builder
+    function addNodeToCanvas(nodeName) {
+      if (sim1CanvasNodes.length >= 6) {
+        showToast("Batas Maksimal", "Canvas sudah berisi 6 node perangkat.", "warning");
+        return;
+      }
+      sim1CanvasNodes.push(nodeName);
+      renderCanvas();
+    }
+
+    function clearCanvas() {
+      sim1CanvasNodes = [];
+      renderCanvas();
+      document.getElementById('sim1-status-badge').className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 text-slate-600";
+      document.getElementById('sim1-status-badge').innerText = "Belum Diuji";
+    }
+
+    function renderCanvas() {
+      const canvas = document.getElementById('sim1-canvas');
+      canvas.innerHTML = '';
+
+      if (sim1CanvasNodes.length === 0) {
+        canvas.innerHTML = '<span id="canvas-placeholder" class="text-xs text-slate-400 mx-auto italic">Canvas kosong. Klik tombol di palet atas untuk memasang urutan ODN.</span>';
+        return;
+      }
+
+      sim1CanvasNodes.forEach((node, idx) => {
+        const nodeDiv = document.createElement('div');
+        nodeDiv.className = "flex items-center gap-1.5 shrink-0";
+        nodeDiv.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-center shadow-2xs flex flex-col items-center min-w-[70px]">
+            <i class="fa-solid ${getNodeIcon(node)} text-slate-700 text-sm mb-1"></i>
+            <span class="text-[11px] font-bold text-slate-800">${node}</span>
+          </div>
+          ${idx < sim1CanvasNodes.length - 1 ? '<i class="fa-solid fa-arrow-right text-slate-300 text-xs mx-0.5"></i>' : ''}
+        `;
+        canvas.appendChild(nodeDiv);
+      });
+    }
+
+    function getNodeIcon(name) {
+      if (name === 'OLT') return 'fa-server';
+      if (name === 'FDF') return 'fa-box-archive';
+      if (name === 'ODC') return 'fa-dumpster';
+      if (name === 'Splitter') return 'fa-code-fork';
+      if (name === 'ODP') return 'fa-boxes-packing';
+      return 'fa-house-signal';
+    }
+
+    function testTopology() {
+      const correctSeq = ["OLT", "FDF", "ODC", "Splitter", "ODP", "Roset/ONT"];
+      const badge = document.getElementById('sim1-status-badge');
+
+      if (sim1CanvasNodes.length !== 6) {
+        badge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200";
+        badge.innerText = "Perangkat Belum Lengkap (Harus 6 Node)";
+        return;
+      }
+
+      let isValid = true;
+      for (let i = 0; i < 6; i++) {
+        if (sim1CanvasNodes[i] !== correctSeq[i]) {
+          isValid = false;
+          break;
+        }
+      }
+
+      if (isValid) {
+        badge.className = "text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200";
+        badge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Valid Architecture';
+        showToast("Topologi Valid", "Urutan arsitektur ODN FTTH dari OLT ke ONT sudah presisi!", "success");
+      } else {
+        badge.className = "text-xs font-semibold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200";
+        badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Invalid Architecture';
+        showToast("Topologi Salah", "Urutan hirarki perangkat ODN tidak sesuai standar GPON.", "warning");
+      }
+    }
+
+    // SIMULATION 2: Splitter Visualizer
+    function setSplitterRatio(ratio) {
+      sim2CurrentRatio = ratio;
+      document.querySelectorAll('.ratio-btn').forEach(btn => {
+        btn.className = "ratio-btn flex-1 py-1 text-xs font-medium rounded-lg text-slate-600";
+      });
+
+      let btnId = "btn-ratio-12";
+      if (ratio === '1:4') btnId = "btn-ratio-14";
+      if (ratio === '1:8') btnId = "btn-ratio-18";
+      if (ratio === '1:16') btnId = "btn-ratio-116";
+      if (ratio === '1:32') btnId = "btn-ratio-132";
+
+      const activeBtn = document.getElementById(btnId);
+      if (activeBtn) activeBtn.className = "ratio-btn flex-1 py-1 text-xs font-semibold rounded-lg bg-white text-slate-900 shadow-2xs border border-slate-200";
+
+      renderSplitterTree();
+    }
+
+    function renderSplitterTree() {
+      const container = document.getElementById('sim2-tree-container');
+      const lossValEl = document.getElementById('sim2-loss-val');
+      const summaryEl = document.getElementById('sim2-output-power-summary');
+      container.innerHTML = '';
+
+      let loss = 3.5;
+      let count = 2;
+      if (sim2CurrentRatio === '1:4') { loss = 7.25; count = 4; }
+      if (sim2CurrentRatio === '1:8') { loss = 10.5; count = 8; }
+      if (sim2CurrentRatio === '1:16') { loss = 14.1; count = 16; }
+      if (sim2CurrentRatio === '1:32') { loss = 17.5; count = 32; }
+
+      const txPower = 2.0;
+      const outPower = (txPower - loss).toFixed(2);
+
+      lossValEl.innerText = `${loss.toFixed(2)} dB`;
+      summaryEl.innerText = `${outPower} dBm per port`;
+
+      for (let i = 1; i <= Math.min(count, 8); i++) {
+        const item = document.createElement('div');
+        item.className = "flex justify-between items-center text-[11px] bg-white px-2.5 py-1 rounded border border-slate-200 font-mono";
+        item.innerHTML = `
+          <span class="text-slate-600"><i class="fa-solid fa-code-branch text-slate-400 mr-1"></i> Output Port #${i}</span>
+          <span class="font-bold text-slate-900">${outPower} dBm</span>
+        `;
+        container.appendChild(item);
+      }
+      if (count > 8) {
+        const more = document.createElement('div');
+        more.className = "text-[10px] text-slate-400 text-center italic py-0.5";
+        more.innerText = `... Menampilkan 8 dari ${count} cabang port output`;
+        container.appendChild(more);
+      }
+    }
+
+    // SIMULATION 3: Link Power Budget Dashboard
+    function runSim3() {
+      const dist = parseFloat(document.getElementById('sim3-dist').value) || 0;
+      const splice = parseInt(document.getElementById('sim3-splice').value) || 0;
+      const conn = parseInt(document.getElementById('sim3-conn').value) || 0;
+      const splitterLoss = parseFloat(document.getElementById('sim3-splitter').value) || 0;
+
+      const alpha = 0.35; // dB/km at 1310nm
+      const lSplice = 0.1;
+      const lConn = 0.25;
+      const txPower = 2.0; // dBm
+      const sensitivity = -28.0; // dBm threshold
+
+      const lossTotal = (dist * alpha) + (splice * lSplice) + (conn * lConn) + splitterLoss;
+      const prx = txPower - lossTotal;
+      const margin = prx - sensitivity;
+
+      document.getElementById('sim3-loss-total').innerText = `${lossTotal.toFixed(2)} dB`;
+      document.getElementById('sim3-prx').innerText = `${prx.toFixed(2)} dBm`;
+      
+      const marginEl = document.getElementById('sim3-margin');
+      marginEl.innerText = `${margin.toFixed(2)} dB`;
+
+      const badge = document.getElementById('sim3-status-badge');
+      if (margin >= 3.0 && prx >= -24.0 && prx <= -18.0) {
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        badge.innerText = "PASS (IDEAL)";
+        marginEl.className = "font-mono font-bold text-emerald-700 text-sm";
+      } else if (margin >= 3.0 && prx >= -27.5) {
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+        badge.innerText = "PASS";
+        marginEl.className = "font-mono font-bold text-emerald-600 text-sm";
+      } else {
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200";
+        badge.innerText = "FAIL (MARGIN LOW / UNSTABLE)";
+        marginEl.className = "font-mono font-bold text-rose-600 text-sm";
+      }
+
+      sim3Params = { dist, splice, conn, splitter: splitterLoss, lossTotal: lossTotal.toFixed(2), prx: prx.toFixed(2), margin: margin.toFixed(2) };
+    }
+
+    // SIMULATION 4: Diagnostic Game
+    function setDiagNode(nodeIdx) {
+      sim4State.currentNode = nodeIdx;
+      document.querySelectorAll('.diag-tab').forEach((tab, idx) => {
+        if (idx === nodeIdx) {
+          tab.className = "diag-tab flex-1 min-w-[60px] py-1 font-semibold rounded-lg bg-white text-slate-900 shadow-2xs";
+        } else {
+          tab.className = "diag-tab flex-1 min-w-[60px] py-1 font-medium text-slate-600";
+        }
+      });
+      updateDiagDisplay();
+    }
+
+    function setDiagTool(toolName) {
+      sim4State.currentTool = toolName;
+      if (toolName === 'OPM') {
+        document.getElementById('tool-opm-btn').className = "px-2 py-0.5 rounded bg-slate-800 text-white font-mono text-[10px]";
+        document.getElementById('tool-vfl-btn').className = "px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-mono text-[10px]";
+      } else {
+        document.getElementById('tool-vfl-btn').className = "px-2 py-0.5 rounded bg-rose-600 text-white font-mono text-[10px]";
+        document.getElementById('tool-opm-btn').className = "px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-mono text-[10px]";
+      }
+      updateDiagDisplay();
+    }
+
+    function updateDiagDisplay() {
+      const title = document.getElementById('diag-location-title');
+      const readout = document.getElementById('diag-meter-readout');
+      const desc = document.getElementById('diag-meter-desc');
+
+      const nodeNames = ["Sentral OLT", "ODC Terminal", "ODP Tiang", "Drop Cable", "ONT Pelanggan"];
+      title.innerText = `Titik Pengukuran: ${nodeNames[sim4State.currentNode]}`;
+
+      if (sim4State.currentTool === 'OPM') {
+        if (sim4State.repaired) {
+          readout.className = "text-lg font-extrabold font-mono text-emerald-600";
+          desc.className = "text-[10px] text-emerald-600 font-medium";
+          if (sim4State.currentNode === 0) { readout.innerText = "+2.50 dBm"; desc.innerText = "Tx Power Normal"; }
+          if (sim4State.currentNode === 1) { readout.innerText = "+1.80 dBm"; desc.innerText = "Feeder Signal Normal"; }
+          if (sim4State.currentNode === 2) { readout.innerText = "-14.20 dBm"; desc.innerText = "Post-Splitter Normal"; }
+          if (sim4State.currentNode === 3) { readout.innerText = "-17.50 dBm"; desc.innerText = "Drop Core Repaired OK"; }
+          if (sim4State.currentNode === 4) { readout.innerText = "-18.50 dBm"; desc.innerText = "ONT Rx Normal (ONLINE)"; }
+        } else {
+          if (sim4State.currentNode === 0) { readout.innerText = "+2.50 dBm"; readout.className="text-lg font-mono font-bold text-slate-900"; desc.innerText = "Tx Power OLT Normal"; desc.className="text-[10px] text-emerald-600"; }
+          if (sim4State.currentNode === 1) { readout.innerText = "+1.80 dBm"; readout.className="text-lg font-mono font-bold text-slate-900"; desc.innerText = "Feeder Signal Normal"; desc.className="text-[10px] text-emerald-600"; }
+          if (sim4State.currentNode === 2) { readout.innerText = "-14.20 dBm"; readout.className="text-lg font-mono font-bold text-slate-900"; desc.innerText = "Post-Splitter Output Normal"; desc.className="text-[10px] text-emerald-600"; }
+          if (sim4State.currentNode === 3) { readout.innerText = "-38.50 dBm"; readout.className="text-lg font-mono font-bold text-rose-600"; desc.innerText = "CRITICAL HIGH LOSS! Drop Cable Terjepit/Putus"; desc.className="text-[10px] text-rose-600 font-bold"; }
+          if (sim4State.currentNode === 4) { readout.innerText = "-40.00 dBm"; readout.className="text-lg font-mono font-bold text-rose-600"; desc.innerText = "MODEM LOS! Sinyal Terputus Total"; desc.className="text-[10px] text-rose-600 font-bold"; }
+        }
+      } else {
+        // VFL Mode
+        if (sim4State.repaired) {
+          readout.innerText = "🔴 LASER CONTINUOUS";
+          readout.className = "text-base font-bold text-rose-600 font-mono";
+          desc.innerText = "Cahaya Merah Menerus Sampai ONT Tanpa Kebocoran";
+          desc.className = "text-[10px] text-emerald-600 font-medium";
+        } else {
+          if (sim4State.currentNode === 3) {
+            readout.innerText = "💥 LEAKAGE DETECTED!";
+            readout.className = "text-base font-bold text-rose-600 font-mono animate-pulse";
+            desc.innerText = "Sinar Laser Merah Bocor Terang di Titik Kabel Terjepit!";
+            desc.className = "text-[10px] text-rose-600 font-bold";
+          } else {
+            readout.innerText = "🔴 LASER ACTIVE";
+            readout.className = "text-base font-bold text-rose-500 font-mono";
+            desc.innerText = "Sinar Laser Berjalan Normal";
+            desc.className = "text-[10px] text-slate-500";
+          }
+        }
+      }
+    }
+
+    function openTroubleshootModal() {
+      document.getElementById('modal-troubleshoot').classList.remove('hidden');
+    }
+
+    function closeTroubleshootModal() {
+      document.getElementById('modal-troubleshoot').classList.add('hidden');
+    }
+
+    function submitRepairAction() {
+      const selected = document.querySelector('input[name="repair-option"]:checked');
+      if (!selected) {
+        showToast("Pilih Solusi", "Harap pilih opsi tindakan perbaikan terlebih dahulu.", "warning");
+        return;
+      }
+
+      if (selected.value === 'opt2') {
+        sim4State.repaired = true;
+        closeTroubleshootModal();
+        updateDiagDisplay();
+        document.getElementById('sim4-status-text').innerText = "Trouble Resolved! Drop Core Fixed";
+        document.getElementById('sim4-status-text').className = "font-bold text-emerald-700";
+        showToast("Perbaikan Berhasil!", "Drop Core telah displicing ulang. Modem ONT kembali ONLINE!", "success");
+      } else {
+        closeTroubleshootModal();
+        showToast("Analisis Kurang Tepat", "Perangkat tersebut normal. Masalah ada pada Drop Cable.", "warning");
+      }
+    }
+
+    // RECORD SIMULATION LOGS
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 2) {
+        let loss = 3.5;
+        if (sim2CurrentRatio === '1:4') loss = 7.25;
+        if (sim2CurrentRatio === '1:8') loss = 10.5;
+        if (sim2CurrentRatio === '1:16') loss = 14.1;
+        if (sim2CurrentRatio === '1:32') loss = 17.5;
+
+        logEntry = {
+          modul: "Simulasi 2: Splitter Visualizer",
+          param: `Splitter Ratio: ${sim2CurrentRatio}`,
+          hasil: `Loss: ${loss} dB, Out: ${(2.0 - loss).toFixed(2)} dBm`,
+          status: "Pembagian Daya Presisi"
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "Simulasi 3: Link Power Budget",
+          param: `Dist: ${sim3Params.dist}km, Splice: ${sim3Params.splice}, Conn: ${sim3Params.conn}`,
+          hasil: `Total Loss: ${sim3Params.lossTotal}dB, Rx: ${sim3Params.prx}dBm`,
+          status: `Margin: ${sim3Params.margin} dB (${parseFloat(sim3Params.margin) >= 3 ? 'PASS' : 'FAIL'})`
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+      showToast("Tercatat", "Hasil praktikum berhasil disimpan ke tabel pengamatan.", "success");
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-100 text-emerald-800";
+        if (row.status.includes("FAIL")) badgeColor = "bg-rose-100 text-rose-800";
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-800">${row.modul}</td>
+          <td class="px-4 py-3 font-mono-code text-slate-600">${row.param}</td>
+          <td class="px-4 py-3 font-mono-code font-bold text-slate-900">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-500 hover:text-rose-700 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        showToast("Perhatian", "Belum ada data pengamatan untuk di-export!", "warning");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Konfigurasi,Hasil Pengukuran,Status Evaluasi\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "FTTH_LKPD12_Data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil", "File CSV hasil pengamatan terunduh.", "success");
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-slate-300 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 hover:border-slate-400 hover:bg-white cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-slate-900">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-900 mb-3 flex items-start gap-2">
+            <span class="bg-slate-900 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2.5 rounded-lg"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        showToast("Identitas Wajib", "Harap lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 12: Perancangan & Arsitektur Jaringan FTTH";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai perancangan arsitektur ODN FTTH dan kalkulasi Link Power Budget.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali redaman splitter dan hirarki urutan perangkat ODN.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi eksperimen simulasi ODN Canvas & Link Budget Dashboard.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-slate-600"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal otomatis via Fetch (Offline).`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset LKPD", "Apakah Anda yakin ingin meriset seluruh isian dan data praktikum LKPD 12 ini?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        clearCanvas();
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir telah dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bg = "bg-slate-900 text-white border-slate-700";
+      let icon = "fa-circle-info text-slate-300";
+      if (type === 'success') { bg = "bg-slate-900 text-white border-emerald-500/50"; icon = "fa-circle-check text-emerald-400"; }
+      if (type === 'warning') { bg = "bg-slate-900 text-white border-amber-500/50"; icon = "fa-triangle-exclamation text-amber-400"; }
+
+      toast.className = `p-3.5 rounded-xl border shadow-xl flex items-start gap-3 text-xs min-w-[260px] max-w-xs transition transform translate-y-2 opacity-0 pointer-events-auto ${bg}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-bold mb-0.5">${title}</p>
+          <p class="text-slate-300 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('modal-confirm');
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const handleYes = () => { cleanup(); onConfirm(); };
+      const handleCancel = () => { cleanup(); };
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.removeEventListener('click', handleYes);
+        btnCancel.removeEventListener('click', handleCancel);
+      };
+
+      btnYes.addEventListener('click', handleYes);
+      btnCancel.addEventListener('click', handleCancel);
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      renderSplitterTree();
+      runSim3();
+      updateDiagDisplay();
+    };
+  </script>
+</body>
+</html>

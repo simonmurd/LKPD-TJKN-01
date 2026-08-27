@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 9: Pengenalan Media Fiber Optik & Spesifikasi Kabel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); }
+    .sim-display-box { background-color: #090d16; border-radius: 0.75rem; position: relative; overflow: hidden; }
+    .glow-neon-blue { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+    .glow-neon-green { box-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
+    .glow-neon-rose { box-shadow: 0 0 15px rgba(251, 113, 133, 0.4); }
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-cyan-900 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md border border-cyan-400/30">
+          <i class="fa-solid fa-bolt-lightning text-3xl text-cyan-300"></i>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-widest text-cyan-200 uppercase">Lembar Kerja Peserta Didik Interaktif</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">LKPD 9: Media Fiber Optik & Spesifikasi Kabel</h1>
+          <p class="text-xs sm:text-sm text-cyan-100 mt-1">Refraction & TIR Hologram, Dispersion Simulator, Cable 3D Explorer, & Polish Loss Analyzer</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-cyan-950/80 px-4 py-2 rounded-xl text-sm border border-cyan-500/30">
+        <i class="fa-solid fa-graduation-cap text-cyan-300"></i>
+        <span class="font-medium" id="status-lkpd-text">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-cyan-500"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-7 h-7 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-bold">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span class="text-xs bg-cyan-50 text-cyan-700 font-medium px-3 py-1 rounded-full border border-cyan-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" class="mb-4 p-3 bg-cyan-50 border-l-4 border-cyan-500 text-cyan-900 rounded-r-lg text-sm flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-cyan-600 text-lg"></i>
+        <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk membuka modul laboratorium dan uji kompetensi.</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-cyan-500 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-cyan-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-cyan-500 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 2: Ringkasan Teori & Parameter Fiber Optik -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-bold">2</span>
+            Ringkasan Teori: Konsep Dasar & Spesifikasi Serat Optik
+          </h2>
+          <span class="text-xs bg-cyan-50 text-cyan-800 font-semibold px-3 py-1 rounded-full border border-cyan-200">Optical Telecommunication Standard</span>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+          <b>Kabel Fiber Optik</b> adalah saluran transmisi data berkecepatan tinggi yang memanfaatkan gelombang cahaya berpendar di dalam media silika kepingan kaca murni. Transmisi ini didasarkan pada prinsip fisika <b>Total Internal Reflection (Pemantulan Internal Sempurna)</b> di mana cahaya merambat secara terus menerus memantul di dalam lapisan <i>Core</i> tanpa bocor keluar melalui <i>Cladding</i>.
+        </p>
+
+        <!-- Dynamic Structural Comparison Table -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs mb-6">
+          <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-table text-cyan-700"></i> Komparasi Utama Single-Mode vs Multi-Mode Fiber
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-200 text-slate-700 uppercase text-[11px]">
+                  <th class="p-2.5 border border-slate-300">Spesifikasi / Parameter</th>
+                  <th class="p-2.5 border border-slate-300">Single-Mode Fiber (SMF - OS2)</th>
+                  <th class="p-2.5 border border-slate-300">Multi-Mode Step-Index (MMF - OM1/OM2)</th>
+                  <th class="p-2.5 border border-slate-300">Multi-Mode Graded-Index (MMF - OM3/OM4)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 bg-white">
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-cyan-900">Diameter Core / Cladding</td>
+                  <td class="p-2.5 border border-slate-200 font-mono">9 µm / 125 µm</td>
+                  <td class="p-2.5 border border-slate-200 font-mono">62.5 µm / 125 µm</td>
+                  <td class="p-2.5 border border-slate-200 font-mono">50 µm / 125 µm</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-cyan-900">Sumber Cahaya Pemancar</td>
+                  <td class="p-2.5 border border-slate-200">Laser Diode (1310 nm / 1550 nm)</td>
+                  <td class="p-2.5 border border-slate-200">LED / Light Emitting Diode (850 nm)</td>
+                  <td class="p-2.5 border border-slate-200">VCSEL / Laser Dioda Presisi (850 nm)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-cyan-900">Dispersi Modal (Modal Dispersion)</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-emerald-600">Nihil / Sangat Rendah</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-rose-600">Tinggi (Step-Index Overlap)</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-amber-600">Rendah (Parabolic Refractive)</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 border border-slate-200 font-bold text-cyan-900">Jarak Transmisi Maksimum</td>
+                  <td class="p-2.5 border border-slate-200 font-semibold text-emerald-600">Sangat Jauh (> 40 km / MAN & WAN)</td>
+                  <td class="p-2.5 border border-slate-200">Pendek (&lt; 2 km / LAN / Gedung)</td>
+                  <td class="p-2.5 border border-slate-200">Menengah (&lt; 550 m Data Center)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key Parameter Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card-hover bg-slate-50 border-t-4 border-cyan-600 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-cyan-950 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-atom text-cyan-600"></i> Hukum Snellius & Indeks Bias
+            </h4>
+            <p class="text-xs text-slate-600">
+              Syarat TIR terjadi saat $n_1 > n_2$ dan sudut datang $\theta_1 > \theta_c$ (sudut kritis). Persamaan refraksi: $n_1 \sin(\theta_1) = n_2 \sin(\theta_2)$.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-50 border-t-4 border-indigo-600 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-indigo-950 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-indigo-600"></i> Proteksi Anatomi Kabel
+            </h4>
+            <p class="text-xs text-slate-600">
+              Terdiri dari Core (Inti Kaca), Cladding (Pemantul), Coating Buffer (Pelindung Kaca), Loose Tube, Water Blocking, Steel Armor, dan Outer Jacket.
+            </p>
+          </div>
+          <div class="card-hover bg-slate-50 border-t-4 border-emerald-600 rounded-xl p-4 border border-slate-200">
+            <h4 class="font-bold text-emerald-950 text-xs mb-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-plug text-emerald-600"></i> Jenis Konektor & Ferrule Polish
+            </h4>
+            <p class="text-xs text-slate-600">
+              Jenis: FC, SC, LC, ST. Polishing: UPC (Ultra Physical Contact - Biru $0^\circ$) vs APC (Angled Physical Contact - Hijau $8^\circ$).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Laboratorium Simulasi Interaktif Modul 9 -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-7 h-7 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-bold">3</span>
+            Laboratorium Simulasi Interaktif Fiber Optik
+          </h2>
+          <span class="text-xs bg-cyan-100 text-cyan-800 font-semibold px-3 py-1 rounded-full border border-cyan-200">4 Quantum Hologram Labs</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Simulasi 1: Refraction & TIR Hologram Lab -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-laser text-cyan-600"></i> Simulasi 1: Refraction & TIR Hologram Lab
+                </h3>
+                <span class="text-xs font-mono font-bold bg-cyan-100 text-cyan-900 px-2 py-0.5 rounded">Snell's Law HUD</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Kendalikan sudut laser pemancar ($0^\circ-90^\circ$) untuk menguji fenomena pembiasan dan Pemantulan Internal Sempurna (TIR).</p>
+
+              <!-- Hologram Canvas Display Box -->
+              <div id="display-sim1" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <!-- SVG Beam Renderer -->
+                <svg id="sim1-svg" class="absolute inset-0 w-full h-full z-0" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Medium Boundary Line -->
+                  <line x1="0" y1="104" x2="100%" y2="104" stroke="#334155" stroke-width="2" stroke-dasharray="4" />
+                  <!-- Normal Axis Line -->
+                  <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#475569" stroke-width="1" stroke-dasharray="2" />
+                  <!-- Incident Laser Beam -->
+                  <line id="sim1-ray-incident" x1="10%" y1="180" x2="50%" y2="104" stroke="#38bdf8" stroke-width="3" filter="drop-shadow(0 0 6px #38bdf8)" />
+                  <!-- Refracted Ray (Escape) -->
+                  <line id="sim1-ray-refracted" x1="50%" y1="104" x2="90%" y2="20" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="3" />
+                  <!-- Reflected Ray (TIR) -->
+                  <line id="sim1-ray-reflected" x1="50%" y1="104" x2="90%" y2="180" stroke="#4ade80" stroke-width="3.5" filter="drop-shadow(0 0 8px #4ade80)" />
+                </svg>
+
+                <div class="z-10 flex justify-between items-center bg-slate-900/90 p-2 rounded-lg border border-slate-800 font-mono-code text-[10px]">
+                  <span class="text-cyan-300"><i class="fa-solid fa-square-root-variable mr-1"></i> $n_1$ Core: <b id="sim1-n1-disp">1.48</b></span>
+                  <span class="text-indigo-300">$n_2$ Clad: <b id="sim1-n2-disp">1.45</b></span>
+                  <span class="text-amber-300">$\theta_c$ Critical: <b id="sim1-crit-disp">78.5°</b></span>
+                </div>
+
+                <div id="sim1-status-badge" class="z-10 self-center bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-lg">
+                  <i class="fa-solid fa-shield-halved"></i> TOTAL INTERNAL REFLECTION (TIR ACTIVE)
+                </div>
+
+                <div class="z-10 bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Sudut Datang ($\theta_1$): <b id="sim1-theta1-disp" class="text-cyan-400">80°</b></span>
+                  <span>Sudut Bias ($\theta_2$): <b id="sim1-theta2-disp" class="text-rose-400">90° (Refracted)</b></span>
+                  <span>Sinyal Terbuang: <b id="sim1-loss-disp" class="text-emerald-400">0 dB (Perfect)</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex justify-between">
+                    <span>Sudut Laser Turret ($\theta_1$)</span>
+                    <span id="sim1-slider-val" class="text-cyan-700 font-bold">80°</span>
+                  </label>
+                  <input type="range" id="sim1-angle-slider" min="10" max="88" value="80" class="w-full accent-cyan-600" oninput="runSim1()">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Material Inti Kaca (Core Material)</label>
+                  <select id="sim1-material" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-cyan-500 outline-none" onchange="runSim1()">
+                    <option value="1.48-1.45" selected>Silika Murni ($n_1=1.48, n_2=1.45$)</option>
+                    <option value="1.55-1.45">High-Index Doped Glass ($n_1=1.55, n_2=1.45$)</option>
+                    <option value="1.46-1.45">Low-Contrast Fiber ($n_1=1.46, n_2=1.45$)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Status Refraksi:</span>
+                <span id="sim1-out-summary" class="font-bold text-emerald-700">Pantulan Sempurna Dalam Core</span>
+              </div>
+              <button onclick="catatSimulasi(1)" class="bg-cyan-700 hover:bg-cyan-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 2: Fiber Core Lightwave Matrix -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-wave-square text-indigo-600"></i> Simulasi 2: Fiber Core Dispersion Matrix
+                </h3>
+                <span class="text-xs font-bold bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded">Quantum Dispersion</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Amati pelebaran pulsa sinyal (Modal Dispersion) dan potensi kerancuan bit (Inter-Symbol Interference) saat jarak diperpanjang.</p>
+
+              <!-- Oscilloscope & Wave Animation Box -->
+              <div id="display-sim2" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between">
+                <div class="flex justify-between items-center text-[10px] font-mono-code text-slate-300">
+                  <span>Mode Serat: <b id="sim2-mode-tag" class="text-cyan-400">Single-Mode 9 µm</b></span>
+                  <span>Jarak Kabel: <b id="sim2-dist-disp" class="text-amber-400">10 km</b></span>
+                </div>
+
+                <!-- Quantum Tunnel / Oscilloscope Visualization -->
+                <div class="relative w-full h-24 bg-slate-950/90 rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center p-2">
+                  <div class="absolute top-1 left-2 text-[9px] font-mono-code text-slate-500"><i class="fa-solid fa-microchip mr-1"></i> Dispersion Oscilloscope</div>
+                  
+                  <!-- Waveform SVG -->
+                  <svg class="w-full h-full" viewBox="0 0 300 60">
+                    <!-- Grid background lines -->
+                    <line x1="0" y1="30" x2="300" y2="30" stroke="#1e293b" stroke-width="1" stroke-dasharray="2" />
+                    <!-- Signal Bit 1 Waveform -->
+                    <path id="sim2-wave-1" d="M 20 50 Q 50 10 80 50" fill="none" stroke="#38bdf8" stroke-width="3" filter="drop-shadow(0 0 6px #38bdf8)" />
+                    <!-- Signal Bit 0/1 Waveform 2 -->
+                    <path id="sim2-wave-2" d="M 120 50 Q 150 10 180 50" fill="none" stroke="#38bdf8" stroke-width="3" filter="drop-shadow(0 0 6px #38bdf8)" />
+                  </svg>
+
+                  <div id="sim2-isi-warning" class="hidden absolute inset-0 bg-rose-950/80 backdrop-blur-xs flex flex-col items-center justify-center text-center p-2 border border-rose-500/50">
+                    <span class="text-rose-400 font-bold text-xs"><i class="fa-solid fa-triangle-exclamation mr-1"></i> BANDWIDTH LIMIT WARNING!</span>
+                    <span class="text-slate-300 text-[10px] mt-0.5">Inter-Symbol Interference (ISI) Terjadi! Pulsa bit bertumpuk parah.</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Modal Dispersion: <b id="sim2-disp-val" class="text-emerald-400">0.0 ns/km</b></span>
+                  <span>Est. Bandwidth: <b id="sim2-bw-val" class="text-cyan-400">100 Gbps</b></span>
+                  <span>Kualitas Bit: <b id="sim2-bit-val" class="text-emerald-400">Sempurna (BER 10⁻¹²)</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Mode & Ukuran Core Serat</label>
+                  <select id="sim2-mode-select" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none" onchange="runSim2()">
+                    <option value="smf9" selected>Core 9 µm (Single-Mode SMF)</option>
+                    <option value="mmf50">Core 50 µm (Multi-Mode Graded-Index)</option>
+                    <option value="mmf62">Core 62.5 µm (Multi-Mode Step-Index)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex justify-between">
+                    <span>Panjang Kabel (Jarak)</span>
+                    <span id="sim2-dist-val" class="text-indigo-700 font-bold">10 km</span>
+                  </label>
+                  <input type="range" id="sim2-dist-slider" min="1" max="40" value="10" class="w-full accent-indigo-600" oninput="runSim2()">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Status Dispersi:</span>
+                <span id="sim2-out-summary" class="font-bold text-indigo-900">Transmisi Bebas Dispersi Modal</span>
+              </div>
+              <button onclick="catatSimulasi(2)" class="bg-cyan-700 hover:bg-cyan-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 3: Cybernetic Fiber Core Anatomy 3D Explorer -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-cubes text-emerald-600"></i> Simulasi 3: Cybernetic Cable Anatomy 3D
+                </h3>
+                <span class="text-xs font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">3D Exploded View</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Geser slider exploded diagram untuk membongkar struktur kabel optik outdoor bermaterial steel armor.</p>
+
+              <!-- 3D Blueprint Canvas Box -->
+              <div id="display-sim3" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <!-- Visual Cable Layers Graphic -->
+                <div class="my-auto flex items-center justify-center gap-1 sm:gap-2 px-2 transition-all duration-300">
+                  <div id="sim3-layer-jacket" class="h-16 w-12 bg-amber-600/90 rounded border border-amber-400 flex flex-col justify-center items-center text-[8px] text-white font-bold p-1 transition-all shadow-md">
+                    <span>Outer</span><span>Jacket</span>
+                  </div>
+                  <div id="sim3-layer-armor" class="h-14 w-11 bg-slate-500/90 rounded border border-slate-300 flex flex-col justify-center items-center text-[8px] text-white font-bold p-1 transition-all shadow-md">
+                    <span>Steel</span><span>Armor</span>
+                  </div>
+                  <div id="sim3-layer-tube" class="h-12 w-10 bg-cyan-600/90 rounded border border-cyan-300 flex flex-col justify-center items-center text-[8px] text-white font-bold p-1 transition-all shadow-md">
+                    <span>Loose</span><span>Tube</span>
+                  </div>
+                  <div id="sim3-layer-buffer" class="h-10 w-9 bg-indigo-600/90 rounded border border-indigo-300 flex flex-col justify-center items-center text-[8px] text-white font-bold p-1 transition-all shadow-md">
+                    <span>Buffer</span>
+                  </div>
+                  <div id="sim3-layer-clad" class="h-8 w-8 bg-sky-400/90 rounded border border-white flex flex-col justify-center items-center text-[7px] text-slate-900 font-bold p-0.5 transition-all shadow-md">
+                    <span>Clad</span>
+                  </div>
+                  <div id="sim3-layer-core" class="h-6 w-7 bg-emerald-400/90 rounded border-2 border-emerald-200 flex flex-col justify-center items-center text-[7px] text-slate-900 font-extrabold p-0.5 transition-all glow-neon-green">
+                    <span>Core</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Lapisan Terpilih: <b id="sim3-layer-name" class="text-cyan-300">Steel Armor Mesh</b></span>
+                  <span>Daya Tahan: <b id="sim3-strength" class="text-emerald-400">1500 N (High Tensile)</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex justify-between">
+                    <span>3D Exploded View Slider</span>
+                    <span id="sim3-explode-val" class="text-emerald-700 font-bold">20%</span>
+                  </label>
+                  <input type="range" id="sim3-explode-slider" min="0" max="100" value="20" class="w-full accent-emerald-600" oninput="runSim3()">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Simulasi Uji Bebas Fisik / Stres</label>
+                  <select id="sim3-stress-test" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-emerald-500 outline-none" onchange="runSim3()">
+                    <option value="normal" selected>Kondisi Normal Standar</option>
+                    <option value="bending">Uji Tekukan Ekstrem (Bending Radius Limit)</option>
+                    <option value="rodent">Uji Gigitan Hama / Pengerat (Rodent Bite)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Hasil Pengujian Fisik:</span>
+                <span id="sim3-out-summary" class="font-bold text-slate-800">Struktur Kabel Utuh & Aman</span>
+              </div>
+              <button onclick="catatSimulasi(3)" class="bg-cyan-700 hover:bg-cyan-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulasi 4: Quantum Connector Matrix & Polish Loss Analyzer -->
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-plug-circle-bolt text-rose-600"></i> Simulasi 4: Connector Polish Loss Analyzer
+                </h3>
+                <span class="text-xs font-bold bg-rose-100 text-rose-900 px-2 py-0.5 rounded">SFP Workbench</span>
+              </div>
+              <p class="text-xs text-slate-500 mb-3">Pasang jenis konektor & tipe pemolesan ferrule ke port SFP Transceiver untuk mengukur Insertion & Return Loss.</p>
+
+              <!-- Workbench Interface Box -->
+              <div id="display-sim4" class="sim-display-box w-full h-52 mb-3 p-3 border border-slate-800 flex flex-col justify-between relative">
+                <div class="flex justify-between items-center text-[10px] font-mono-code text-slate-300">
+                  <span>Port Target: <b class="text-indigo-300">Port 1 - LC/UPC SFP Slot</b></span>
+                  <span id="sim4-match-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded font-bold">MATCHED OK</span>
+                </div>
+
+                <!-- Connector & Ferrule Visual Matcher -->
+                <div class="my-auto flex items-center justify-around px-4">
+                  <div class="flex flex-col items-center">
+                    <div id="sim4-conn-icon" class="w-12 h-12 rounded-xl bg-blue-600 border-2 border-white text-white text-sm font-bold flex items-center justify-center shadow-lg transition-all">
+                      LC
+                    </div>
+                    <span id="sim4-conn-label" class="text-[10px] font-mono-code text-cyan-300 mt-1">LC-UPC (Blue)</span>
+                  </div>
+
+                  <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-right-left text-slate-500 text-lg animate-pulse"></i>
+                    <span id="sim4-ferrule-angle" class="text-[9px] font-mono-code text-slate-400 mt-0.5">Ferrule 0° Flat</span>
+                  </div>
+
+                  <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-xl bg-slate-800 border-2 border-cyan-400 text-cyan-300 text-xs font-bold flex flex-col items-center justify-center shadow-lg">
+                      <i class="fa-solid fa-network-wired text-sm"></i>
+                      <span class="text-[8px] mt-0.5">SFP Port</span>
+                    </div>
+                    <span class="text-[10px] font-mono-code text-slate-400 mt-1">LC-UPC Adapter</span>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-2 rounded text-[10px] font-mono-code text-slate-300 flex justify-between border border-slate-800">
+                  <span>Insertion Loss: <b id="sim4-il-val" class="text-emerald-400">0.2 dB (Good)</b></span>
+                  <span>Return Loss: <b id="sim4-rl-val" class="text-cyan-400">-55 dB</b></span>
+                  <span>Back Reflection: <b id="sim4-br-val" class="text-emerald-400">Sangat Rendah</b></span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jenis Konektor Fiber</label>
+                  <select id="sim4-conn-type" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-rose-500 outline-none" onchange="runSim4()">
+                    <option value="LC" selected>LC (Lucent Connector - Push-Pull Small)</option>
+                    <option value="SC">SC (Subscriber Connector - Square)</option>
+                    <option value="FC">FC (Ferrule Connector - Screw Metal)</option>
+                    <option value="ST">ST (Straight Tip - Bayonet Twist)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tipe Pemolesan Ferrule</label>
+                  <select id="sim4-polish-type" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-medium focus:ring-2 focus:ring-rose-500 outline-none" onchange="runSim4()">
+                    <option value="UPC" selected>UPC (Ultra Physical Contact - Warna Biru 0°)</option>
+                    <option value="APC">APC (Angled Physical Contact - Warna Hijau 8°)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700 flex justify-between items-center">
+              <div>
+                <span class="block text-[10px] text-slate-400">Status Kelayakan Sambungan:</span>
+                <span id="sim4-out-summary" class="font-bold text-emerald-700">Presisi Tinggi & Redaman Minimal</span>
+              </div>
+              <button onclick="catatSimulasi(4)" class="bg-cyan-700 hover:bg-cyan-800 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Log
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tabel Pengamatan Praktikum -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-bold">4</span>
+              Tabel Pengamatan Praktikum Media Fiber Optik
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Catatan log eksperimen yang direkap secara otomatis dari modul simulasi interaktif di atas.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="exportCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium text-xs px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs text-slate-600" id="tbl-pengamatan">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Modul Simulasi</th>
+                <th class="px-4 py-3">Parameter Konfigurasi / Pengujian</th>
+                <th class="px-4 py-3">Hasil / Pengukuran Kinerja</th>
+                <th class="px-4 py-3">Status Evaluasi Optik</th>
+                <th class="px-4 py-3 text-center w-16 no-print">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body" class="divide-y divide-slate-200 bg-white">
+              <tr id="empty-row">
+                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: Uji Kompetensi -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-7 h-7 bg-cyan-100 text-cyan-800 rounded-lg text-sm font-bold">5</span>
+              Uji Kompetensi Serat Optik & Spesifikasi Kabel
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah 20 pertanyaan pilihan ganda berikut untuk menguji pemahaman teori dan praktikum Anda.</p>
+          </div>
+          <span class="text-xs font-semibold bg-cyan-100 text-cyan-900 px-3 py-1 rounded-full border border-cyan-200">20 Soal Pilihan Ganda</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Penyelesaian:</p>
+          <p>Pastikan semua soal uji kompetensi dan tabel pengamatan telah terisi lengkap sebelum menyelesaikan LKPD.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset LKPD
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim LKPD
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-cyan-100 text-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">LKPD 9 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nilai Akhir Uji Kompetensi</p>
+          <div class="text-5xl font-black text-cyan-700 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil dikirim ke server guru.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-900 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-600 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    let tableData = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
+      }
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
+
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
+
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selKelas.appendChild(opt);
+        });
+      } else {
+        selKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selNama = document.getElementById('sel-nama');
+
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selNama.appendChild(opt);
+        });
+      } else {
+        selNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
+        }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-cyan-50 text-cyan-700 font-medium px-3 py-1 rounded-full border border-cyan-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
+      }
+    }
+
+    // Bank Soal Uji Kompetensi LKPD 9: Pengenalan Fiber Optik & Spesifikasi Kabel
+    const questionBank = [
+      { id: 1, q: "Prinsip fisika utama yang memungkinkan gelombang cahaya terperangkap dan merambat di dalam inti (core) serat optik tanpa bocor keluar dinamakan...", options: ["A. Refraksi Sempurna Terbuka", "B. Total Internal Reflection (Pemantulan Internal Sempurna)", "C. Modal Dispersion Coupling", "D. Chromatic Attenuation Interference", "E. Diffuse Light Scattering"], ans: "B" },
+      { id: 2, q: "Menurut Hukum Snellius $n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$, syarat mutlak terjadinya Pemantulan Internal Sempurna (TIR) pada media serat optik adalah...", options: ["A. Indeks bias Core ($n_1$) harus lebih kecil dari Cladding ($n_2$)", "B. Indeks bias Core ($n_1$) harus lebih besar dari Cladding ($n_2$), dan sudut datang $\\theta_1 > \\theta_c$", "C. Sudut datang $\\theta_1$ harus tepat $0^\\circ$ terhadap garis normal", "D. Indeks bias Cladding ($n_2$) harus bernilai nol", "E. Sudut bias $\\theta_2$ selalu bernilai $180^\\circ$"], ans: "B" },
+      { id: 3, q: "Sudut kritis ($\\theta_c$) didefinisikan sebagai sudut datang $\\theta_1$ yang menghasilkan sudut bias ($\\theta_2$) sebesar...", options: ["A. $0^\\circ$", "B. $45^\\circ$", "C. $90^\\circ$", "D. $180^\\circ$", "E. $360^\\circ$"], ans: "C" },
+      { id: 4, q: "Berapakah diameter inti (Core) standar pada kabel Single-Mode Fiber (SMF - OS2)?", options: ["A. $9\\ \\mu\\text{m}$", "B. $50\\ \\mu\\text{m}$", "C. $62.5\\ \\mu\\text{m}$", "D. $125\\ \\mu\\text{m}$", "E. $250\\ \\mu\\text{m}$"], ans: "A" },
+      { id: 5, q: "Karakteristik utama serat Multi-Mode Fiber (MMF) dibandingkan Single-Mode Fiber (SMF) adalah...", options: ["A. MMF memiliki diameter core lebih kecil dan jarak jangkauan lebih jauh", "B. MMF menggunakan transmisi sinar laser tunggal presisi", "C. MMF memiliki diameter core lebih besar ($50/62.5\\ \\mu\\text{m}$) sehingga cahaya merambat melalui banyak lintasan mode", "D. MMF tidak memiliki lapisan cladding", "E. MMF bebas dari masalah modal dispersion"], ans: "C" },
+      { id: 6, q: "Fenomena pelebaran pulsa cahaya akibat variasi kecepatan lintasan mode yang berbeda saat melalui kabel Multi-Mode dinamakan...", options: ["A. Chromatic Refraction", "B. Modal Dispersion (Dispersi Modal)", "C. Polarization Loss", "D. Structural Attenuation", "E. Back Reflection Signal"], ans: "B" },
+      { id: 7, q: "Dampak utama dari Modal Dispersion berlebih pada jaringan kabel optik jarak jauh adalah...", options: ["A. Kenaikan suhu inti kaca secara drastis", "B. Terjadinya Inter-Symbol Interference (ISI) yang membatasi kapasitas bandwidth dan kecepatan transmisi data", "C. Kabel menjadi kaku dan mudah patah", "D. Warna jaket luar berubah warna", "E. Hambatan listrik meningkat"], ans: "B" },
+      { id: 8, q: "Lapisan serat optik yang langsung menyelubungi Core dan memiliki indeks bias lebih rendah ($n_2$) untuk memantulkan cahaya kembali ke Core dinamakan...", options: ["A. Outer Jacket", "B. Cladding", "C. Tight Buffer", "D. Steel Armor Mesh", "E. Ripcord Strength Element"], ans: "B" },
+      { id: 9, q: "Berapakah ukuran standar diameter Cladding luar pada hampir seluruh jenis serat optik (baik SMF maupun MMF)?", options: ["A. $9\\ \\mu\\text{m}$", "B. $50\\ \\mu\\text{m}$", "C. $125\\ \\mu\\text{m}$", "D. $250\\ \\mu\\text{m}$", "E. $900\\ \\mu\\text{m}$"], ans: "C" },
+      { id: 10, q: "Lapisan kabel optik outdoor yang berfungsi khusus melindungi kabel dari benturan fisik mekanis dan gigitan pengerat/hama dinamakan...", options: ["A. Primary Coating Buffer", "B. Loose Tube Gel", "C. Armored Steel Mesh / Steel Tape", "D. Central Strength Member", "E. Ferrule Ceramic"], ans: "C" },
+      { id: 11, q: "Konektor optik berbodi persegi kecil (Small Form Factor) yang dilengkapi kait pendorong (push-pull) dan sangat populer terpasang pada SFP Transceiver dinamakan...", options: ["A. ST Connector", "B. FC Connector", "C. LC Connector (Lucent Connector)", "D. SC Connector", "E. E2000 Connector"], ans: "C" },
+      { id: 12, q: "Konektor optik berbodi persegi besar dengan sistem pengunci push-pull yang umum dijumpai pada perangkat modem ONT / FTTH rumah dinamakan...", options: ["A. SC Connector (Subscriber Connector)", "B. ST Connector", "C. FC Connector", "D. BNC Connector", "E. SMA Connector"], ans: "A" },
+      { id: 13, q: "Konektor optik berbodi logam bulat yang menggunakan mekanisme ulir putar (screw-on) untuk lingkungan tinggi getaran dinamakan...", options: ["A. LC Connector", "B. FC Connector (Ferrule Connector)", "C. SC Connector", "D. ST Connector", "E. RJ-45 Optical"], ans: "B" },
+      { id: 14, q: "Konektor optik jenis ST (Straight Tip) dapat dikenali secara visual dari bentuk fisik...", options: ["A. Persegi warna biru dengan kait pendorong", "B. Bulat berbodi plastik dengan sistem jepit slide", "C. Bulat berbodi logam dengan sistem pengunci bayonet putar (push-and-twist)", "D. Segenam tembaga berulir", "E. Gepeng tipis transparan"], ans: "C" },
+      { id: 15, q: "Apakah ciri khas fisik dan warna standar dari konektor serat optik dengan pemolesan APC (Angled Physical Contact)?", options: ["A. Berwarna Biru dengan permukaan ferrule datar $0^\\circ$", "B. Berwarna Hijau dengan sudut kemiringan permukaan ferrule $8^\\circ$", "C. Berwarna Merah dengan sudut kemiringan ferrule $45^\\circ$", "D. Berwarna Hitam dengan permukaan cembung", "E. Berwarna Kuning tanpa sudut ferrule"], ans: "B" },
+      { id: 16, q: "Mengapa pemolesan APC (Hijau) menghasilkan Return Loss yang jauh lebih baik (pantulan balik lebih rendah) dibanding UPC (Biru)?", options: ["A. Karena ferrule APC dilapisi emas murni", "B. Karena sudut kemiringan $8^\\circ$ memantulkan cahaya yang balik terbias ke Cladding, bukan kembali ke sumber laser pemancar", "C. Karena APC menggunakan bahan plastik tebal", "D. Karena APC memiliki diameter core $50\\ \\mu\\text{m}$", "E. Karena APC tidak memerlukan adapter SFP"], ans: "B" },
+      { id: 17, q: "Apa dampak buruk yang terjadi jika siswa memaksa menghubungkan konektor LC-UPC (Biru) secara langsung ke adaptor LC-APC (Hijau)?", options: ["A. Kecepatan data meningkat dua kali lipat", "B. Terjadi celah udara (air gap) dan kerusakan fisik permukaan ferrule yang memicu Insertion Loss tinggi ($> 15\\ \\text{dB}$)", "C. Kabel optik meleleh seketika", "D. Tidak ada dampak sama sekali", "E. Sinyal otomatis terkonversi menjadi listrik"], ans: "B" },
+      { id: 18, q: "Berapakah daya redaman maksilmal standar yang diizinkan untuk satu titik sambungan konektor optik (Insertion Loss)?", options: ["A. $\\le 0.3\\ \\text{dB}$", "B. $\\le 5.0\\ \\text{dB}$", "C. $\\le 12.0\\ \\text{dB}$", "D. $\\le 25.0\\ \\text{dB}$", "E. $\\le 50.0\\ \\text{dB}$"], ans: "A" },
+      { id: 19, q: "Fenomena kebocoran cahaya keluar dari Cladding akibat pembengkokan fisik kabel yang melampaui batas minimum Bending Radius dinamakan...", options: ["A. Dispersion Loss", "B. Microbending / Macrobending Loss", "C. Splice Attenuation", "D. Return Reflection Loss", "E. Thermal Resistance Error"], ans: "B" },
+      { id: 20, q: "Perangkat ukur berbasis pantulan gelombang optik yang digunakan untuk menganalisis lokasi putus kabel, nilai redaman total, dan panjang saluran fiber optik dinamakan...", options: ["A. Optical Power Meter (OPM)", "B. Visual Fault Locator (VFL)", "C. OTDR (Optical Time-Domain Reflectometer)", "D. Fusion Splicer", "E. Optical Light Source (OLS)"], ans: "C" }
+    ];
+
+    // Simulation Data Objects
+    let sim1Data = {};
+    let sim2Data = {};
+    let sim3Data = {};
+    let sim4Data = {};
+
+    // Simulation 1: Refraction & TIR Hologram Lab
+    function runSim1() {
+      const angle = parseInt(document.getElementById('sim1-angle-slider').value);
+      const matVal = document.getElementById('sim1-material').value.split('-');
+      const n1 = parseFloat(matVal[0]);
+      const n2 = parseFloat(matVal[1]);
+
+      document.getElementById('sim1-slider-val').innerText = `${angle}°`;
+      document.getElementById('sim1-n1-disp').innerText = n1.toFixed(2);
+      document.getElementById('sim1-n2-disp').innerText = n2.toFixed(2);
+      document.getElementById('sim1-theta1-disp').innerText = `${angle}°`;
+
+      // Critical Angle theta_c = arcsin(n2/n1) in degrees
+      const critRad = Math.asin(n2 / n1);
+      const critDeg = Math.round((critRad * 180) / Math.PI * 10) / 10;
+      document.getElementById('sim1-crit-disp').innerText = `${critDeg}°`;
+
+      const rayIncident = document.getElementById('sim1-ray-incident');
+      const rayRefracted = document.getElementById('sim1-ray-refracted');
+      const rayReflected = document.getElementById('sim1-ray-reflected');
+      const statusBadge = document.getElementById('sim1-status-badge');
+
+      // Visual angle calculations
+      const incidentX = 50 - Math.tan((angle * Math.PI) / 180) * 40;
+      rayIncident.setAttribute('x1', `${Math.max(5, incidentX)}%`);
+
+      let isTIR = angle >= critDeg;
+      let theta2Text = "";
+      let lossText = "";
+      let summaryText = "";
+
+      if (isTIR) {
+        // Reflected ray active
+        rayRefracted.setAttribute('stroke-opacity', '0');
+        rayReflected.setAttribute('stroke-opacity', '1');
+        const reflectX = 50 + Math.tan((angle * Math.PI) / 180) * 40;
+        rayReflected.setAttribute('x2', `${Math.min(95, reflectX)}%`);
+
+        statusBadge.className = "z-10 self-center bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-lg glow-neon-green";
+        statusBadge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> TOTAL INTERNAL REFLECTION (TIR ACTIVE)';
+
+        theta2Text = "N/A (Pantulan Sempurna)";
+        lossText = "0 dB (Sinyal Terperangkap)";
+        summaryText = "Pantulan Sempurna Dalam Core (TIR Berhasil)";
+      } else {
+        // Refraction / Photon Escape
+        // Snell's Law sin(theta2) = (n1/n2)*sin(theta1)
+        const sinTheta2 = (n1 / n2) * Math.sin((angle * Math.PI) / 180);
+        const theta2Deg = Math.round((Math.asin(Math.min(1, sinTheta2)) * 180) / Math.PI);
+
+        rayRefracted.setAttribute('stroke-opacity', '1');
+        rayReflected.setAttribute('stroke-opacity', '0.2');
+        const refractX = 50 + Math.tan((theta2Deg * Math.PI) / 180) * 35;
+        rayRefracted.setAttribute('x2', `${Math.min(95, refractX)}%`);
+
+        statusBadge.className = "z-10 self-center bg-rose-950/80 text-rose-300 border border-rose-500/50 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide flex items-center gap-1.5 shadow-lg glow-neon-rose";
+        statusBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PHOTON ESCAPE / SIGNAL DECAY';
+
+        theta2Text = `${theta2Deg}° (Terbias Keluar)`;
+        lossText = " High (> 18 dB Signal Leak)";
+        summaryText = "Cahaya Bocor Keluar Inti Kaca (Bukan TIR)";
+      }
+
+      document.getElementById('sim1-theta2-disp').innerText = theta2Text;
+      document.getElementById('sim1-loss-disp').innerText = lossText;
+      document.getElementById('sim1-out-summary').innerText = summaryText;
+
+      sim1Data = { angle, n1, n2, critDeg, isTIR, lossText, summaryText };
+    }
+
+    // Simulation 2: Fiber Core Dispersion Matrix
+    function runSim2() {
+      const mode = document.getElementById('sim2-mode-select').value;
+      const dist = parseInt(document.getElementById('sim2-dist-slider').value);
+
+      document.getElementById('sim2-dist-val').innerText = `${dist} km`;
+      document.getElementById('sim2-dist-disp').innerText = `${dist} km`;
+
+      const modeTag = document.getElementById('sim2-mode-tag');
+      const wave1 = document.getElementById('sim2-wave-1');
+      const wave2 = document.getElementById('sim2-wave-2');
+      const isiWarn = document.getElementById('sim2-isi-warning');
+
+      let dispVal = 0;
+      let bwVal = "";
+      let bitQuality = "";
+      let summaryText = "";
+
+      if (mode === 'smf9') {
+        modeTag.innerText = "Single-Mode 9 µm (OS2)";
+        dispVal = Math.round(dist * 0.05 * 10) / 10;
+        bwVal = "100 Gbps (Ultra High)";
+        bitQuality = "Sempurna (BER 10⁻¹²)";
+        summaryText = "Bebas Modal Dispersion (Pulsa Tajam)";
+        isiWarn.classList.add('hidden');
+
+        // Waveform shape: Sharp narrow peak
+        wave1.setAttribute('d', 'M 30 50 Q 50 10 70 50');
+        wave2.setAttribute('d', 'M 130 50 Q 150 10 170 50');
+      } else if (mode === 'mmf50') {
+        modeTag.innerText = "Multi-Mode 50 µm Graded (OM3)";
+        dispVal = Math.round(dist * 1.2 * 10) / 10;
+        bwVal = dist > 10 ? "1 Gbps" : "10 Gbps";
+        bitQuality = dist > 15 ? "Kategori Rendah" : "Baik (BER 10⁻⁹)";
+        summaryText = "Dispersi Modal Moderat (Graded Index)";
+
+        if (dist > 15) {
+          isiWarn.classList.remove('hidden');
+          wave1.setAttribute('d', 'M 10 50 Q 60 15 110 50');
+          wave2.setAttribute('d', 'M 90 50 Q 140 15 190 50');
+        } else {
+          isiWarn.classList.add('hidden');
+          wave1.setAttribute('d', 'M 20 50 Q 50 15 80 50');
+          wave2.setAttribute('d', 'M 120 50 Q 150 15 180 50');
+        }
+      } else if (mode === 'mmf62') {
+        modeTag.innerText = "Multi-Mode 62.5 µm Step (OM1)";
+        dispVal = Math.round(dist * 4.5 * 10) / 10;
+        bwVal = dist > 5 ? "100 Mbps (Terbatas)" : "1 Gbps";
+        bitQuality = dist > 5 ? "Kerusakan Bit (ISI Inter-Symbol)" : "Cukup";
+        summaryText = "Dispersi Modal Tinggi (Step Index)";
+
+        if (dist > 5) {
+          isiWarn.classList.remove('hidden');
+          wave1.setAttribute('d', 'M 0 50 Q 60 10 120 50');
+          wave2.setAttribute('d', 'M 60 50 Q 120 10 180 50');
+        } else {
+          isiWarn.classList.add('hidden');
+          wave1.setAttribute('d', 'M 15 50 Q 50 15 85 50');
+          wave2.setAttribute('d', 'M 115 50 Q 150 15 185 50');
+        }
+      }
+
+      document.getElementById('sim2-disp-val').innerText = `${dispVal} ns`;
+      document.getElementById('sim2-bw-val').innerText = bwVal;
+      document.getElementById('sim2-bit-val').innerText = bitQuality;
+      document.getElementById('sim2-out-summary').innerText = summaryText;
+
+      sim2Data = { mode, dist, dispVal, bwVal, bitQuality, summaryText };
+    }
+
+    // Simulation 3: Cybernetic Fiber Core Anatomy 3D
+    function runSim3() {
+      const explode = parseInt(document.getElementById('sim3-explode-slider').value);
+      const stress = document.getElementById('sim3-stress-test').value;
+
+      document.getElementById('sim3-explode-val').innerText = `${explode}%`;
+
+      // Explode gap spacing
+      const gap = Math.round(explode * 0.25);
+      document.getElementById('sim3-layer-jacket').style.marginRight = `${gap}px`;
+      document.getElementById('sim3-layer-armor').style.marginRight = `${gap}px`;
+      document.getElementById('sim3-layer-tube').style.marginRight = `${gap}px`;
+      document.getElementById('sim3-layer-buffer').style.marginRight = `${gap}px`;
+      document.getElementById('sim3-layer-clad').style.marginRight = `${gap}px`;
+
+      let layerName = "Armored Steel Mesh";
+      let strength = "1500 N (High Tensile)";
+      let summaryText = "Kabel Utuh & Proteksi Maksimal";
+
+      if (stress === 'bending') {
+        summaryText = "Macro-Bending Loss! Tekukan Melampaui Limit";
+        strength = "Sinyal Bocor (Redaman +8 dB)";
+        document.getElementById('sim3-layer-core').className = "h-6 w-7 bg-rose-500/90 rounded border-2 border-rose-300 flex flex-col justify-center items-center text-[7px] text-white font-extrabold p-0.5 transition-all glow-neon-rose";
+      } else if (stress === 'rodent') {
+        summaryText = "Steel Armor Menahan Gigitan Hama / Pengerat";
+        strength = "Armor Proteksi Aktif (Aman)";
+        document.getElementById('sim3-layer-core').className = "h-6 w-7 bg-emerald-400/90 rounded border-2 border-emerald-200 flex flex-col justify-center items-center text-[7px] text-slate-900 font-extrabold p-0.5 transition-all glow-neon-green";
+      } else {
+        document.getElementById('sim3-layer-core').className = "h-6 w-7 bg-emerald-400/90 rounded border-2 border-emerald-200 flex flex-col justify-center items-center text-[7px] text-slate-900 font-extrabold p-0.5 transition-all glow-neon-green";
+      }
+
+      document.getElementById('sim3-layer-name').innerText = layerName;
+      document.getElementById('sim3-strength').innerText = strength;
+      document.getElementById('sim3-out-summary').innerText = summaryText;
+
+      sim3Data = { explode, stress, layerName, strength, summaryText };
+    }
+
+    // Simulation 4: Quantum Connector Matrix & Polish Loss
+    function runSim4() {
+      const conn = document.getElementById('sim4-conn-type').value;
+      const polish = document.getElementById('sim4-polish-type').value;
+
+      const connIcon = document.getElementById('sim4-conn-icon');
+      const connLabel = document.getElementById('sim4-conn-label');
+      const ferruleAngle = document.getElementById('sim4-ferrule-angle');
+      const matchBadge = document.getElementById('sim4-match-badge');
+
+      connIcon.innerText = conn;
+      
+      let colorClass = polish === 'UPC' ? 'bg-blue-600' : 'bg-emerald-600';
+      connIcon.className = `w-12 h-12 rounded-xl ${colorClass} border-2 border-white text-white text-sm font-bold flex items-center justify-center shadow-lg transition-all`;
+      connLabel.innerText = `${conn}-${polish} (${polish === 'UPC' ? 'Blue' : 'Green'})`;
+      ferruleAngle.innerText = polish === 'UPC' ? 'Ferrule 0° Flat' : 'Ferrule 8° Angled';
+
+      let ilVal = "";
+      let rlVal = "";
+      let brVal = "";
+      let summaryText = "";
+
+      // Target adapter port is LC-UPC
+      if (conn === 'LC' && polish === 'UPC') {
+        matchBadge.className = "bg-emerald-950 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded font-bold";
+        matchBadge.innerText = "MATCHED PERFECT";
+        ilVal = "0.2 dB (Sangat Bagus)";
+        rlVal = "-55 dB";
+        brVal = "Rendah (< 0.001%)";
+        summaryText = "Presisi Tinggi & Redaman Sangat Rendah";
+      } else if (conn === 'LC' && polish === 'APC') {
+        matchBadge.className = "bg-rose-950 text-rose-400 border border-rose-500/50 px-2 py-0.5 rounded font-bold glow-neon-rose";
+        matchBadge.innerText = "FERRULE MISMATCH!";
+        ilVal = "16.5 dB (PARAH / HIGH LOSS)";
+        rlVal = "-20 dB (Tinggi)";
+        brVal = "BAHAYA! Air Gap & Back Reflection";
+        summaryText = "Dilarang! Celah Udara Terjadi Akibat Sudut 8°";
+      } else {
+        matchBadge.className = "bg-amber-950 text-amber-400 border border-amber-500/50 px-2 py-0.5 rounded font-bold";
+        matchBadge.innerText = "PHYSICAL ADAPTER MISMATCH";
+        ilVal = "25.0 dB (Disconnected)";
+        rlVal = "0 dB";
+        brVal = "Sinyal Terputus Total";
+        summaryText = "Bentuk Fisik Konektor Tidak Sesuai Port SFP";
+      }
+
+      document.getElementById('sim4-il-val').innerText = ilVal;
+      document.getElementById('sim4-rl-val').innerText = rlVal;
+      document.getElementById('sim4-br-val').innerText = brVal;
+      document.getElementById('sim4-out-summary').innerText = summaryText;
+
+      sim4Data = { conn, polish, ilVal, rlVal, brVal, summaryText };
+    }
+
+    // Record Simulation Log to Table
+    function catatSimulasi(simNum) {
+      let logEntry = {};
+
+      if (simNum === 1) {
+        logEntry = {
+          modul: "Simulasi 1: Refraction & TIR Lab",
+          param: `Sudut: ${sim1Data.angle}°, n1: ${sim1Data.n1}, n2: ${sim1Data.n2}`,
+          hasil: `Critical Angle: ${sim1Data.critDeg}°, Loss: ${sim1Data.lossText}`,
+          status: sim1Data.isTIR ? "TIR Berhasil (Core Trap)" : "Photon Escape (Bocor)"
+        };
+      } else if (simNum === 2) {
+        logEntry = {
+          modul: "Simulasi 2: Dispersion Matrix",
+          param: `Mode: ${sim2Data.mode.toUpperCase()}, Jarak: ${sim2Data.dist} km`,
+          hasil: `Dispersion: ${sim2Data.dispVal} ns, Est BW: ${sim2Data.bwVal}`,
+          status: sim2Data.summaryText
+        };
+      } else if (simNum === 3) {
+        logEntry = {
+          modul: "Simulasi 3: Cable 3D Explorer",
+          param: `Explode: ${sim3Data.explode}%, Uji Stres: ${sim3Data.stress}`,
+          hasil: `Proteksi: ${sim3Data.layerName}, Strength: ${sim3Data.strength}`,
+          status: sim3Data.summaryText
+        };
+      } else if (simNum === 4) {
+        logEntry = {
+          modul: "Simulasi 4: Connector Loss Analyzer",
+          param: `Konektor: ${sim4Data.conn}-${sim4Data.polish}`,
+          hasil: `Insertion Loss: ${sim4Data.ilVal}, RL: ${sim4Data.rlVal}`,
+          status: sim4Data.summaryText
+        };
+      }
+
+      tableData.push(logEntry);
+      renderTabelPengamatan();
+      showToast("Tercatat", "Hasil pengamatan serat optik berhasil disimpan ke tabel.", "success");
+    }
+
+    function deleteDataRow(index) {
+      tableData.splice(index, 1);
+      renderTabelPengamatan();
+    }
+
+    function renderTabelPengamatan() {
+      const tbody = document.getElementById('tbl-body');
+      tbody.innerHTML = '';
+
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Belum ada data pengamatan. Klik tombol "+ Catat Log" pada salah satu modul simulasi di atas untuk menyimpan hasil.</td></tr>`;
+        return;
+      }
+
+      tableData.forEach((row, idx) => {
+        let badgeColor = "bg-emerald-100 text-emerald-800";
+        if (row.status.includes("Escape") || row.status.includes("Bocor") || row.status.includes("MISMATCH") || row.status.includes("PARAH") || row.status.includes("Bencana") || row.status.includes("Dilarang")) {
+          badgeColor = "bg-rose-100 text-rose-800";
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-center font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3 font-semibold text-slate-800">${row.modul}</td>
+          <td class="px-4 py-3 font-mono-code text-slate-600">${row.param}</td>
+          <td class="px-4 py-3 font-mono-code font-bold text-cyan-700">${row.hasil}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeColor}">${row.status}</span></td>
+          <td class="px-4 py-3 text-center no-print">
+            <button onclick="deleteDataRow(${idx})" class="text-rose-500 hover:text-rose-700 font-medium text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      if (tableData.length === 0) {
+        showToast("Perhatian", "Belum ada data pengamatan untuk di-export!", "warning");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,No,Modul Simulasi,Parameter Konfigurasi,Hasil Pengukuran,Status Evaluasi\n";
+      tableData.forEach((d, i) => {
+        csvContent += `${i + 1},"${d.modul}","${d.param}","${d.hasil}","${d.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Fiber_Optic_LKPD9_Data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil", "File CSV hasil pengamatan terunduh.", "success");
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-3 p-2.5 rounded-lg border border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/30 cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-cyan-600 focus:ring-cyan-500">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-800 mb-3 flex items-start gap-2">
+            <span class="bg-cyan-700 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2 rounded"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        showToast("Identitas Wajib", "Harap lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "LKPD 9: Pengenalan Media Fiber Optik & Spesifikasi Kabel";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir,
+        tabelPengamatan: tableData
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai prinsip Total Internal Reflection, spesifikasi kabel, dan tipe konektor optik.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali perbedaan modal dispersion pada Single-mode vs Multi-mode serta tipe pemolesan UPC vs APC.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi eksperimen simulasi Hologram TIR dan baca ringkasan teori LKPD 9.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-cyan-500"></i> Mengirim data ke server guru...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> Data berhasil terkirim ke spreadsheet guru!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal otomatis via Fetch (Offline).`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset LKPD", "Apakah Anda yakin ingin meriset seluruh isian dan data praktikum LKPD 9 ini?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        tableData = [];
+        waktuMulai = 0;
+        renderTabelPengamatan();
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir telah dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bg = "bg-slate-900 border-slate-700 text-white";
+      let icon = "fa-circle-info text-cyan-400";
+      if (type === 'success') { bg = "bg-slate-900 border-emerald-500/40 text-white"; icon = "fa-circle-check text-emerald-400"; }
+      if (type === 'warning') { bg = "bg-slate-900 border-amber-500/40 text-white"; icon = "fa-triangle-exclamation text-amber-400"; }
+
+      toast.className = `p-3.5 rounded-xl border shadow-xl flex items-start gap-3 text-xs min-w-[260px] max-w-xs transition transform translate-y-2 opacity-0 pointer-events-auto ${bg}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-bold mb-0.5">${title}</p>
+          <p class="text-slate-300 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('modal-confirm');
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const handleYes = () => { cleanup(); onConfirm(); };
+      const handleCancel = () => { cleanup(); };
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.removeEventListener('click', handleYes);
+        btnCancel.removeEventListener('click', handleCancel);
+      };
+
+      btnYes.addEventListener('click', handleYes);
+      btnCancel.addEventListener('click', handleCancel);
+    }
+
+    window.onload = function () {
+      initDatabaseSiswa();
+      renderQuiz();
+      runSim1();
+      runSim2();
+      runSim3();
+      runSim4();
+    };
+  </script>
+</body>
+</html>
