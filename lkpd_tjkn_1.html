@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-            <!-- Simulator Section with Glassmorphism -->
+            <!-- Simulator Section -->
             <section class="bg-white/70 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
                     <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
@@ -152,7 +152,6 @@
                             </tr>
                         </thead>
                         <tbody id="tabelPengamatanBody" class="divide-y divide-white/60">
-                            <!-- Tabel items sama seperti source -->
                             <tr class="hover:bg-white/50 transition-colors">
                                 <td class="p-3 border-r border-white/60 text-center font-medium">1</td>
                                 <td class="p-3 border-r border-white/60"><input type="text" class="w-full bg-transparent focus:border-indigo-400 focus:outline-none transition-colors border-b border-transparent" value="192.168.1.1 (Gateway)"></td>
@@ -167,7 +166,6 @@
                                 <td class="p-3 border-r border-white/60"><input type="text" class="w-full bg-transparent focus:border-indigo-400 focus:outline-none transition-colors border-b border-transparent" placeholder="Contoh: 8 ms"></td>
                                 <td class="p-3"><input type="text" class="w-full bg-transparent focus:border-indigo-400 focus:outline-none transition-colors border-b border-transparent" placeholder="Normal"></td>
                             </tr>
-                            <!-- Baris ke-3 sampai 10 -->
                             <tr class="hover:bg-white/50 transition-colors">
                                 <td class="p-3 border-r border-white/60 text-center font-medium">3</td>
                                 <td class="p-3 border-r border-white/60"><input type="text" class="w-full bg-transparent focus:border-indigo-400 focus:outline-none border-b border-transparent" value="8.8.8.8 (Google DNS Primary)"></td>
@@ -233,7 +231,6 @@
                 <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-2">
                     <div class="bg-indigo-100 text-indigo-600 p-1.5 rounded-md"><i class="fa-solid fa-clipboard-question"></i></div> Pertanyaan Analisis & Evaluasi
                 </h3>
-                <!-- Textareas with Glassmorphism -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">1. Apa arti dari pesan **"Reply from..."** saat proses *ping* ke IP lokal/gateway sedang berjalan?</label>
                     <textarea id="ans1" rows="2" class="w-full px-4 py-3 text-sm bg-white/50 border border-white/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-all shadow-sm" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
@@ -276,12 +273,13 @@
                 </div>
             </section>
 
+            <!-- Section Pilihan Ganda (20 Soal) -->
             <section class="bg-white/70 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 space-y-6">
                 <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                     <div class="bg-rose-100 text-rose-600 p-1.5 rounded-md"><i class="fa-solid fa-list-check"></i></div> Soal Evaluasi Pilihan Ganda (20 Soal)
                 </h3>
 
-                <!-- Contoh Soal dengan radio styling -->
+                <!-- Soal 1 -->
                 <div class="space-y-3 border-b border-slate-200/50 pb-5">
                     <p class="text-sm font-semibold text-slate-800">1. Apakah fungsi utama dari perintah *ping* dalam suatu jaringan komputer?</p>
                     <div class="space-y-2 pl-2 text-sm text-slate-700">
@@ -297,16 +295,229 @@
                 <div class="space-y-3 border-b border-slate-200/50 pb-5">
                     <p class="text-sm font-semibold text-slate-800">2. Protokol lapisan jaringan manakah yang digunakan secara langsung oleh utilitas *ping* untuk mengirim pesan?</p>
                     <div class="space-y-2 pl-2 text-sm text-slate-700">
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="A" class="text-indigo-600"> A. TCP</label>
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="B" class="text-indigo-600"> B. UDP</label>
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="C" class="text-indigo-600"> C. ICMP</label>
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="D" class="text-indigo-600"> D. FTP</label>
-                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="E" class="text-indigo-600"> E. HTTP</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. TCP</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. UDP</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. ICMP</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. FTP</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg2" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. HTTP</label>
                     </div>
                 </div>
-                
-                <!-- (Untuk keperluan efisiensi, struktur HTML Soal 3 - 20 sama dengan source code[cite: 1] dengan penambahan styling di atas) -->
-                <!-- Disingkat namun pada produksi, masukkan kembali semua soal 3 - 20 dari source -->
+
+                <!-- Soal 3 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">3. Apa arti dari status pesan *"Request Timed Out"* (RTO) saat Anda menjalankan pengujian *ping*?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg3" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Koneksi jaringan berjalan sangat cepat dan tanpa kendala</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg3" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Perangkat tujuan menolak permintaan karena memori penuh</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg3" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Perangkat target tidak memberikan balasan dalam batas waktu yang ditentukan</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg3" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Alamat IP asal belum terdaftar pada router gateway</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg3" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Kabel jaringan atau gelombang Wi-Fi mengalami kelebihan daya</label>
+                    </div>
+                </div>
+
+                <!-- Soal 4 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">4. Perilaku default perintah `ping 8.8.8.8` pada aplikasi terminal Android berbasis Linux (seperti Termux) adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg4" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Hanya mengirimkan 1 paket data lalu berhenti</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg4" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mengirimkan tepat 4 paket data secara otomatis</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg4" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengirim paket secara terus-menerus sampai dihentikan pengguna (Ctrl+C)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg4" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Langsung mengunduh file dari server Google</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg4" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Membuka browser default secara otomatis</label>
+                    </div>
+                </div>
+
+                <!-- Soal 5 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">5. Satuan standar yang digunakan untuk mengukur nilai waktu tunda (*latency*) pada pengujian *ping* adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg5" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Mbps (Megabit per second)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg5" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. ms (Millisecond)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg5" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Hz (Hertz)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg5" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. GB (Gigabyte)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg5" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. dBm (Decibel-milliwatts)</label>
+                    </div>
+                </div>
+
+                <!-- Soal 6 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">6. Pada baris respons balasan *ping*, terdapat istilah **TTL**. Apakah kepanjangan dari TTL?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg6" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Total Time Limits</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg6" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Time to Live</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg6" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Transmission Traffic Line</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg6" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Target Transfer Layer</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg6" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Terminal Test Link</label>
+                    </div>
+                </div>
+
+                <!-- Soal 7 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">7. Apakah fungsi utama dari adanya nilai **TTL** pada paket IP yang dikirimkan dalam jaringan?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg7" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Menentukan kecepatan transmisi kabel fiber optik</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg7" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mencegah paket data berputar terus-menerus tanpa henti (*routing loop*)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg7" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengenskripsi data agar tidak dibaca oleh pihak ketiga</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg7" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menyimpan riwayat pencarian web pengguna</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg7" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mengubah alamat IP privat menjadi IP publik</label>
+                    </div>
+                </div>
+
+                <!-- Soal 8 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">8. Jika Smartphone berhasil *ping* ke IP Gateway (192.168.1.1) tetapi gagal (*RTO*) saat *ping* ke IP publik Google (8.8.8.8), letak gangguan terbesar berada di...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg8" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Modul Wi-Fi pada perangkat Android siswa</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg8" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Sambungan/Layanan internet dari ISP ke Router Gateway</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg8" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Kerusakan fisik kartu NIC internal Android</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg8" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Server lokal sekolah mengalami *overheat*</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg8" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Sistem operasi Android perlu diperbarui</label>
+                    </div>
+                </div>
+
+                <!-- Soal 9 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">9. Manakah di bawah ini yang menjadi penyebab utama melonjaknya nilai *latency* (ping tinggi) saat melakukan pengujian via koneksi Wi-Fi?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg9" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Penggunaan kawat tembaga berlebihan pada access point</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg9" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Banyaknya hambatan fisik (tembok) dan interferensi frekuensi nirkabel</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg9" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Menggunakan alamat IP statis pada smartphone</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg9" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menonaktifkan bluetooth pada smartphone</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg9" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Terlalu banyak menyimpan kontak HP</label>
+                    </div>
+                </div>
+
+                <!-- Soal 10 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">10. Pesan kesalahan *"Destination Host Unreachable"* pada hasil perintah *ping* menandakan bahwa...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg10" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Server tujuan telah memblokir semua alamat IP publik</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg10" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Router pengirim tidak dapat menemukan jalur/rute menuju alamat tujuan</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg10" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Paket berhasil sampai tetapi ditolak oleh antivirus</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg10" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Kecepatan internet terlalu cepat melebihi kapasitas target</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg10" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Domain belum diperpanjang oleh pemiliknya</label>
+                    </div>
+                </div>
+
+                <!-- Soal 11 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">11. Manakah aplikasi emulator terminal populer di Android yang mendukung eksekusi perintah *ping* berbasis teks/CLI?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg11" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. WhatsApp</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg11" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Termux</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg11" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. WPS Office</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg11" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Canva</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg11" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. CapCut</label>
+                    </div>
+                </div>
+
+                <!-- Soal 12 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">12. Berapakah ukuran muatan data (*payload*) bawaan standar yang dikirim oleh perintah *ping* pada Linux/Android?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg12" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 8 byte</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg12" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 64 byte (56 byte ICMP payload + header)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg12" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 1024 byte</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg12" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 5 MB</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg12" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 1 GB</label>
+                    </div>
+                </div>
+
+                <!-- Soal 13 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">13. Perintah yang tepat pada Termux untuk membatasi eksekusi pengujian *ping* hanya sebanyak 5 kali pengiriman paket adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg13" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. `ping -t 5 8.8.8.8`</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg13" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. `ping -c 5 8.8.8.8`</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg13" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. `ping -n 5 8.8.8.8`</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg13" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. `ping -l 5 8.8.8.8`</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg13" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. `ping -stop 5 8.8.8.8`</label>
+                    </div>
+                </div>
+
+                <!-- Soal 14 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">14. Alamat IP khusus yang berfungsi sebagai *Loopback Address* untuk menguji tumpukan TCP/IP internal pada perangkat Anda sendiri adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg14" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 192.168.1.1</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg14" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 127.0.0.1</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg14" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 255.255.255.0</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg14" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 0.0.0.0</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg14" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 10.0.0.1</label>
+                    </div>
+                </div>
+
+                <!-- Soal 15 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">15. Alamat IP DNS Publik milik Google yang paling sering dijadikan target acuan tes koneksi internet global adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg15" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 1.1.1.1</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg15" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 192.168.0.1</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg15" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 8.8.8.8</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg15" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 112.215.20.1</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg15" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 80.80.80.80</label>
+                    </div>
+                </div>
+
+                <!-- Soal 16 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">16. Apakah peran utama dari layanan *Domain Name System* (DNS) saat Anda melakukan *ping* ke alamat `www.google.com`?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg16" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Menerjemahkan nama domain `www.google.com` menjadi alamat IP angka yang sesuai</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg16" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mempercepat pengiriman file multimedia melalui koneksi Wi-Fi</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg16" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengompres ukuran data agar menghemat kuota seluler</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg16" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menyimpan kata sandi jaringan Wi-Fi sekolah</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg16" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mencegah serangan malware saat melakukan browsing</label>
+                    </div>
+                </div>
+
+                <!-- Soal 17 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">17. Jika pengujian *ping* ke IP Loopback `127.0.0.1` menghasilkan status *Request Timed Out*, maka diagnosa awal yang paling tepat adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg17" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Kabel kabel fiber optic milik ISP terputus</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg17" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Terjadi masalah/kerusakan pada tumpukan (*stack*) protokol jaringan internal di smartphone</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg17" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Kuota data internet habis total</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg17" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Router sekolah mengalami mati listrik</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg17" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Server Google sedang mati total (*down*)</label>
+                    </div>
+                </div>
+
+                <!-- Soal 18 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">18. Apa arti dari informasi statistik *"0% packet loss"* pada rangkuman akhir setelah perintah *ping* selesai dijalankan?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg18" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Seluruh paket data yang dikirim berhasil diterima kembali tanpa ada yang hilang</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg18" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Semua paket gagal terkirim karena jaringan tidak stabil</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg18" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Pengujian dibatalkan secara sepihak oleh server tujuan</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg18" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Pengiriman data mengalami tundaan sebesar 0 milidetik</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg18" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Tidak ada bandwidth yang tersisa pada jaringan</label>
+                    </div>
+                </div>
+
+                <!-- Soal 19 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">19. Mengapa utilitas pengujian *ping* tidak menggunakan nomor *port* tertentu seperti halnya protokol HTTP (Port 80) atau SSH (Port 22)?</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg19" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Karena *ping* dibuat khusus untuk meretas server tanpa terdeteksi</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg19" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Karena ICMP bekerja langsung di Network Layer tanpa menggunakan Transport Layer (TCP/UDP)</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg19" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Karena *ping* hanya dapat berjalan jika port firewall dibuka seluruhnya</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg19" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Karena sistem operasi Android secara otomatis menyembunyikan nomor port</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg19" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Karena *ping* tidak membutuhkan pengalamatan IP sama sekali</label>
+                    </div>
+                </div>
+
+                <!-- Soal 20 -->
+                <div class="space-y-3 border-b border-slate-200/50 pb-5">
+                    <p class="text-sm font-semibold text-slate-800">20. Menurut alur baku *troubleshooting* jaringan, langkah awal pengujian *ping* yang paling tepat saat memeriksa masalah internet adalah...</p>
+                    <div class="space-y-2 pl-2 text-sm text-slate-700">
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg20" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Langsung melakukan *ping* ke server di luar negeri</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg20" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Melakukan *ping* bertahap: IP Loopback (127.0.0.1) -> IP Gateway Lokal -> IP Public DNS</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg20" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Melakukan *ping* ke alamat IP teman terdekat terlebih dahulu</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg20" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Mengganti kartu SIM smartphone secara acak</label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-1.5 rounded-lg transition-colors"><input type="radio" name="pg20" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mengubah nama SSID Wi-Fi sekolah</label>
+                    </div>
+                </div>
             </section>
 
             <div class="flex flex-col sm:flex-row justify-end gap-3 pb-10">
@@ -339,7 +550,6 @@
         let waktuMulai = 0;
         let masterDataSiswa = [];
         
-        // Data CSV Siswa sama persis seperti file[cite: 1]
         const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
 SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
 SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
@@ -564,8 +774,7 @@ SMK NEGERI 1 SINGKAWANG,XII TJK 1,27 SEFTIANUS MARFIN
 SMK NEGERI 1 SINGKAWANG,XII TJK 1,28 TATA MAHA DEWI
 SMK NEGERI 1 SINGKAWANG,XII TJK 1,29 URAY CHINTYA SELVA
 SMK NEGERI 1 SINGKAWANG,XII TJK 1,30 VIA HANDAYANI`; 
-        // Note: Sisipkan sisa data CSV di sini pada file utuh.
-        
+
         window.addEventListener('DOMContentLoaded', () => {
             const baris = csvDataSiswa.trim().split('\n');
             masterDataSiswa = [];
@@ -630,8 +839,13 @@ SMK NEGERI 1 SINGKAWANG,XII TJK 1,30 VIA HANDAYANI`;
             });
         }
 
-        // Kunci PG dari source[cite: 1]
-        const kunciPG = { pg1: "B", pg2: "C", pg3: "C", pg4: "C", pg5: "B", pg6: "B", pg7: "B", pg8: "B", pg9: "B", pg10: "B", pg11: "B", pg12: "B", pg13: "B", pg14: "B", pg15: "C", pg16: "A", pg17: "B", pg18: "A", pg19: "B", pg20: "B" };
+        // Kunci PG untuk 20 Soal
+        const kunciPG = { 
+            pg1: "B", pg2: "C", pg3: "C", pg4: "C", pg5: "B", 
+            pg6: "B", pg7: "B", pg8: "B", pg9: "B", pg10: "B", 
+            pg11: "B", pg12: "B", pg13: "B", pg14: "B", pg15: "C", 
+            pg16: "A", pg17: "B", pg18: "A", pg19: "B", pg20: "B" 
+        };
 
         function simpanIdentitas() {
             const sekolah = document.getElementById('inputSekolah').value;
@@ -655,7 +869,6 @@ SMK NEGERI 1 SINGKAWANG,XII TJK 1,30 VIA HANDAYANI`;
             const target = document.getElementById('targetSelect').value;
             const terminal = document.getElementById('terminalOutput');
             
-            // Efek pembersihan terminal dengan transisi[cite: 1] dimodifikasi
             terminal.innerHTML = `<span class="text-slate-400">PING ${target} 56(84) bytes of data.</span><br>`;
             
             let packetCount = 0;
@@ -671,7 +884,6 @@ SMK NEGERI 1 SINGKAWANG,XII TJK 1,30 VIA HANDAYANI`;
                         terminal.innerHTML += `<span class="text-emerald-400 drop-shadow-sm">64 bytes from ${target}: icmp_seq=${packetCount} ttl=114 time=${timeMs} ms</span><br>`;
                     }
                     terminal.innerHTML += `<span id="cursorBlink" class="text-slate-500 animate-pulse">_</span>`;
-                    // Hapus cursor lama
                     const cursors = terminal.querySelectorAll('#cursorBlink');
                     if (cursors.length > 1) cursors[0].remove();
                     terminal.scrollTop = terminal.scrollHeight;
