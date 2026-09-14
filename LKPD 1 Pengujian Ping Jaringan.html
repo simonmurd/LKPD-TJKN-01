@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD 1 Pengujian Ping Jaringan dengan Android</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    #terminalOutput::-webkit-scrollbar { width: 6px; }
+    #terminalOutput::-webkit-scrollbar-track { background: transparent; }
+    #terminalOutput::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8 selection:bg-indigo-100 selection:text-indigo-700">
+  <div class="max-w-5xl mx-auto space-y-8">
+    
+    <!-- HEADER -->
+    <header class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-sm text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600 mb-3 border border-indigo-100">Lembar Kerja Peserta Didik</span>
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">LKPD 1: Pengujian Ping Jaringan</h1>
+      <p class="text-slate-500 text-sm max-w-2xl mx-auto">Pengujian Konektivitas & Latensi Jaringan Menggunakan Aplikasi Terminal / Network Tools di Android</p>
+    </header>
+
+    <!-- BAGIAN 1: IDENTITAS -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+      <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+        <h2 class="text-base font-semibold text-slate-800">Bagian 1: Identitas Peserta Didik</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Pilih Sekolah</label>
+          <select id="inputSekolah" onchange="filterKelas()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+            <option value="">-- Pilih Sekolah --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Kelas</label>
+          <select id="inputKelas" onchange="filterNama()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5">Nama Lengkap</label>
+          <select id="inputNamaLengkap" onchange="checkIdentity()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <label class="flex items-center space-x-3 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+          <input type="radio" id="pilihanLkpd" name="pilihanLkpd" value="LKPD 1 (Ping Jaringan)" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500" checked>
+          <span class="text-xs md:text-sm font-medium text-slate-700">LKPD 1 : Pengujian Ping Jaringan via Android</span>
+        </label>
+      </div>
+
+      <div id="identity-warning" class="bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs flex items-center space-x-2 transition-all">
+        <svg class="w-4 h-4 flex-shrink-0 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        <span>Harap lengkapi Identitas Peserta Didik terlebih dahulu untuk membuka Bagian 2 s/d Bagian 6.</span>
+      </div>
+    </section>
+
+    <!-- WRAPPER CONTENT UNTUK SECTION BERIKUTNYA -->
+    <div id="content-sections" class="space-y-8 opacity-40 pointer-events-none select-none transition-all duration-300">
+      
+      <!-- BAGIAN 2: TUJUAN, ALAT & BAHAN -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 2: Tujuan Pembelajaran, Alat & Bahan</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-xs md:text-sm text-indigo-700 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Tujuan Pembelajaran</span>
+            </div>
+            <ul class="text-xs text-slate-600 leading-relaxed space-y-1.5">
+              <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-0.5"></i> Memahami fungsi perintah ping untuk troubleshooting jaringan.</li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-0.5"></i> Menggunakan aplikasi network tools di Android (Termux/Ping IP).</li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-500 mt-0.5"></i> Menganalisis status konektivitas & latensi jaringan secara akurat.</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-xs md:text-sm text-indigo-700 flex items-center gap-1.5"><i class="fa-solid fa-toolbox"></i> Alat & Bahan</span>
+            </div>
+            <ul class="text-xs text-slate-600 leading-relaxed space-y-1.5">
+              <li class="flex items-start gap-2"><i class="fa-solid fa-microchip text-amber-500 mt-0.5"></i> Smartphone Android terhubung ke Wi-Fi / Seluler.</li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-microchip text-amber-500 mt-0.5"></i> Aplikasi Android (Termux / Ping IP / Network Analyzer).</li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-microchip text-amber-500 mt-0.5"></i> Target IP Gateway, DNS Google, atau Website publik.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 3: SIMULATOR PING ANDROID -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+            <h2 class="text-base font-semibold text-slate-800">Bagian 3: Simulator Ping Android</h2>
+          </div>
+          <span class="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-0.5 rounded-full font-semibold">Interactive Tool</span>
+        </div>
+        <p class="text-xs text-slate-500">Pilih salah satu dari 10 target di bawah ini, lalu klik tombol "Jalankan Ping" untuk melihat hasil pengujian simulasi.</p>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-1">
+          <select id="targetSelect" class="flex-grow bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+            <option value="192.168.1.1">1. 192.168.1.1 (Gateway / Router Lokal)</option>
+            <option value="192.168.1.254">2. 192.168.1.254 (Access Point / Switch)</option>
+            <option value="8.8.8.8">3. 8.8.8.8 (Google DNS Primary)</option>
+            <option value="8.8.4.4">4. 8.8.4.4 (Google DNS Secondary)</option>
+            <option value="1.1.1.1">5. 1.1.1.1 (Cloudflare DNS Primary)</option>
+            <option value="www.google.com">6. www.google.com (Website Google)</option>
+            <option value="www.detik.com">7. www.detik.com (Portal Berita Lokal)</option>
+            <option value="www.github.com">8. www.github.com (Repository Developer)</option>
+            <option value="10.0.0.138">9. 10.0.0.138 (Modem / ONT Fiber)</option>
+            <option value="192.168.99.99">10. 192.168.99.99 (Target RTO / Putus)</option>
+          </select>
+          <button onclick="jalankanSimulasiPing()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl px-5 py-2.5 text-xs md:text-sm transition shadow-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Jalankan Ping
+          </button>
+        </div>
+
+        <!-- Terminal macOS / Linux Style -->
+        <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900 text-emerald-400 font-mono text-xs shadow-inner">
+          <div class="bg-slate-800 px-4 py-2 flex items-center gap-2 border-b border-slate-700">
+            <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+            <span class="text-[10px] text-slate-400 font-sans ml-2">termux@android:~</span>
+          </div>
+          <div id="terminalOutput" class="p-4 h-52 overflow-y-auto flex flex-col justify-start leading-relaxed">
+            <span class="text-slate-400"># Siap melakukan pengujian jaringan. Pilih target dan klik jalankan...</span>
+            <span class="text-slate-500 animate-pulse mt-1">_</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 4: LEMBAR TABEL PENGAMATAN -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 4: Lembar Tabel Pengamatan (10 Item)</h2>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-700 border-b border-slate-200">
+                <th class="p-3 font-semibold text-center w-12 border-r border-slate-200">No</th>
+                <th class="p-3 font-semibold border-r border-slate-200">Target Tujuan</th>
+                <th class="p-3 font-semibold border-r border-slate-200">Status Koneksi</th>
+                <th class="p-3 font-semibold border-r border-slate-200">Rata-rata Latency (ms)</th>
+                <th class="p-3 font-semibold">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="tabelPengamatanBody" class="divide-y divide-slate-200 bg-white">
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">1</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="192.168.1.1 (Gateway)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 5 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">2</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="192.168.1.254 (Access Point)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 8 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">3</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="8.8.8.8 (Google DNS Primary)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 25 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">4</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="8.8.4.4 (Google DNS Secondary)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 26 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">5</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="1.1.1.1 (Cloudflare DNS)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 20 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">6</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="www.google.com"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 30 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">7</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="www.detik.com"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 35 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">8</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="www.github.com"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 45 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">9</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="10.0.0.138 (Modem ONT)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: 4 ms"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Normal"></td>
+              </tr>
+              <tr class="hover:bg-slate-50/80">
+                <td class="p-2.5 text-center font-medium border-r border-slate-200">10</td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" value="192.168.99.99 (Target RTO)"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Reply / RTO"></td>
+                <td class="p-2.5 border-r border-slate-200"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="Contoh: -"></td>
+                <td class="p-2.5"><input type="text" class="w-full bg-transparent focus:outline-none" placeholder="RTO / Gagal"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BAGIAN 5: PERTANYAAN ANALISIS & EVALUASI -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 5: Pertanyaan Analisis & Evaluasi</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">1. Apa arti dari pesan <b>"Reply from..."</b> saat proses <i>ping</i> ke IP lokal/gateway sedang berjalan?</label>
+            <textarea id="ans1" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">2. Apa arti dari pesan <b>"Request Timed Out" (RTO)</b> pada target yang tidak aktif, dan apa penyebab utamanya?</label>
+            <textarea id="ans2" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">3. Mengapa nilai <i>latency</i> (waktu tunda) ke IP Gateway lokal umumnya jauh lebih kecil dibandingkan ke DNS publik (seperti 8.8.8.8)?</label>
+            <textarea id="ans3" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">4. Apa fungsi dari protokol ICMP (<i>Internet Control Message Protocol</i>) dalam perintah <i>ping</i> yang Anda lakukan di Android?</label>
+            <textarea id="ans4" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">5. Bagaimana perbedaan hasil pengujian <i>ping</i> ketika menggunakan alamat IP langsung (misal: 8.8.8.8) dibandingkan menggunakan nama domain (misal: www.google.com)?</label>
+            <textarea id="ans5" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">6. Apa peran penting server DNS dalam mendukung konektivitas internet pada perangkat Android?</label>
+            <textarea id="ans6" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">7. Faktor fisik apa saja yang dapat menyebabkan lonjakan nilai <i>latency</i> saat melakukan <i>ping</i> via Wi-Fi di smartphone?</label>
+            <textarea id="ans7" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">8. Jika perangkat Android bisa <i>ping</i> ke IP Gateway (192.168.1.1) tetapi gagal ke internet (8.8.8.8), di mana masalahnya?</label>
+            <textarea id="ans8" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">9. Mengapa pengujian <i>troubleshooting</i> jaringan menggunakan perintah <i>ping</i> sangat penting dikuasai oleh Teknisi Jaringan?</label>
+            <textarea id="ans9" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan jawaban analisis Anda di sini..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">10. Tuliskan kesimpulan menyeluruh mengenai kondisi kualitas jaringan yang Anda uji selama praktikum ini!</label>
+            <textarea id="ans10" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition" placeholder="Tuliskan kesimpulan praktikum di sini..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAGIAN 6: SOAL EVALUASI PILIHAN GANDA -->
+      <section class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+        <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+          <h2 class="text-base font-semibold text-slate-800">Bagian 6: Soal Evaluasi Pilihan Ganda (20 Soal)</h2>
+        </div>
+
+        <!-- Soal 1 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">1. Apakah fungsi utama dari perintah <i>ping</i> dalam suatu jaringan komputer?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg1" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Mengamankan jaringan dari serangan hacker</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg1" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Menguji konektivitas dan latensi antar perangkat</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg1" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengubah alamat IP dinamis menjadi statis</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg1" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Mempercepat kecepatan unduh data internet</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg1" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mengonfigurasi perangkat router secara otomatis</label>
+          </div>
+        </div>
+
+        <!-- Soal 2 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">2. Protokol lapisan jaringan manakah yang digunakan secara langsung oleh utilitas <i>ping</i> untuk mengirim pesan?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg2" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. TCP</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg2" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. UDP</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg2" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. ICMP</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg2" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. FTP</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg2" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. HTTP</label>
+          </div>
+        </div>
+
+        <!-- Soal 3 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">3. Apa arti dari status pesan <b>"Request Timed Out"</b> (RTO) saat Anda menjalankan pengujian <i>ping</i>?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg3" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Koneksi jaringan berjalan sangat cepat dan tanpa kendala</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg3" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Perangkat tujuan menolak permintaan karena memori penuh</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg3" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Perangkat target tidak memberikan balasan dalam batas waktu yang ditentukan</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg3" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Alamat IP asal belum terdaftar pada router gateway</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg3" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Kabel jaringan atau gelombang Wi-Fi mengalami kelebihan daya</label>
+          </div>
+        </div>
+
+        <!-- Soal 4 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">4. Perilaku default perintah `ping 8.8.8.8` pada aplikasi terminal Android berbasis Linux (seperti Termux) adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg4" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Hanya mengirimkan 1 paket data lalu berhenti</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg4" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mengirimkan tepat 4 paket data secara otomatis</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg4" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengirim paket secara terus-menerus sampai dihentikan pengguna (Ctrl+C)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg4" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Langsung mengunduh file dari server Google</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg4" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Membuka browser default secara otomatis</label>
+          </div>
+        </div>
+
+        <!-- Soal 5 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">5. Satuan standar yang digunakan untuk mengukur nilai waktu tunda (<i>latency</i>) pada pengujian <i>ping</i> adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg5" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Mbps (Megabit per second)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg5" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. ms (Millisecond)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg5" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Hz (Hertz)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg5" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. GB (Gigabyte)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg5" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. dBm (Decibel-milliwatts)</label>
+          </div>
+        </div>
+
+        <!-- Soal 6 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">6. Pada baris respons balasan <i>ping</i>, terdapat istilah <b>TTL</b>. Apakah kepanjangan dari TTL?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg6" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Total Time Limits</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg6" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Time to Live</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg6" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Transmission Traffic Line</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg6" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Target Transfer Layer</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg6" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Terminal Test Link</label>
+          </div>
+        </div>
+
+        <!-- Soal 7 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">7. Apakah fungsi utama dari adanya nilai <b>TTL</b> pada paket IP yang dikirimkan dalam jaringan?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg7" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Menentukan kecepatan transmisi kabel fiber optik</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg7" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mencegah paket data berputar terus-menerus tanpa henti (<i>routing loop</i>)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg7" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengenskripsi data agar tidak dibaca oleh pihak ketiga</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg7" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menyimpan riwayat pencarian web pengguna</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg7" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mengubah alamat IP privat menjadi IP publik</label>
+          </div>
+        </div>
+
+        <!-- Soal 8 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">8. Jika Smartphone berhasil <i>ping</i> ke IP Gateway (192.168.1.1) tetapi gagal (<i>RTO</i>) saat <i>ping</i> ke IP publik Google (8.8.8.8), letak gangguan terbesar berada di...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg8" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Modul Wi-Fi pada perangkat Android siswa</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg8" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Sambungan/Layanan internet dari ISP ke Router Gateway</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg8" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Kerusakan fisik kartu NIC internal Android</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg8" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Server lokal sekolah mengalami <i>overheat</i></label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg8" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Sistem operasi Android perlu diperbarui</label>
+          </div>
+        </div>
+
+        <!-- Soal 9 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">9. Manakah di bawah ini yang menjadi penyebab utama melonjaknya nilai <i>latency</i> (ping tinggi) saat melakukan pengujian via koneksi Wi-Fi?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg9" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Penggunaan kawat tembaga berlebihan pada access point</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg9" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Banyaknya hambatan fisik (tembok) dan interferensi frekuensi nirkabel</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg9" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Menggunakan alamat IP statis pada smartphone</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg9" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menonaktifkan bluetooth pada smartphone</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg9" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Terlalu banyak menyimpan kontak HP</label>
+          </div>
+        </div>
+
+        <!-- Soal 10 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">10. Pesan kesalahan <b>"Destination Host Unreachable"</b> pada hasil perintah <i>ping</i> menandakan bahwa...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg10" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Server tujuan telah memblokir semua alamat IP publik</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg10" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Router pengirim tidak dapat menemukan jalur/rute menuju alamat tujuan</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg10" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Paket berhasil sampai tetapi ditolak oleh antivirus</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg10" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Kecepatan internet terlalu cepat melebihi kapasitas target</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg10" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Domain belum diperpanjang oleh pemiliknya</label>
+          </div>
+        </div>
+
+        <!-- Soal 11 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">11. Manakah aplikasi emulator terminal populer di Android yang mendukung eksekusi perintah <i>ping</i> berbasis teks/CLI?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg11" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. WhatsApp</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg11" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Termux</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg11" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. WPS Office</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg11" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Canva</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg11" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. CapCut</label>
+          </div>
+        </div>
+
+        <!-- Soal 12 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">12. Berapakah ukuran muatan data (<i>payload</i>) bawaan standar yang dikirim oleh perintah <i>ping</i> pada Linux/Android?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg12" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 8 byte</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg12" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 64 byte (56 byte ICMP payload + header)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg12" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 1024 byte</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg12" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 5 MB</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg12" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 1 GB</label>
+          </div>
+        </div>
+
+        <!-- Soal 13 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">13. Perintah yang tepat pada Termux untuk membatasi eksekusi pengujian <i>ping</i> hanya sebanyak 5 kali pengiriman paket adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg13" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. `ping -t 5 8.8.8.8`</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg13" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. `ping -c 5 8.8.8.8`</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg13" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. `ping -n 5 8.8.8.8`</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg13" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. `ping -l 5 8.8.8.8`</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg13" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. `ping -stop 5 8.8.8.8`</label>
+          </div>
+        </div>
+
+        <!-- Soal 14 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">14. Alamat IP khusus yang berfungsi sebagai <i>Loopback Address</i> untuk menguji tumpukan TCP/IP internal pada perangkat Anda sendiri adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg14" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 192.168.1.1</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg14" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 127.0.0.1</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg14" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 255.255.255.0</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg14" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 0.0.0.0</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg14" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 10.0.0.1</label>
+          </div>
+        </div>
+
+        <!-- Soal 15 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">15. Alamat IP DNS Publik milik Google yang paling sering dijadikan target acuan tes koneksi internet global adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg15" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. 1.1.1.1</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg15" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. 192.168.0.1</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg15" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. 8.8.8.8</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg15" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. 112.215.20.1</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg15" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. 80.80.80.80</label>
+          </div>
+        </div>
+
+        <!-- Soal 16 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">16. Apakah peran utama dari layanan <i>Domain Name System</i> (DNS) saat Anda melakukan <i>ping</i> ke alamat `www.google.com`?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg16" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Menerjemahkan nama domain `www.google.com` menjadi alamat IP angka yang sesuai</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg16" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Mempercepat pengiriman file multimedia melalui koneksi Wi-Fi</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg16" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Mengompres ukuran data agar menghemat kuota seluler</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg16" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Menyimpan kata sandi jaringan Wi-Fi sekolah</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg16" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mencegah serangan malware saat melakukan browsing</label>
+          </div>
+        </div>
+
+        <!-- Soal 17 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">17. Jika pengujian <i>ping</i> ke IP Loopback `127.0.0.1` menghasilkan status <i>Request Timed Out</i>, maka diagnosa awal yang paling tepat adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg17" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Kabel kabel fiber optic milik ISP terputus</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg17" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Terjadi masalah/kerusakan pada tumpukan (<i>stack</i>) protokol jaringan internal di smartphone</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg17" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Kuota data internet habis total</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg17" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Router sekolah mengalami mati listrik</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg17" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Server Google sedang mati total (<i>down</i>)</label>
+          </div>
+        </div>
+
+        <!-- Soal 18 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">18. Apa arti dari informasi statistik <b>"0% packet loss"</b> pada rangkuman akhir setelah perintah <i>ping</i> selesai dijalankan?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg18" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Seluruh paket data yang dikirim berhasil diterima kembali tanpa ada yang hilang</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg18" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Semua paket gagal terkirim karena jaringan tidak stabil</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg18" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Pengujian dibatalkan secara sepihak oleh server tujuan</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg18" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Pengiriman data mengalami tundaan sebesar 0 milidetik</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg18" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Tidak ada bandwidth yang tersisa pada jaringan</label>
+          </div>
+        </div>
+
+        <!-- Soal 19 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">19. Mengapa utilitas pengujian <i>ping</i> tidak menggunakan nomor <i>port</i> tertentu seperti halnya protokol HTTP (Port 80) atau SSH (Port 22)?</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg19" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Karena <i>ping</i> dibuat khusus untuk meretas server tanpa terdeteksi</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg19" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Karena ICMP bekerja langsung di Network Layer tanpa menggunakan Transport Layer (TCP/UDP)</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg19" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Karena <i>ping</i> hanya dapat berjalan jika port firewall dibuka seluruhnya</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg19" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Karena sistem operasi Android secara otomatis menyembunyikan nomor port</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg19" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Karena <i>ping</i> tidak membutuhkan pengalamatan IP sama sekali</label>
+          </div>
+        </div>
+
+        <!-- Soal 20 -->
+        <div class="space-y-3 border-b border-slate-100 pb-4">
+          <p class="text-xs md:text-sm font-semibold text-slate-800">20. Menurut alur baku <i>troubleshooting</i> jaringan, langkah awal pengujian <i>ping</i> yang paling tepat saat memeriksa masalah internet adalah...</p>
+          <div class="space-y-2 pl-2 text-xs md:text-sm text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg20" value="A" class="text-indigo-600 focus:ring-indigo-500"> A. Langsung melakukan <i>ping</i> ke server di luar negeri</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg20" value="B" class="text-indigo-600 focus:ring-indigo-500"> B. Melakukan <i>ping</i> bertahap: IP Loopback (127.0.0.1) -> IP Gateway Lokal -> IP Public DNS</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg20" value="C" class="text-indigo-600 focus:ring-indigo-500"> C. Melakukan <i>ping</i> ke alamat IP teman terdekat terlebih dahulu</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg20" value="D" class="text-indigo-600 focus:ring-indigo-500"> D. Mengganti kartu SIM smartphone secara acak</label>
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded-lg transition"><input type="radio" name="pg20" value="E" class="text-indigo-600 focus:ring-indigo-500"> E. Mengubah nama SSID Wi-Fi sekolah</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTON AKSI -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pb-10">
+        <button onclick="resetForm()" class="bg-white border border-slate-200 text-slate-700 text-xs md:text-sm font-medium px-5 py-2.5 rounded-xl transition hover:bg-slate-50 shadow-sm">
+          Reset Form
+        </button>
+        <button onclick="simpanDanKirimKeSheet()" id="btnKirim" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs md:text-sm font-medium px-6 py-2.5 rounded-xl transition shadow-sm flex items-center justify-center gap-2">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Selesaikan & Kirim LKPD
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL NOTIFIKASI -->
+  <div id="customModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-xl text-center space-y-4">
+      <div id="modalIcon" class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Berhasil!</h3>
+      <p id="modalMessage" class="text-xs text-slate-600 leading-relaxed">Pesan notifikasi sistem.</p>
+      <button onclick="tutupModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2.5 rounded-xl transition shadow-sm">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+    
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK NEGERI 1 SINGKAWANG,X TJK,03 DENIS
+SMK NEGERI 1 SINGKAWANG,X TJK,04 DEO REVALDY AHMAD
+SMK NEGERI 1 SINGKAWANG,X TJK,05 EVAN KRESNA LEE
+SMK NEGERI 1 SINGKAWANG,X TJK,06 FEBRIYANTO
+SMK NEGERI 1 SINGKAWANG,X TJK,07 HERKULANUS PERDY
+SMK NEGERI 1 SINGKAWANG,X TJK,08 HIQMAL LIONEL ALVIANO
+SMK NEGERI 1 SINGKAWANG,X TJK,09 INDRA KESUMAH
+SMK NEGERI 1 SINGKAWANG,X TJK,10 JERRY KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,X TJK,11 KABILA SYIFA
+SMK NEGERI 1 SINGKAWANG,X TJK,12 KEYLA KIRANA PUTRI
+SMK NEGERI 1 SINGKAWANG,X TJK,13 KRISTIAN DAFI
+SMK NEGERI 1 SINGKAWANG,X TJK,14 LIONEL VAN EXAUDI HUTABARAT
+SMK NEGERI 1 SINGKAWANG,X TJK,15 MIRATUL TASYA RAMADHANI
+SMK NEGERI 1 SINGKAWANG,X TJK,16 MUHAMMAD RAYHAN AL GHIFARY
+SMK NEGERI 1 SINGKAWANG,X TJK,17 MUHAMMAD ZAKY RAFANANDO
+SMK NEGERI 1 SINGKAWANG,X TJK,18 NATARI KEYZA JUNIAR
+SMK NEGERI 1 SINGKAWANG,X TJK,19 NAZUA KASTINA
+SMK NEGERI 1 SINGKAWANG,X TJK,20 NUR AZANI
+SMK NEGERI 1 SINGKAWANG,X TJK,21 NURAINI
+SMK NEGERI 1 SINGKAWANG,X TJK,22 PIRANDA RAMADANI
+SMK NEGERI 1 SINGKAWANG,X TJK,23 REBHELIA
+SMK NEGERI 1 SINGKAWANG,X TJK,24 REVAN
+SMK NEGERI 1 SINGKAWANG,X TJK,25 RIA ADHA
+SMK NEGERI 1 SINGKAWANG,X TJK,26 RINDU PRANITA NUARI
+SMK NEGERI 1 SINGKAWANG,X TJK,27 RIVALDO RANGGA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,X TJK,28 SELVIA
+SMK NEGERI 1 SINGKAWANG,X TJK,29 SITI MARIYAM
+SMK NEGERI 1 SINGKAWANG,X TJK,30 SYIFA FAHIRA
+SMK NEGERI 1 SINGKAWANG,X TJK,31 WULANDARI
+SMK NEGERI 1 SINGKAWANG,X TJK,32 YULIANTI
+SMK NEGERI 1 SINGKAWANG,X TJK,33 YUNKHI
+SMK NEGERI 1 SINGKAWANG,XI TJK,01 RIZKY JUNIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,02 SEMELIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,03 AHMAD NOVA RIANTO
+SMK NEGERI 1 SINGKAWANG,XI TJK,04 AIDANAZMAN DATINOV
+SMK NEGERI 1 SINGKAWANG,XI TJK,05 AJI SOPYAN DWI
+SMK NEGERI 1 SINGKAWANG,XI TJK,06 ANGELA DARA LISTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,07 ANNISA SALSA SHAFIRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,09 AYRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,10 AZURA
+SMK NEGERI 1 SINGKAWANG,XI TJK,11 BAYU CITRA PRATAMA
+SMK NEGERI 1 SINGKAWANG,XI TJK,12 BUNGA LESTARI
+SMK NEGERI 1 SINGKAWANG,XI TJK,13 CHASTLE ALPHA RICHIE
+SMK NEGERI 1 SINGKAWANG,XI TJK,14 DEVINA YUNA
+SMK NEGERI 1 SINGKAWANG,XI TJK,15 DINDA PUTRI RAHAYU
+SMK NEGERI 1 SINGKAWANG,XI TJK,16 EDWIN PRAYOGA
+SMK NEGERI 1 SINGKAWANG,XI TJK,17 FAJAR JULIANSYAH
+SMK NEGERI 1 SINGKAWANG,XI TJK,18 FRANSISCO DWI ADITYA
+SMK NEGERI 1 SINGKAWANG,XI TJK,19 GABRIEL ARESTA
+SMK NEGERI 1 SINGKAWANG,XI TJK,20 GLORIA ELSIA
+SMK NEGERI 1 SINGKAWANG,XI TJK,21 IHSAN AZHALLAH FAWWAZ
+SMK NEGERI 1 SINGKAWANG,XI TJK,22 INDRAYANI
+SMK NEGERI 1 SINGKAWANG,XI TJK,23 IRFAN RACHMANDANI FERDIAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,24 KEVIN APRILIO
+SMK NEGERI 1 SINGKAWANG,XI TJK,25 KHOIRUNNISA
+SMK NEGERI 1 SINGKAWANG,XI TJK,26 LAFYCA CALYZZA
+SMK NEGERI 1 SINGKAWANG,XI TJK,27 MAHLIK ADI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XI TJK,28 MUHAMAD ADHA NUR IKHSAN
+SMK NEGERI 1 SINGKAWANG,XI TJK,29 MUHAMMAD NABIL PASHA
+SMK NEGERI 1 SINGKAWANG,XI TJK,30 NURLILA FADILLA
+SMK NEGERI 1 SINGKAWANG,XI TJK,31 RENI
+SMK NEGERI 1 SINGKAWANG,XI TJK,32 RIA KURNIATI
+SMK NEGERI 1 SINGKAWANG,XI TJK,33 RIDWAN RAKA HARTONO
+SMK NEGERI 1 SINGKAWANG,XI TJK,34 SAEPUL MAJID
+SMK NEGERI 1 SINGKAWANG,XI TJK,35 VIONA
+SMK NEGERI 1 SINGKAWANG,XI TJK,36 WAHYU
+SMK MUDITA SINGKAWANG,XI TJKT,01 ALICIA JENIFER
+SMK MUDITA SINGKAWANG,XI TJKT,02 ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,03 CALVINIUS BUNARTO
+SMK MUDITA SINGKAWANG,XI TJKT,04 CHELSY VEROSSA
+SMK MUDITA SINGKAWANG,XI TJKT,05 DERMAN JOHAN
+SMK MUDITA SINGKAWANG,XI TJKT,06 DESTIAN WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,07 DISON NIKANOR
+SMK MUDITA SINGKAWANG,XI TJKT,08 ENNIO EDWARD
+SMK MUDITA SINGKAWANG,XI TJKT,09 FANI VANESA
+SMK MUDITA SINGKAWANG,XI TJKT,10 HANNY PHANGGESTY
+SMK MUDITA SINGKAWANG,XI TJKT,11 HERWIT BRIAN
+SMK MUDITA SINGKAWANG,XI TJKT,12 JAVI YANTO
+SMK MUDITA SINGKAWANG,XI TJKT,13 JEFRY
+SMK MUDITA SINGKAWANG,XI TJKT,14 JONATHAN VINCENTIUS
+SMK MUDITA SINGKAWANG,XI TJKT,15 KELLY ANGELA
+SMK MUDITA SINGKAWANG,XI TJKT,16 KEVIN KURNIAWAN
+SMK MUDITA SINGKAWANG,XI TJKT,17 LEONARDO
+SMK MUDITA SINGKAWANG,XI TJKT,18 LORENZO JONATHAN PANGESTU
+SMK MUDITA SINGKAWANG,XI TJKT,19 MEDY SANJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,20 MEYCHEN CARNELLA
+SMK MUDITA SINGKAWANG,XI TJKT,21 MICHELLE
+SMK MUDITA SINGKAWANG,XI TJKT,22 NESHA FREDELINA XHIAUW
+SMK MUDITA SINGKAWANG,XI TJKT,23 RAYMEND
+SMK MUDITA SINGKAWANG,XI TJKT,24 RICARDO
+SMK MUDITA SINGKAWANG,XI TJKT,25 SUYANBUN LIPFIANDY
+SMK MUDITA SINGKAWANG,XI TJKT,26 TRI WIJAYA
+SMK MUDITA SINGKAWANG,XI TJKT,27 VINCENT
+SMK MUDITA SINGKAWANG,XI TJKT,28 VINCENT ALBERTO FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,29 VINCENT BUN
+SMK MUDITA SINGKAWANG,XI TJKT,30 VINCENT LAUNARDY
+SMK MUDITA SINGKAWANG,XI TJKT,31 VINSEN
+SMK MUDITA SINGKAWANG,XI TJKT,32 VITO ALBERT FEROZ
+SMK MUDITA SINGKAWANG,XI TJKT,33 VITON
+SMK MUDITA SINGKAWANG,XI TJKT,34 WENNI NINGSI WONGSO
+SMK MUDITA SINGKAWANG,XI TJKT,35 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,36 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,37 WILLIAM
+SMK MUDITA SINGKAWANG,XI TJKT,38 YUVENSIUS
+SMK MUDITA SINGKAWANG,XII TJKT,01 DALVIN ANDERSON
+SMK MUDITA SINGKAWANG,XII TJKT,02 DANNIEL DAVE DAISUKE
+SMK MUDITA SINGKAWANG,XII TJKT,03 DENNY
+SMK MUDITA SINGKAWANG,XII TJKT,04 FERDI NOVENDI
+SMK MUDITA SINGKAWANG,XII TJKT,05 FLOURA
+SMK MUDITA SINGKAWANG,XII TJKT,06 HENGKY
+SMK MUDITA SINGKAWANG,XII TJKT,07 JIU PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,08 JULIANA DELVI WANTRIANI
+SMK MUDITA SINGKAWANG,XII TJKT,09 JULIYANTO
+SMK MUDITA SINGKAWANG,XII TJKT,10 JUN KIUH
+SMK MUDITA SINGKAWANG,XII TJKT,11 JUN PHEN
+SMK MUDITA SINGKAWANG,XII TJKT,12 JUNIATY
+SMK MUDITA SINGKAWANG,XII TJKT,14 KELVIN TERRENCE
+SMK MUDITA SINGKAWANG,XII TJKT,15 LEONARDO
+SMK MUDITA SINGKAWANG,XII TJKT,16 LEWIS MARCO
+SMK MUDITA SINGKAWANG,XII TJKT,17 LI NA
+SMK MUDITA SINGKAWANG,XII TJKT,18 MARCO GENIUS
+SMK MUDITA SINGKAWANG,XII TJKT,19 NELSON ALVARO
+SMK MUDITA SINGKAWANG,XII TJKT,21 NOFIKA
+SMK MUDITA SINGKAWANG,XII TJKT,22 NYIAN BUN
+SMK MUDITA SINGKAWANG,XII TJKT,23 NYUN CU
+SMK MUDITA SINGKAWANG,XII TJKT,24 OKTAVIANI
+SMK MUDITA SINGKAWANG,XII TJKT,25 RENDI
+SMK MUDITA SINGKAWANG,XII TJKT,26 RICO WIJAYA
+SMK MUDITA SINGKAWANG,XII TJKT,27 SI WEN
+SMK MUDITA SINGKAWANG,XII TJKT,28 SIAU KHIM
+SMK MUDITA SINGKAWANG,XII TJKT,29 SU CHUI
+SMK MUDITA SINGKAWANG,XII TJKT,30 TRI DERMERSIA
+SMK MUDITA SINGKAWANG,XII TJKT,31 VELIYAN VINSON
+SMK MUDITA SINGKAWANG,XII TJKT,32 VICKA ANJELICA
+SMK MUDITA SINGKAWANG,XII TJKT,33 WILLIAM
+SMK MUDITA SINGKAWANG,XII TJKT,34 WILLSON HANATA
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,01 ANANDIKHA FITHRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,02 AGNES MARGARETTA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,03 ADE REZKIANSYAH
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,04 CRISTY VALEN
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,05 DENNY GILLBERT
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,06 DION SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,07 ESTER APRIANI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,08 FAHRI IMANNUDDIN
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,09 GABRIEL OHARA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,10 HINSA SILALAHI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,11 IRAISYA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,12 ISNAL RIZOLA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,13 JONNY ALEXIUS
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,14 JULIARDI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,15 LAUDYA SALSABILA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,16 LESKA ELSI VINRIANI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,17 MARGARETHA EASTER WINA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,18 MISS SYAFIRA CLEOPATRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,19 MUHAMMAD AKBAR JULRIZOI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,20 MULAWARMAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,21 NICHOLAS WIRRY FREDICO
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,23 REHAN MULYARDO
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,24 RINGGA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,26 SARAH ANISA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,28 VIOLA ANGGELIA PUTRI
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,29 WIDYA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,30 YENITA
+SMK NEGERI 1 SINGKAWANG,XII TJK 3,31 ZHACKY NURAHMAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,01 ADE FIMANSYAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,02 AYMAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,03 AURA SAPHIRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,05 DAVID
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,06 DIKA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,07 DIVA SEPTIARA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,08 ESHA WAHYU JUWANDI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,09 FEBRIOLA LIE FHONG
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,10 GRESTIA ELDA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,11 GREYALDI JUSTIN JACKSON
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,12 INDRY VINARTI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,13 JOHN YURA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,14 KEYSHA LARISSA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,15 LUCKY VALENTINO
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,16 MARVIN ALFANDA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,17 MEILY MAHA PUTRI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,18 MISNADIH
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,19 MUHAMMAD RAFI RAMADHAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,20 NURHALIMAH
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,21 PURIM AILFANI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,22 QIRAN ATHA YASSAR
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,24 RAHAEL NOVARIANDY
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,26 RINDRA FACHRI SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,27 TUTI SULISTIAWATI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,28 URAY AFISYA PUTRI
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,29 VIECK DEP
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,30 YUANDITHA KARIN
+SMK NEGERI 1 SINGKAWANG,XII TJK 2,31 ZADILA AL QINDI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,01 AURA PUTRI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,02 ARINI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,03 ARDIANUS RANDA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,05 CELVIN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,06 DANIA TRIAPSARI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,07 DERY IAN SANDY SYAHPUTRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,08 ELPIDIUS BRILLYANE
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,09 FIANELLA DENATTA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,10 FRANSISKUS GUNDU SETIAWAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,11 GEOVANO JEHARUT
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,12 GRAFATEIS SIAHAYA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,13 IMMANUEL BONY PRATAΜΑ
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,14 JESICA PRANATA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,15 KESYA VANESYA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,16 LESTARI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,17 MARSYA ANASTASYA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,18 MEYSA PRATAMA HASIBUAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,19 MICHELLE LOUIS
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,20 MUHAMMAD RAFEL APRILIAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,21 OHALIP
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,22 PHAISAL NURZAKI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,23 RAHMAN ALAMEYAH
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,24 RANDA SAPUTRA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,26 ROHIM KURNIAWAN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,27 SEFTIANUS MARFIN
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,28 TATA MAHA DEWI
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,29 URAY CHINTYA SELVA
+SMK NEGERI 1 SINGKAWANG,XII TJK 1,30 VIA HANDAYANI`; 
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const baris = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      for(let i = 1; i < baris.length; i++) {
+        const kolom = baris[i].split(',');
+        if(kolom.length >= 3) {
+          masterDataSiswa.push({
+            sekolah: kolom[0].trim(),
+            kelas: kolom[1].trim(),
+            nama: kolom[2].trim()
+          });
+        }
+      }
+      inisialisasiDropdownSekolah();
+    });
+
+    function inisialisasiDropdownSekolah() {
+      const selectSekolah = document.getElementById('inputSekolah');
+      const sekolahUnik = [...new Set(masterDataSiswa.map(item => item.sekolah))];
+      
+      selectSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+      sekolahUnik.forEach(sekolah => {
+        const opt = document.createElement('option');
+        opt.value = sekolah;
+        opt.textContent = sekolah;
+        selectSekolah.appendChild(opt);
+      });
+    }
+
+    function filterKelas() {
+      const sekolahDipilih = document.getElementById('inputSekolah').value;
+      const selectKelas = document.getElementById('inputKelas');
+      const selectNama = document.getElementById('inputNamaLengkap');
+      
+      selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selectNama.disabled = true;
+
+      if (!sekolahDipilih) {
+        selectKelas.disabled = true;
+        checkIdentity();
+        return;
+      }
+
+      selectKelas.disabled = false;
+      const kelasUnik = [...new Set(masterDataSiswa.filter(item => item.sekolah === sekolahDipilih).map(item => item.kelas))];
+      kelasUnik.forEach(kelas => {
+        const opt = document.createElement('option');
+        opt.value = kelas;
+        opt.textContent = kelas;
+        selectKelas.appendChild(opt);
+      });
+      checkIdentity();
+    }
+
+    function filterNama() {
+      const sekolahDipilih = document.getElementById('inputSekolah').value;
+      const kelasDipilih = document.getElementById('inputKelas').value;
+      const selectNama = document.getElementById('inputNamaLengkap');
+      
+      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (!kelasDipilih) {
+        selectNama.disabled = true;
+        checkIdentity();
+        return;
+      }
+
+      selectNama.disabled = false;
+      const listNama = masterDataSiswa.filter(item => item.sekolah === sekolahDipilih && item.kelas === kelasDipilih);
+      listNama.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.nama;
+        opt.textContent = item.nama;
+        selectNama.appendChild(opt);
+      });
+      checkIdentity();
+    }
+
+    function checkIdentity() {
+      const sekolah = document.getElementById('inputSekolah').value;
+      const kelas = document.getElementById('inputKelas').value;
+      const nama = document.getElementById('inputNamaLengkap').value;
+
+      const content = document.getElementById('content-sections');
+      const warning = document.getElementById('identity-warning');
+
+      if (sekolah && kelas && nama) {
+        content.classList.remove('opacity-40', 'pointer-events-none', 'select-none');
+        warning.classList.add('hidden');
+        if (!waktuMulai) waktuMulai = Date.now();
+      } else {
+        content.classList.add('opacity-40', 'pointer-events-none', 'select-none');
+        warning.classList.remove('hidden');
+      }
+    }
+
+    // Kunci PG 20 Soal
+    const kunciPG = { 
+      pg1: "B", pg2: "C", pg3: "C", pg4: "C", pg5: "B", 
+      pg6: "B", pg7: "B", pg8: "B", pg9: "B", pg10: "B", 
+      pg11: "B", pg12: "B", pg13: "B", pg14: "B", pg15: "C", 
+      pg16: "A", pg17: "B", pg18: "A", pg19: "B", pg20: "B" 
+    };
+
+    function jalankanSimulasiPing() {
+      const target = document.getElementById('targetSelect').value;
+      const terminal = document.getElementById('terminalOutput');
+      
+      terminal.innerHTML = `<span class="text-slate-400">PING ${target} 56(84) bytes of data.</span><br>`;
+      
+      let packetCount = 0;
+      const maxPackets = 4;
+      
+      const interval = setInterval(() => {
+        packetCount++;
+        if (packetCount <= maxPackets) {
+          if (target === "192.168.99.99") {
+            terminal.innerHTML += `<span class="text-rose-400">Request timeout for icmp_seq ${packetCount}</span><br>`;
+          } else {
+            const timeMs = Math.floor(Math.random() * 25) + 3;
+            terminal.innerHTML += `<span class="text-emerald-400">64 bytes from ${target}: icmp_seq=${packetCount} ttl=114 time=${timeMs} ms</span><br>`;
+          }
+          terminal.innerHTML += `<span id="cursorBlink" class="text-slate-500 animate-pulse">_</span>`;
+          const cursors = terminal.querySelectorAll('#cursorBlink');
+          if (cursors.length > 1) cursors[0].remove();
+          terminal.scrollTop = terminal.scrollHeight;
+        } else {
+          clearInterval(interval);
+          const finalCursor = terminal.querySelector('#cursorBlink');
+          if(finalCursor) finalCursor.remove();
+          
+          terminal.innerHTML += `<br><span class="text-slate-400">--- ${target} ping statistics ---</span><br>`;
+          if (target === "192.168.99.99") {
+            terminal.innerHTML += `<span class="text-rose-400 font-bold">4 packets transmitted, 0 received, 100% packet loss</span>`;
+          } else {
+            terminal.innerHTML += `<span class="text-emerald-400 font-bold">4 packets transmitted, 4 received, 0% packet loss</span>`;
+          }
+          terminal.innerHTML += `<br><span class="text-slate-500 animate-pulse">_</span>`;
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      }, 500);
+    }
+
+    function simpanDanKirimKeSheet() {
+      const sekolah = document.getElementById('inputSekolah').value;
+      const nama = document.getElementById('inputNamaLengkap').value.trim();
+      const kelas = document.getElementById('inputKelas').value;
+
+      if(!sekolah || !kelas || !nama) {
+        tampilkanModal("Peringatan", "Mohon lengkapi identitas Anda terlebih dahulu!", "warning");
+        return;
+      }
+
+      let skorBenar = 0;
+      for (let i = 1; i <= 20; i++) {
+        const radios = document.getElementsByName(`pg${i}`);
+        let selected = "";
+        for (const r of radios) { if (r.checked) { selected = r.value; break; } }
+        if (selected === kunciPG[`pg${i}`]) skorBenar++;
+      }
+
+      const durasiDetik = waktuMulai ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const nilaiAkhir = skorBenar * 5; 
+      
+      let pilihanLkpdTerpilih = "LKPD 1 (Ping Jaringan)";
+      const radioLkpd = document.getElementById('pilihanLkpd');
+      if (radioLkpd && radioLkpd.checked) pilihanLkpdTerpilih = radioLkpd.value;
+
+      const payload = { sekolah: sekolah, nama_lengkap: nama, pilihan_lkpd: pilihanLkpdTerpilih, kelas: kelas, durasi_detik: durasiDetik, skor_pg_benar: skorBenar, nilai_akhir: nilaiAkhir };
+
+      const btn = document.getElementById('btnKirim');
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...`;
+      btn.disabled = true;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        redirect: 'follow', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        tampilkanModal("Berhasil!", `LKPD berhasil dikirim!\nNama: ${nama}\nSkor Pilihan Ganda: ${skorBenar} / 20 (${nilaiAkhir})`, "success");
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Terkirim`;
+      })
+      .catch(err => {
+        tampilkanModal("Selesai", `Pengiriman data selesai!\nNama: ${nama}\nSkor Pilihan Ganda: ${skorBenar} / 20 (${nilaiAkhir})`, "success");
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai`;
+      });
+    }
+
+    function resetForm() { 
+      if (window.confirm("Reset seluruh jawaban dan form?")) location.reload(); 
+    }
+
+    function tampilkanModal(judul, pesan, tipe) {
+      const modal = document.getElementById('customModal');
+      document.getElementById('modalTitle').textContent = judul;
+      document.getElementById('modalMessage').textContent = pesan;
+      
+      const icon = document.getElementById('modalIcon');
+      if (tipe === 'success') {
+        icon.className = "w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-xl";
+        icon.innerHTML = `<i class="fa-solid fa-check"></i>`;
+      } else {
+        icon.className = "w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto text-xl";
+        icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function tutupModal() {
+      const modal = document.getElementById('customModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
