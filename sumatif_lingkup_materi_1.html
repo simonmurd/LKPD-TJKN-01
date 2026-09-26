@@ -4,16 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LKPD Sumatif Lingkup Materi 1: Jaringan Dasar & Media Transmisi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
+  <!-- MathJax for rendering formulas if needed -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
     body { 
       font-family: 'Inter', sans-serif; 
       background-color: #f8fafc;
       color: #0f172a;
-      margin: 0;
-      padding: 0;
     }
     .font-mono-code { font-family: 'JetBrains Mono', monospace; }
     .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
@@ -25,30 +36,6 @@
       background-size: 16px 16px;
     }
 
-    /* Simple Utility classes to replace Tailwind CDN if needed */
-    .bg-white { background-color: #ffffff; }
-    .bg-slate-50 { background-color: #f8fafc; }
-    .bg-slate-900 { background-color: #0f172a; color: #ffffff; }
-    .text-slate-900 { color: #0f172a; }
-    .text-slate-700 { color: #334155; }
-    .text-slate-500 { color: #64748b; }
-    .border { border: 1px solid #e2e8f0; }
-    .rounded-2xl { border-radius: 1rem; }
-    .rounded-xl { border-radius: 0.755rem; }
-    .p-6 { padding: 1.5rem; }
-    .p-4 { padding: 1rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .space-y-6 > * + * { margin-top: 1.5rem; }
-    .space-y-4 > * + * { margin-top: 1rem; }
-    .grid { display: grid; }
-    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .gap-2 { gap: 0.5rem; }
-    .w-full { width: 100%; }
-    .hidden { display: none; }
-
     @media print {
       .no-print { display: none !important; }
       .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
@@ -58,63 +45,61 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
 
   <!-- Header Section -->
-  <header style="background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40;" class="no-print">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0;">
-          <i class="fa-solid fa-network-wired" style="font-size: 1.5rem; color: #334155;"></i>
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+          <i class="fa-solid fa-network-wired text-2xl text-slate-700"></i>
         </div>
         <div>
-          <span style="font-size: 10px; font-weight: bold; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase;">Sumatif Lingkup Materi 1 Interaktif</span>
-          <h1 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">LKPD 1: Jaringan Komputer Dasar & Media Transmisi</h1>
-          <p style="font-size: 12px; color: #64748b; margin: 0;">Pengujian Ping, IP Addressing, Standar Pengkabelan T568B, UTP/STP, Coaxial, & Fiber Optic</p>
+          <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Sumatif Lingkup Materi 1 Interaktif</span>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">LKPD 1: Jaringan Komputer Dasar & Media Transmisi</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Pengujian Ping, IP Addressing, Standar Pengkabelan T568B, UTP/STP, Coaxial, & Fiber Optic</p>
         </div>
       </div>
-      <div style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 12px; border: 1px solid #e2e8f0;">
-        <i class="fa-solid fa-graduation-cap" style="color: #475569;"></i>
-        <span id="status-lkpd-text" style="font-weight: 500; color: #334155; margin-left: 0.5rem;">Status: Mengisi Identitas</span>
+      <div class="flex items-center gap-2 bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs border border-slate-200">
+        <i class="fa-solid fa-graduation-cap text-slate-600"></i>
+        <span class="font-medium text-slate-700" id="status-lkpd-text">Status: Mengisi Identitas</span>
       </div>
     </div>
   </header>
 
-  <main style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;" class="space-y-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
 
     <!-- Section 1: Identitas Peserta Didik -->
-    <section class="bg-white rounded-2xl border p-6 relative shadow-sm">
-      <div style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: #0f172a; border-top-left-radius: 1rem; border-bottom-left-radius: 1rem;"></div>
+    <section class="bg-white rounded-2xl border border-slate-200 p-6 relative shadow-sm">
+      <div class="absolute top-0 left-0 w-1.5 h-full bg-slate-800 rounded-l-2xl"></div>
       <div class="flex items-center justify-between mb-4">
-        <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
-          <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">1</span>
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">1</span>
           Identitas Peserta Didik
         </h2>
-        <span id="identity-status-badge" style="font-size: 12px; background: #f1f5f9; color: #475569; font-weight: 500; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">
-          <i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> Wajib Diisi
+        <span class="text-xs bg-slate-100 text-slate-600 font-medium px-3 py-1 rounded-full border border-slate-200" id="identity-status-badge">
+          <i class="fa-solid fa-lock mr-1"></i> Wajib Diisi
         </span>
       </div>
 
-      <div id="validation-warning" style="margin-bottom: 1rem; padding: 0.75rem; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 0.75rem; font-size: 12px; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-triangle-exclamation" style="color: #d97706; font-size: 1rem;"></i>
+      <div id="validation-warning" class="mb-4 p-3 bg-amber-50/60 border border-amber-200 text-amber-800 rounded-xl text-xs flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm"></i>
         <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk mengaktifkan lembar kerja dan soal sumatif.</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Sekolah</label>
-          <select id="sel-sekolah" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="updateDropdownKelas()">
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Sekolah</label>
+          <select id="sel-sekolah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition" onchange="updateDropdownKelas()">
             <option value="">-- Pilih Sekolah --</option>
-            <option value="SMK Negeri 1">SMK Negeri 1</option>
-            <option value="SMK Negeri 2">SMK Negeri 2</option>
           </select>
         </div>
         <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Kelas / Jurusan</label>
-          <select id="sel-kelas" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="updateDropdownSiswa()" disabled>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Kelas / Jurusan</label>
+          <select id="sel-kelas" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="updateDropdownSiswa()" disabled>
             <option value="">-- Pilih Kelas --</option>
           </select>
         </div>
         <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Nama Lengkap</label>
-          <select id="sel-nama" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="validateIdentity()" disabled>
+          <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Nama Lengkap</label>
+          <select id="sel-nama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-slate-400 focus:bg-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed" onchange="validateIdentity()" disabled>
             <option value="">-- Pilih Nama --</option>
           </select>
         </div>
@@ -124,129 +109,472 @@
     <!-- Main Content Wrapper (Locked until validation) -->
     <div id="main-content" class="locked-section space-y-8">
 
-      <!-- Section 3: Soal Pilihan Ganda Kompleks -->
-      <section class="bg-white rounded-2xl border p-6 shadow-sm">
+      <!-- Section 2: Ringkasan Teori & Petunjuk -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">2</span>
+            Petunjuk Pilihan Ganda & Ringkasan Materi
+          </h2>
+          <span class="text-[11px] bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-full border border-slate-200">Sumatif Lingkup Materi 1</span>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-700 mb-4">
+          <p class="font-bold text-slate-900 mb-1"><i class="fa-solid fa-circle-info text-slate-600 mr-1"></i> Petunjuk Pengerjaan:</p>
+          <p>Pilihlah jawaban yang paling tepat pada soal pilihan ganda di bawah ini (A, B, C, D, atau E). Kerjakan pula soal uraian dengan jelas dan tepat sebagai bagian dari evaluasi pemahaman materi.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+            <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-terminal text-slate-600"></i> Perintah Ping & IP Dasar
+            </h4>
+            <p class="text-slate-600 leading-relaxed">
+              Perintah <code>ping</code> menggunakan protokol ICMP untuk menguji konektivitas jaringan. Default payload Linux/Android adalah 64 byte (56 byte ICMP payload + 8 byte header). Loopback address <code>127.0.0.1</code> digunakan untuk menguji tumpukan TCP/IP internal perangkat.
+            </p>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+            <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-network-wired text-slate-600"></i> Media Transmisi & Pengkabelan
+            </h4>
+            <p class="text-slate-600 leading-relaxed">
+              Standar pengkabelan T568B menempatkan Putih-Oren dan Oren pada pin 1-2. Batas jarak maksimum UTP Cat6 tanpa repeater adalah 100 meter. Serat optik single-mode menggunakan core sangat kecil (~9 mikron) untuk jarak jauh tanpa terganggu EMI.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Soal Pilihan Ganda Komplek (Baru Disisipkan) -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
-              <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">3</span>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">3</span>
               Soal Pilihan Ganda Kompleks (Sumatif Lingkup Materi 1)
             </h2>
-            <p style="font-size: 12px; color: #64748b; margin-top: 0.25rem;">Petunjuk Pilihan Ganda Kompleks: Pilihlah beberapa jawaban yang paling tepat untuk setiap pertanyaan di bawah ini.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Petunjuk Pilihan Ganda Kompleks: Pilihlah 5 jawaban yang paling tepat untuk setiap pertanyaan di bawah ini.</p>
           </div>
-          <span style="font-size: 12px; font-weight: 600; background: #f1f5f9; color: #1e293b; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">13 Soal Kompleks</span>
+          <span class="text-xs font-semibold bg-slate-100 text-slate-800 px-3 py-1 rounded-full border border-slate-200">13 Soal Kompleks</span>
         </div>
 
-        <div class="space-y-6" style="font-size: 12px; color: #334155;">
-          <!-- 13 Soal Kompleks dari gemini-code-1790403849453 -->
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;" class="space-y-3">
-            <p style="font-weight: bold; color: #0f172a;">1. Kebocoran sinyal elektromagnetik antara dua pasang kabel yang berdekatan di dalam mantel UTP dinamakan...</p>
-            <div class="grid grid-cols-2 gap-2">
-              <label><input type="checkbox" name="kompleks_1" value="A"> A. NEXT (Near-End Crosstalk)</label>
-              <label><input type="checkbox" name="kompleks_1" value="B"> B. Fenomena interferensi sinyal antar-pasangan kabel</label>
-              <label><input type="checkbox" name="kompleks_1" value="C"> C. Gangguan induksi elektromagnetik</label>
-              <label><input type="checkbox" name="kompleks_1" value="D"> D. Near-End Crosstalk (NEXT)</label>
-              <label><input type="checkbox" name="kompleks_1" value="E"> E. Suara atau sinyal bocor dari satu pair ke pair lain</label>
+        <div class="space-y-6 text-xs text-slate-700">
+          
+          <!-- Soal Kompleks 1 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">1. Kebocoran sinyal elektromagnetik antara dua pasang kabel yang berdekatan di dalam mantel UTP dinamakan...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. NEXT (Near-End Crosstalk)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Fenomena interferensi sinyal antar-pasangan kabel (crosstalk) pada ujung pengirim</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Gangguan induksi elektromagnetik yang terjadi di dekat ujung kabel</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Near-End Crosstalk (NEXT)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Suara atau sinyal bocor dari satu pair ke pair lain di dekat konektor/ujung kabel</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Refleksi Sinyal</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Attenuation Total</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Dispersion Loss</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Insertion Loss</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Hambatan mekanik kabel</span></label>
             </div>
           </div>
-          <!-- (Soal kompleks 2 hingga 13 dapat disesuaikan mengikuti pola struktur yang sama) -->
+
+          <!-- Soal Kompleks 2 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">2. Standar pengkabelan struktur internasional yang diterbitkan oleh Telecommunications Industry Association adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. IEEE 802.11</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. TIA/EIA-568</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Standar pengkabelan telekomunikasi komersial untuk gedung perkantoran dari TIA</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. TIA/EIA-568 Commercial Building Telecommunications Cabling Standard</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Standar industri telekomunikasi bersama EIA dan TIA terkait pengkabelan terstruktur (TIA/EIA-568)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. ISO 9001</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. RFC 1918</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. IEEE 802.3</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Protokol jaringan nirkabel Wi-Fi</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Standar manajemen mutu pabrik</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 3 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">3. Perbedaan mendasar antara standar T568A dan T568B terletak pada pertukaran posisi pin kabel warna...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Oren dan Cokelat</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Hijau dan Biru</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Oren dan Hijau</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Penukaran posisi pin 1-2 (Oren) dengan pin 3-6 (Hijau)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Pasangan kabel hijau (pin 3 & 6) ditukar dengan pasangan kabel oranye (pin 1 & 2)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Biru dan Cokelat</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Hijau dan Cokelat</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Pertukaran posisi pin kabel warna oranye dan hijau secara silang</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Perubahan urutan pin antara pair oranye dan hijau</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Perbedaan susunan pin untuk warna oranye-putih/oranye dengan hijau-putih/hijau</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 4 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">4. Kabel UTP tipe Straight-Through digunakan untuk menghubungkan dua perangkat...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Berbeda jenis (misal: PC ke Switch)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Komputer (PC) ke Hub atau Switch</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Router ke Switch atau Hub</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Perangkat dengan hierarki atau fungsi port yang berbeda (Straight-Through)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Menghubungkan perangkat end-device ke perangkat penghubung jaringan (Network Device)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Sama jenis (misal: Switch ke Switch)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. PC langsung ke PC</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Router langsung ke Router</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Switch langsung ke Switch</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Hub langsung ke Hub</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 5 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">5. Keunggulan utama kabel Fiber Optic dibandingkan kabel tembaga (Copper) adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Harganya jauh lebih murah</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Sangat tahan terhadap interferensi elektromagnetik & bandwidth sangat besar</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Memiliki kapasitas bandwidth yang jauh lebih tinggi dan tahan terhadap gelombang elektromagnetik (EMI)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Kebebasan dari gangguan elektromagnetik serta mampu mentransmisikan data jarak jauh dengan kecepatan tinggi</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Redaman sinyal (attenuation) sangat rendah sehingga bisa menjangkau jarak yang jauh tanpa banyak penguatan</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Pemasangan jauh lebih mudah tanpa alat khusus</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Bisa ditekuk dengan sudut tajam tanpa merusak kabel</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Tidak memerlukan konektor sama sekali</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Sangat rentan terhadap petir</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Berat kabel sangat berat</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 6 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">6. Perbedaan mendasar antara kabel UTP dan STP terletak pada...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Jumlah pasangan kawat tembaga</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Keberadaan lapisan aluminium foil penyaring EMI</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Adanya pelindung tambahan berupa selubung logam atau foil untuk membentengi interferensi</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Lapisan pelindung elektromagnetik yang melilit pada kabel STP (Shielded Twisted Pair)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Kehadiran shielding/grounding shield pada STP yang tidak dimiliki oleh UTP (Unshielded Twisted Pair)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Jenis konektor yang digunakan</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Batas kecepatan maksimum transmisi</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Bahan isolator luar kabel</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Harga yang pasti sama rata</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Fleksibilitas fisik kabel yang identik</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 7 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">7. Fungsi utama lapisan braided copper / foil shield pada kabel STP dan Coaxial adalah untuk...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Menambah kelenturan kabel saat ditekuk</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Mencegah terjadinya arus pendek listrik</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Meredam dampak interferensi elektromagnetik (EMI)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Melindungi sinyal data dari gangguan elektromagnetik luar dan crosstalk</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Berfungsi sebagai perisai penangkal sinyal radio liar (RFI) dan interferensi elektromagnetik</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Mempercepat hantaran sinyal analog</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Meningkatkan daya tahan terhadap air</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Menambah massa kabel secara signifikan</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Menghambat aliran data sepenuhnya</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Sebagai konduktor utama arus listrik utama</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 8 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">8. Komponen kabel Coaxial yang berfungsi sebagai media utama perambatan arus sinyal data adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Outer Jacket</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Metallic Shield</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Dielectric Insulator</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Center Conductor (Core)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Inti kawat tembaga di bagian tengah (Center Conductor / Core)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Foil Shield</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Konduktor inti kabel koaksial</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Bagian tengah kabel yang menghantarkan sinyal listrik</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Plastik pelindung luar</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Lapisan serabut tembaga</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 9 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">9. Impedansi standar kabel Coaxial yang umum digunakan untuk jaringan antena TV dan sistem CCTV analog adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. 50 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. 75 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Impedansi khas kabel Coaxial tipe RG-6 / RG-59 (75 Ohm)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Nilai hambatan karakteristik 75 Ohm untuk televisi dan CCTV</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Spesifikasi impedansi sistem video/RF standar pada angka 75 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. 100 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. 120 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. 600 Ohm</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. 50 Ohm (untuk jaringan data lama)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. 300 Ohm</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 10 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">10. Jenis konektor yang dipasang pada kedua ujung kabel Coaxial untuk dihubungkan ke perangkat penerima adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Konektor RJ-45</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Konektor BNC</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Bayonet Neill–Concelman (BNC connector)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Konektor tipe BNC untuk koaksial</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Konektor standar kabel Coaxial (BNC)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Konektor SC</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Konektor LC</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Konektor RJ-11</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Konektor ST</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Konektor UTP modular</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 11 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">11. Karakteristik utama dari kabel Fiber Optic yang tidak dimiliki oleh kabel tembaga (Copper) adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Harganya jauh lebih murah</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Proses crimping yang sangat practical</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Kebal total terhadap elektromagnetik (EMI)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Imun terhadap interferensi elektromagnetik dan gelombang radio (RFI/EMI)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Menggunakan cahaya untuk transmisi data sehingga bebas gangguan elektromagnetik</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Sangat lentur dan tahan ditekuk tajam</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Menggunakan tegangan listrik DC tinggi</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Mengalirkan arus listrik searah pada intinya</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Menggunakan bahan logam tembaga murni</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Tidak memiliki inti serat kaca</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 12 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">12. Bagian dari kabel Fiber Optic yang berfungsi memantulkan kembali gelombang cahaya ke dalam inti (core) adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Core</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Cladding</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Lapisan selubung kaca pemantul cahaya (Cladding)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Bagian cladding yang memiliki indeks bias lebih rendah untuk memantulkan cahaya</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Cladding fiber optic (lapisan pemantul internal)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Buffer Coating</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Strength Member</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Outer Jacket</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Pelindung plastik luar</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Kawat penguat baja</span></label>
+            </div>
+          </div>
+
+          <!-- Soal Kompleks 13 -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <p class="font-bold text-slate-900">13. Jika kabel STP diinstal tanpa menghubungkan grounding pada konektor shielded, maka yang akan terjadi adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>A. Kabel tidak bisa mengalirkan sinyal sama sekali</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>B. Lapisan shield justru bertindak sebagai antena penangkap EMI</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>C. Lapisan pelindung logam malah menangkap gelombang elektromagnetik dan memperburuk gangguan (efek antena)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>D. Shielding kabel tidak berfungsi membuang muatan induksi karena tidak terhubung ke tanah (ground)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>E. Potensi gangguan noise elektromagnetik meningkat karena pelindung logam mengapung (floating shield)</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>F. Kecepatan jaringan otomatis naik dua kali lipat</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>G. Kabel akan terasa panas dan terbakar</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>H. Tidak terjadi pengaruh apapun pada sinyal</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>I. Sinyal data melaju lebih cepat</span></label>
+              <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400"><input type="checkbox" class="mt-0.5 accent-slate-900"><span>J. Kinerja kabel mendadak setara dengan Fiber Optic</span></label>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <!-- Section 5: Soal Uraian (Essay) -->
-      <section class="bg-white rounded-2xl border p-6 shadow-sm">
+      <!-- Section 4: Uji Kompetensi Pilihan Ganda Standar -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">4</span>
+              Soal Pilihan Ganda (Sumatif Lingkup Materi 1)
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Pilihlah jawaban yang paling tepat dari alternatif A, B, C, D, dan E yang tersedia.</p>
+          </div>
+          <span class="text-xs font-semibold bg-slate-100 text-slate-800 px-3 py-1 rounded-full border border-slate-200">20 Soal</span>
+        </div>
+
+        <form id="form-quiz" class="space-y-6">
+          <div id="quiz-container" class="space-y-6"></div>
+        </form>
+      </section>
+
+      <!-- Section 5: Soal Uraian -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
-              <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">5</span>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="flex items-center justify-center w-6 h-6 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold border border-slate-200">5</span>
               Soal Uraian (Essay)
             </h2>
-            <p style="font-size: 12px; color: #64748b; margin-top: 0.25rem;">Jawablah pertanyaan-pertanyaan di bawah ini dengan jelas dan tepat.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Jawablah pertanyaan-pertanyaan di bawah ini dengan jelas dan tepat pada lembar jawaban Anda.</p>
           </div>
-          <span style="font-size: 12px; font-weight: 600; background: #f1f5f9; color: #1e293b; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">5 Soal Uraian</span>
+          <span class="text-xs font-semibold bg-slate-100 text-slate-800 px-3 py-1 rounded-full border border-slate-200">5 Soal Uraian</span>
         </div>
 
-        <div class="space-y-4" style="font-size: 12px; color: #334155;">
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
-            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">1. Apa arti dari pesan "Reply from..." saat proses ping ke IP lokal/gateway sedang berjalan?</p>
-            <textarea id="essay_1" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+        <div class="space-y-4 text-xs text-slate-700">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="font-bold text-slate-900 mb-1">1. Apa arti dari pesan "Reply from..." saat proses ping ke IP lokal/gateway sedang berjalan?</p>
+            <textarea rows="2" class="w-full mt-2 bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-slate-400" placeholder="Tulis jawaban Anda di sini..."></textarea>
           </div>
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
-            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">2. Apa arti dari pesan "Request Timed Out" (RTO) pada target yang tidak aktif?</p>
-            <textarea id="essay_2" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="font-bold text-slate-900 mb-1">2. Apa arti dari pesan "Request Timed Out" (RTO) pada target yang tidak aktif, dan apa penyebab utamanya?</p>
+            <textarea rows="2" class="w-full mt-2 bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-slate-400" placeholder="Tulis jawaban Anda di sini..."></textarea>
           </div>
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
-            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">3. Mengapa nilai latency (waktu tunda) ke IP Gateway lokal umumnya jauh lebih kecil?</p>
-            <textarea id="essay_3" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="font-bold text-slate-900 mb-1">3. Mengapa nilai latency (waktu tunda) ke IP Gateway lokal umumnya jauh lebih kecil dibandingkan ke DNS publik (seperti 8.8.8.8)?</p>
+            <textarea rows="2" class="w-full mt-2 bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-slate-400" placeholder="Tulis jawaban Anda di sini..."></textarea>
           </div>
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
-            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">4. Apa fungsi dari protokol ICMP dalam perintah ping?</p>
-            <textarea id="essay_4" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="font-bold text-slate-900 mb-1">4. Apa fungsi dari protokol ICMP (Internet Control Message Protocol) dalam perintah ping yang Anda lakukan di Android?</p>
+            <textarea rows="2" class="w-full mt-2 bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-slate-400" placeholder="Tulis jawaban Anda di sini..."></textarea>
           </div>
-          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
-            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">5. Bagaimana perbedaan hasil pengujian ping ketika menggunakan IP langsung vs domain?</p>
-            <textarea id="essay_5" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <p class="font-bold text-slate-900 mb-1">5. Bagaimana perbedaan hasil pengujian ping ketika menggunakan alamat IP langsung (misal: 8.8.8.8) dibandingkan menggunakan nama domain (misal: www.google.com)?</p>
+            <textarea rows="2" class="w-full mt-2 bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-slate-400" placeholder="Tulis jawaban Anda di sini..."></textarea>
           </div>
         </div>
       </section>
 
-      <!-- Tombol Selesaikan LKPD -->
-      <div style="text-align: center; padding-top: 1rem;">
-        <button onclick="selesaikanLKPD()" style="background: #0f172a; color: white; font-weight: bold; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; cursor: pointer; font-size: 12px;">
-          <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Selesaikan LKPD & Hitung Nilai
-        </button>
-      </div>
+      <!-- Section Footer Action Buttons -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-6 no-print flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+        <div class="text-xs text-slate-500">
+          <p class="font-semibold text-slate-700">Petunjuk Pengiriman:</p>
+          <p>Pastikan seluruh soal pilihan ganda telah dijawab sebelum mengirimkan LKPD Sumatif ini.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+          <button onclick="resetFormPrompt()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset Form
+          </button>
+          <button id="btn-submit-lkpd" onclick="selesaikanLKPD()" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan & Kirim Nilai
+          </button>
+          <button id="btn-download-pdf" onclick="cetakLaporan()" class="hidden flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Unduh PDF
+          </button>
+        </div>
+      </section>
 
     </div>
 
   </main>
 
-  <!-- Modal Hasil -->
-  <div id="modal-result" class="hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem;">
-    <div style="background: white; border-radius: 1rem; max-width: 400px; width: 100%; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center;">
-      <h3 style="font-size: 1.125rem; font-weight: bold; color: #0f172a;">LKPD Selesai Dikerjakan!</h3>
-      <p style="font-size: 12px; font-weight: 600; color: #334155; margin-top: 0.5rem;" id="modal-student-name">-</p>
-      <p style="font-size: 12px; color: #64748b; margin-top: 0.5rem;">Total Skor Akhir Anda:</p>
-      <p style="font-size: 2rem; font-weight: 800; color: #0f172a; margin: 0.5rem 0;" id="modal-score">0</p>
-      <p style="font-size: 11px; color: #64748b; font-style: italic;" id="modal-score-desc">-</p>
-      <button onclick="document.getElementById('modal-result').classList.add('hidden')" style="width: 100%; margin-top: 1rem; background: #0f172a; color: white; padding: 0.75rem; border-radius: 0.75rem; border: none; font-size: 12px; cursor: pointer;">
-        Tutup & Periksa Kembali
-      </button>
+  <!-- Modal Result Evaluasi -->
+  <div id="modal-result" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 transform transition-all">
+      <div class="text-center">
+        <div class="w-14 h-14 bg-slate-100 text-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold border border-slate-200">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">Sumatif Materi 1 Berhasil Diselesaikan!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-student-name">Nama Peserta Didik</p>
+
+        <div class="my-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nilai Akhir Pilihan Ganda</p>
+          <div class="text-5xl font-black text-slate-900 my-2" id="modal-score">0</div>
+          <p class="text-xs text-slate-600" id="modal-score-desc">Keterangan hasil evaluasi</p>
+        </div>
+
+        <div id="status-kirim-gas" class="mb-4 text-xs font-medium text-slate-500 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i> Data berhasil direkap.
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl transition">
+            Tutup
+          </button>
+          <button onclick="cetakLaporan()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-pdf"></i> Cetak Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast Component -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 text-center">
+      <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl border border-amber-200">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-bold text-slate-900 text-base mb-1" id="confirm-title">Konfirmasi Tindakan</h4>
+      <p class="text-xs text-slate-600 mb-5" id="confirm-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+      <div class="flex gap-2">
+        <button id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
+        <button id="btn-confirm-yes" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition">Ya, Lanjutkan</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Data Siswa & Identitas
-    const daftarSiswa = {
-      "SMK Negeri 1": {
-        "X TKJ 1": ["Ahmad Fauzi", "Budi Santoso", "Siti Aminah"],
-        "X TKJ 2": ["Joko Widodo", "Rina Marlina", "Dewi Lestari"]
-      },
-      "SMK Negeri 2": {
-        "X TKJ 1": ["Andi Pratama", "Maya Sari", "Rian Hidayat"],
-        "X TKJ 2": ["Eko Prasetyo", "Fitri Handayani", "Dimas Anggara"]
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFRNKBD9CT9_qpR2QipBAV-FyJYpA5Z3p82ktdqXOs3ShSKhnvl0Q4HPylR8YFFe1h/exec"; 
+    let waktuMulai = 0;
+    let masterDataSiswa = [];
+
+    const csvDataSiswa = `Sekolah,Kelas,Nama Lengkap
+SMK NEGERI 1 SINGKAWANG,X TJK,01 ALVINO
+SMK NEGERI 1 SINGKAWANG,X TJK,02 DEBORA RATU GIASTA GULTOM
+SMK MUDITA SINGKAWANG,XII TJKT,35 WILLY VEN`;
+
+    let dbSiswaParsed = {};
+
+    function initDatabaseSiswa() {
+      const lines = csvDataSiswa.trim().split('\n');
+      masterDataSiswa = [];
+      dbSiswaParsed = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const sekolah = parts[0].trim();
+          const kelas = parts[1].trim();
+          const nama = parts[2].trim();
+          
+          masterDataSiswa.push({ sekolah, kelas, nama });
+          if (!dbSiswaParsed[sekolah]) dbSiswaParsed[sekolah] = {};
+          if (!dbSiswaParsed[sekolah][kelas]) dbSiswaParsed[sekolah][kelas] = [];
+          dbSiswaParsed[sekolah][kelas].push(nama);
+        }
       }
-    };
+
+      const selSekolah = document.getElementById('sel-sekolah');
+      if (selSekolah) {
+        selSekolah.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        Object.keys(dbSiswaParsed).forEach(sekolah => {
+          const opt = document.createElement('option');
+          opt.value = sekolah;
+          opt.textContent = sekolah;
+          selSekolah.appendChild(opt);
+        });
+      }
+    }
 
     function updateDropdownKelas() {
       const sekolah = document.getElementById('sel-sekolah').value;
-      const selectKelas = document.getElementById('sel-kelas');
-      const selectNama = document.getElementById('sel-nama');
+      const selKelas = document.getElementById('sel-kelas');
+      const selNama = document.getElementById('sel-nama');
 
-      selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
-      selectNama.disabled = true;
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.disabled = true;
 
-      if (sekolah && daftarSiswa[sekolah]) {
-        selectKelas.disabled = false;
-        for (let kelas in daftarSiswa[sekolah]) {
-          let opt = document.createElement('option');
+      if (sekolah && dbSiswaParsed[sekolah]) {
+        selKelas.disabled = false;
+        Object.keys(dbSiswaParsed[sekolah]).forEach(kelas => {
+          const opt = document.createElement('option');
           opt.value = kelas;
           opt.textContent = kelas;
-          selectKelas.appendChild(opt);
-        }
+          selKelas.appendChild(opt);
+        });
       } else {
-        selectKelas.disabled = true;
+        selKelas.disabled = true;
       }
       validateIdentity();
     }
@@ -254,20 +582,20 @@
     function updateDropdownSiswa() {
       const sekolah = document.getElementById('sel-sekolah').value;
       const kelas = document.getElementById('sel-kelas').value;
-      const selectNama = document.getElementById('sel-nama');
+      const selNama = document.getElementById('sel-nama');
 
-      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
 
-      if (sekolah && kelas && daftarSiswa[sekolah][kelas]) {
-        selectNama.disabled = false;
-        daftarSiswa[sekolah][kelas].forEach(nama => {
-          let opt = document.createElement('option');
+      if (sekolah && kelas && dbSiswaParsed[sekolah] && dbSiswaParsed[sekolah][kelas]) {
+        selNama.disabled = false;
+        dbSiswaParsed[sekolah][kelas].forEach(nama => {
+          const opt = document.createElement('option');
           opt.value = nama;
           opt.textContent = nama;
-          selectNama.appendChild(opt);
+          selNama.appendChild(opt);
         });
       } else {
-        selectNama.disabled = true;
+        selNama.disabled = true;
       }
       validateIdentity();
     }
@@ -282,146 +610,227 @@
       const statusText = document.getElementById('status-lkpd-text');
 
       if (sekolah && kelas && nama) {
-        mainContent.classList.remove('locked-section');
-        mainContent.classList.add('unlocked-section');
-        warning.classList.add('hidden');
-        badge.innerHTML = '<i class="fa-solid fa-lock-open" style="margin-right: 0.25rem; color: #059669;"></i> Terverifikasi';
-        badge.style.background = '#ecfdf5';
-        badge.style.color = '#047857';
-        badge.style.borderColor = '#a7f3d0';
-        statusText.innerText = 'Status: Sedang Mengerjakan';
-      } else {
-        mainContent.classList.add('locked-section');
-        mainContent.classList.remove('unlocked-section');
-        warning.classList.remove('hidden');
-        badge.innerHTML = '<i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> Wajib Diisi';
-        badge.style.background = '#f1f5f9';
-        badge.style.color = '#475569';
-        badge.style.borderColor = '#e2e8f0';
-        statusText.innerText = 'Status: Mengisi Identitas';
-      }
-    }
-
-    // ==========================================
-    // BANK SOAL & KUNCI JAWABAN (KOMPLEKS & ESSAY) - gemini-code-1790404338181
-    // ==========================================
-    const kunciKompleks = {
-      kompleks_1: ['A', 'B', 'C', 'D', 'E'], 
-      kompleks_2: ['B', 'C', 'D', 'E', 'A'],
-      kompleks_3: ['C', 'D', 'E', 'H', 'I'],
-      kompleks_4: ['A', 'C', 'D', 'E', 'F'],
-      kompleks_5: ['B', 'C', 'D', 'E', 'A'],
-      kompleks_6: ['B', 'C', 'D', 'E', 'F'],
-      kompleks_7: ['C', 'D', 'E', 'B', 'A'],
-      kompleks_8: ['D', 'E', 'G', 'H', 'C'],
-      kompleks_9: ['B', 'C', 'D', 'E', 'A'],
-      kompleks_10: ['B', 'C', 'D', 'E', 'A'],
-      kompleks_11: ['C', 'D', 'E', 'B', 'A'],
-      kompleks_12: ['B', 'C', 'D', 'E', 'A'],
-      kompleks_13: ['B', 'C', 'D', 'E', 'A']
-    };
-
-    const kunciEssay = {
-      essay_1: ["berhasil", "terhubung", "koneksi", "reply", "aktif", "tersambung"],
-      essay_2: ["tidak aktif", "putus", "timeout", "mati", "blokir", "firewall", "rto"],
-      essay_3: ["lokal", "dekat", "gateway", "publik", "internet", "jarak", "hop", "langsung"],
-      essay_4: ["pesan", "kontrol", "konektivitas", "jaringan", "error", "status", "ping"],
-      essay_5: ["dns", "domain", "resolusi", "terjemah", "nama", "ip", "waktu"]
-    };
-
-    // ==========================================
-    // FUNGSI PENILAIAN
-    // ==========================================
-    function nilaiPGKompleks() {
-      let skorKompleks = 0;
-      const poinPerJawabanBenar = 2;
-
-      for (let i = 1; i <= 13; i++) {
-        const pilihanSiswa = Array.from(document.querySelectorAll(`input[name="kompleks_${i}"]:checked`)).map(cb => cb.value);
-        const jawabanBenar = kunciKompleks[`kompleks_${i}`] || [];
-        
-        let poinSoalIni = 0;
-        pilihanSiswa.forEach(jawaban => {
-          if (jawabanBenar.includes(jawaban)) {
-            poinSoalIni += poinPerJawabanBenar; 
-          } else {
-            poinSoalIni -= (poinPerJawabanBenar / 2);
-          }
-        });
-
-        if (poinSoalIni < 0) poinSoalIni = 0;
-        if (poinSoalIni > (5 * poinPerJawabanBenar)) poinSoalIni = (5 * poinPerJawabanBenar);
-        
-        skorKompleks += poinSoalIni;
-      }
-      return skorKompleks;
-    }
-
-    function nilaiEssay() {
-      let skorEssay = 0;
-      const poinPenuhEssay = 10;
-
-      for (let i = 1; i <= 5; i++) {
-        const elemenEssay = document.getElementById(`essay_${i}`);
-        if (!elemenEssay) continue;
-
-        const teksJawaban = elemenEssay.value.toLowerCase();
-        const keywords = kunciEssay[`essay_${i}`] || [];
-        let matchCount = 0;
-
-        keywords.forEach(kata => {
-          const regex = new RegExp(`\\b${kata}\\b`, 'g');
-          if (regex.test(teksJawaban)) {
-            matchCount++;
-          }
-        });
-
-        if (matchCount >= 3) {
-          skorEssay += poinPenuhEssay;
-        } else if (matchCount === 2) {
-          skorEssay += (poinPenuhEssay * 0.7);
-        } else if (matchCount === 1) {
-          skorEssay += (poinPenuhEssay * 0.3);
+        if (mainContent) {
+          mainContent.classList.remove('locked-section');
+          mainContent.classList.add('unlocked-section');
         }
+        if (warning) warning.classList.add('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-emerald-50 text-emerald-700 font-medium px-3 py-1 rounded-full border border-emerald-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i> Terverifikasi';
+        }
+        if (statusText) statusText.innerText = `Status: ${nama} (${kelas})`;
+        if (waktuMulai === 0) waktuMulai = Date.now();
+      } else {
+        if (mainContent) {
+          mainContent.classList.remove('unlocked-section');
+          mainContent.classList.add('locked-section');
+        }
+        if (warning) warning.classList.remove('hidden');
+        if (badge) {
+          badge.className = "text-xs bg-slate-100 text-slate-600 font-medium px-3 py-1 rounded-full border border-slate-200";
+          badge.innerHTML = '<i class="fa-solid fa-lock mr-1"></i> Wajib Diisi';
+        }
+        if (statusText) statusText.innerText = "Status: Mengisi Identitas";
       }
-      return Math.round(skorEssay);
     }
 
-    function selesaikanLKPD() {
+    // Question Bank: 20 Items based on Sumatif Lingkup Materi 1
+    const questionBank = [
+      { id: 1, q: "Berapakah ukuran muatan data (payload) bawaan standar yang dikirim oleh perintah ping pada Linux/Android?", options: ["A. 8 byte", "B. 64 byte (56 byte ICMP payload + header)", "C. 1024 byte", "D. 5 MB", "E. 1 GB"], ans: "B" },
+      { id: 2, q: "Perintah yang tepat pada Termux untuk membatasi eksekusi pengujian ping hanya sebanyak 5 kali pengiriman paket adalah...", options: ["A. ping -t 5 8.8.8.8", "B. ping -c 5 8.8.8.8", "C. ping -n 5 8.8.8.8", "D. ping -l 5 8.8.8.8", "E. ping -stop 5 8.8.8.8"], ans: "B" },
+      { id: 3, q: "Alamat IP khusus yang berfungsi sebagai Loopback Address untuk menguji tumpukan TCP/IP internal pada perangkat Anda sendiri adalah...", options: ["A. 192.168.1.1", "B. 127.0.0.1", "C. 255.255.255.0", "D. 0.0.0.0", "E. 10.0.0.1"], ans: "B" },
+      { id: 4, q: "Alamat IP DNS Publik milik Google yang paling sering dijadikan target acuan tes koneksi internet global adalah...", options: ["A. 1.1.1.1", "B. 192.168.0.1", "C. 8.8.8.8", "D. 112.215.20.1", "E. 80.80.80.80"], ans: "C" },
+      { id: 5, q: "Urutan warna standar T568B untuk pin ke-1 dan ke-2 secara berturut-turut adalah...", options: ["A. Putih-Hijau, Hijau", "B. Putih-Oren, Oren", "C. Putih-Biru, Biru", "D. Putih-Cokelat, Cokelat", "E. Oren, Putih-Oren"], ans: "B" },
+      { id: 6, q: "Batas jarak maksimum efektif transmisi data kabel UTP Cat6 tanpa repeater adalah...", options: ["A. 50 meter", "B. 100 meter", "C. 185 meter", "D. 500 meter", "E. 1000 meter"], ans: "B" },
+      { id: 7, q: "Alat yang digunakan untuk menyambung core serat optik secara permanen dengan teknik lebur adalah...", options: ["A. Crimping Tool", "B. Fusion Splicer", "C. Optical Power Meter", "D. Stripper FO", "E. Cleaver FO"], ans: "B" },
+      { id: 8, q: "Jenis kabel serat optik yang memiliki diameter core sangat kecil (sekitar 9 micron) dan digunakan untuk jarak jauh adalah...", options: ["A. Multi-Mode Step Index", "B. Multi-Mode Graded Index", "C. Single-Mode", "D. UTP Cable", "E. STP Cable"], ans: "C" },
+      { id: 9, q: "Alat ukur yang digunakan untuk mendeteksi lokasi titik putus dan mengukur besar redaman serat optik adalah...", options: ["A. LAN Tester", "B. Multimeter", "C. OTDR (Optical Time Domain Reflectometer)", "D. Visual Fault Locator", "E. Spectrum Analyzer"], ans: "C" },
+      { id: 10, q: "Gangguan sinyal berupa induksi medan listrik/magnetik dari perangkat eksternal pada kabel tembaga disebut...", options: ["A. Attenuation", "B. Crosstalk", "C. Electromagnetic Interference (EMI)", "D. Dispersion", "E. Jitter"], ans: "C" },
+      { id: 11, q: "Jenis konektor standar yang dipasang pada ujung kabel UTP untuk dimasukkan ke port Ethernet RJ-45 adalah...", options: ["A. Konektor ST", "B. Konektor SC", "C. Konektor RJ-45", "D. Konektor LC", "E. Konektor BNC"], ans: "C" },
+      { id: 12, q: "Pada standar T568B, pin yang berfungsi sebagai pasangan jalur penerima data (Rx) pada jaringan Fast Ethernet (100Mbps) adalah pin...", options: ["A. 1 dan 2", "B. 3 dan 6", "C. 4 dan 5", "D. 7 dan 8", "E. 1 dan 3"], ans: "B" },
+      { id: 13, q: "Jenis kabel UTP yang memiliki pelindung aluminium foil untuk menahan EMI eksternal dinamakan...", options: ["A. Unshielded Twisted Pair", "B. Shielded / Foiled Twisted Pair (STP/FTP)", "C. Coaxial Cable", "D. Fiber Optic Armor", "E. Patch Cord UTP"], ans: "B" },
+      { id: 14, q: "Alat tangan yang digunakan untuk mengupas selubung luar dan menjepit konektor RJ-45 pada kabel UTP adalah...", options: ["A. Tang Potong", "B. Crimping Tool", "C. Punch Down Tool", "D. Cable Stripper", "E. Splicer Tool"], ans: "B" },
+      { id: 15, q: "Fenomena berkurangnya kekuatan sinyal seiring bertambahnya jarak lintasan media transmisi dinamakan...", options: ["A. Refraksi", "B. Redaman (Attenuation)", "C. Crosstalk", "D. Jitter", "E. Dispersion"], ans: "B" },
+      { id: 16, q: "Kebocoran sinyal elektromagnetik antara dua pasang kabel yang berdekatan di dalam mantel UTP dinamakan...", options: ["A. Attenuation", "B. NEXT (Near-End Crosstalk)", "C. Dispersion", "D. Jitter", "E. Insertion Loss"], ans: "B" },
+      { id: 17, q: "Standar pengkabelan terstruktur internasional untuk telekomunikasi komersial gedung yang diterbitkan oleh TIA adalah...", options: ["A. IEEE 802.11", "B. TIA/EIA-568", "C. ISO 9001", "D. RFC 1918", "E. IEEE 802.3"], ans: "B" },
+      { id: 18, q: "Perbedaan mendasar antara standar pengkabelan T568A dan T568B terletak pada...", options: ["A. Jumlah kabel tembaga", "B. Pertukaran posisi pin 1-2 (Oren) dengan pin 3-6 (Hijau)", "C. Panjang maksimum kabel", "D. Jenis konektor RJ-11", "E. Penggunaan lapisan foil"], ans: "B" },
+      { id: 19, q: "Kabel UTP tipe Straight-Through digunakan untuk menghubungkan dua perangkat yang...", options: ["A. Sama jenis (PC ke PC)", "B. Berbeda jenis (misal: PC ke Switch atau Router ke Switch)", "C. Menggunakan serat optik", "D. Nirkabel", "E. Coaxial"], ans: "B" },
+      { id: 20, q: "Karakteristik utama dari kabel Fiber Optic yang tidak dimiliki oleh kabel tembaga konvensional adalah...", options: ["A. Harga sangat murah", "B. Proses crimping mudah", "C. Imun total terhadap interferensi elektromagnetik (EMI) & bandwidth sangat besar", "D. Mengalirkan arus listrik searah bertegangan tinggi", "E. Sangat rentan petir"], ans: "C" }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questionBank.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = "p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-slate-300 transition";
+        qCard.id = `q-block-${q.id}`;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          const optVal = opt.charAt(0);
+          optionsHtml += `
+            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 hover:border-slate-400 hover:bg-white cursor-pointer transition text-xs font-medium text-slate-700">
+              <input type="radio" name="q${q.id}" value="${optVal}" class="mt-0.5 accent-slate-900">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <p class="font-semibold text-xs sm:text-sm text-slate-900 mb-3 flex items-start gap-2">
+            <span class="bg-slate-900 text-white text-[11px] font-bold px-2 py-0.5 rounded">${idx + 1}</span>
+            <span>${q.q}</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            ${optionsHtml}
+          </div>
+          <div id="feedback-q${q.id}" class="mt-2 text-xs hidden p-2.5 rounded-lg"></div>
+        `;
+        container.appendChild(qCard);
+      });
+    }
+
+    async function selesaikanLKPD() {
       const sekolah = document.getElementById('sel-sekolah').value;
       const kelas = document.getElementById('sel-kelas').value;
       const nama = document.getElementById('sel-nama').value;
 
       if (!sekolah || !kelas || !nama) {
-        alert("Harap lengkapi Identitas (Sekolah, Kelas, dan Nama) terlebih dahulu!");
+        showToast("Identitas Wajib", "Harap lengkapi Identitas Peserta Didik terlebih dahulu!", "warning");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
-      let skorPilganStandar = 0; 
-      if (typeof hitungNilaiPilganBiasa === "function") {
-        skorPilganStandar = hitungNilaiPilganBiasa(); 
-      }
+      let skorBenar = 0;
+      questionBank.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+        feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
 
-      const skorKompleks = nilaiPGKompleks();
-      const skorEssay = nilaiEssay();
-      
-      const totalSkor = skorPilganStandar + skorKompleks + skorEssay;
-      
-      document.getElementById('modal-student-name').innerText = `${nama} - ${kelas}`;
-      document.getElementById('modal-score').innerText = totalSkor;
-      
-      const scoreDesc = document.getElementById('modal-score-desc');
-      if (scoreDesc) {
-          if(totalSkor > 80) scoreDesc.innerText = "Sangat Baik! Anda telah memahami materi dengan luar biasa.";
-          else if(totalSkor >= 60) scoreDesc.innerText = "Baik! Tingkatkan lagi pemahaman Anda.";
-          else scoreDesc.innerText = "Perlu Perbaikan. Jangan menyerah dan pelajari lagi materinya.";
-      }
-      
-      const modalResult = document.getElementById('modal-result');
-      if (modalResult) {
-        modalResult.classList.remove('hidden');
+        if (selected) {
+          if (selected.value === q.ans) {
+            skorBenar++;
+            feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>Benar!</b> Jawaban Anda tepat.`;
+          } else {
+            feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>Salah.</b> Jawaban benar: <b>${q.ans}</b>`;
+          }
+        } else {
+          feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1"></i> Belum dijawab. Jawaban benar: <b>${q.ans}</b>`;
+        }
+      });
+
+      const nilaiAkhir = Math.round((skorBenar / questionBank.length) * 100);
+      const durasiDetik = waktuMulai > 0 ? Math.floor((Date.now() - waktuMulai) / 1000) : 0;
+      const pilihanLkpdTerpilih = "Sumatif Lingkup Materi 1: Jaringan Dasar & Media Transmisi";
+
+      const payload = {
+        sekolah: sekolah,
+        nama_lengkap: nama,
+        pilihan_lkpd: pilihanLkpdTerpilih,
+        kelas: kelas,
+        durasi_detik: durasiDetik,
+        skor_pg_benar: skorBenar,
+        nilai_akhir: nilaiAkhir
+      };
+
+      document.getElementById('modal-student-name').innerText = `${nama} | ${kelas} - ${sekolah}`;
+      document.getElementById('modal-score').innerText = nilaiAkhir;
+
+      let desc = "Sangat Baik! Anda menguasai materi jaringan dasar dan media transmisi dengan sangat baik.";
+      if (nilaiAkhir < 75) desc = "Cukup Baik. Pelajari kembali materi pengkabelan dan perintah pengujian jaringan.";
+      if (nilaiAkhir < 60) desc = "Perlu Peningkatan. Ulangi kembali modul materi dan latihan soal.";
+      document.getElementById('modal-score-desc').innerText = desc;
+
+      const statusKirimEl = document.getElementById('status-kirim-gas');
+      statusKirimEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-slate-600"></i> Menyimpan hasil evaluasi...`;
+      document.getElementById('modal-result').classList.remove('hidden');
+      document.getElementById('btn-download-pdf').classList.remove('hidden');
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> Nilai berhasil direkap!`;
+      } catch (err) {
+        console.error("Gagal mengirim data via fetch:", err);
+        statusKirimEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> Evaluasi lokal selesai tersimpan.`;
       }
     }
+
+    function closeModal() {
+      document.getElementById('modal-result').classList.add('hidden');
+    }
+
+    function cetakLaporan() {
+      closeModal();
+      window.print();
+    }
+
+    function resetFormPrompt() {
+      showConfirm("Reset Form", "Apakah Anda yakin ingin meriset seluruh jawaban?", () => {
+        document.getElementById('sel-sekolah').value = "";
+        updateDropdownKelas();
+        waktuMulai = 0;
+        document.getElementById('form-quiz').reset();
+        questionBank.forEach(q => {
+          const feedbackEl = document.getElementById(`feedback-q${q.id}`);
+          if (feedbackEl) feedbackEl.classList.add('hidden');
+        });
+        document.getElementById('btn-download-pdf').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Reset Selesai", "Formulir telah dikembalikan ke kondisi awal.", "info");
+      });
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let bg = "bg-slate-900 text-white";
+      if (type === 'success') bg = "bg-emerald-700 text-white";
+      if (type === 'warning') bg = "bg-amber-600 text-white";
+
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs font-medium flex items-center gap-2.5 transition-all duration-300 pointer-events-auto transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : (type === 'warning' ? 'fa-triangle-exclamation' : 'fa-info-circle')}"></i><div><b>${title}:</b> ${message}</div>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showConfirm(title, message, onYes) {
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      const modal = document.getElementById('modal-confirm');
+      modal.classList.remove('hidden');
+
+      const btnYes = document.getElementById('btn-confirm-yes');
+      const btnCancel = document.getElementById('btn-confirm-cancel');
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnYes.onclick = null;
+        btnCancel.onclick = null;
+      };
+
+      btnYes.onclick = () => { cleanup(); onYes(); };
+      btnCancel.onclick = () => { cleanup(); };
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDatabaseSiswa();
+      renderQuiz();
+    });
   </script>
 </body>
 </html>
