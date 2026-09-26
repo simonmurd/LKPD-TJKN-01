@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LKPD Sumatif Lingkup Materi 1: Jaringan Dasar & Media Transmisi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .locked-section { opacity: 0.35; pointer-events: none; filter: blur(2px); transition: all 0.4s ease; }
+    .unlocked-section { opacity: 1; pointer-events: auto; filter: blur(0); transition: all 0.4s ease; }
+    
+    .grid-bg-pattern {
+      background-color: #ffffff;
+      background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+      background-size: 16px 16px;
+    }
+
+    /* Simple Utility classes to replace Tailwind CDN if needed */
+    .bg-white { background-color: #ffffff; }
+    .bg-slate-50 { background-color: #f8fafc; }
+    .bg-slate-900 { background-color: #0f172a; color: #ffffff; }
+    .text-slate-900 { color: #0f172a; }
+    .text-slate-700 { color: #334155; }
+    .text-slate-500 { color: #64748b; }
+    .border { border: 1px solid #e2e8f0; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-xl { border-radius: 0.755rem; }
+    .p-6 { padding: 1.5rem; }
+    .p-4 { padding: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .grid { display: grid; }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .gap-2 { gap: 0.5rem; }
+    .w-full { width: 100%; }
+    .hidden { display: none; }
+
+    @media print {
+      .no-print { display: none !important; }
+      .locked-section { opacity: 1 !important; filter: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
+
+  <!-- Header Section -->
+  <header style="background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40;" class="no-print">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0;">
+          <i class="fa-solid fa-network-wired" style="font-size: 1.5rem; color: #334155;"></i>
+        </div>
+        <div>
+          <span style="font-size: 10px; font-weight: bold; letter-spacing: 0.05em; color: #94a3b8; text-transform: uppercase;">Sumatif Lingkup Materi 1 Interaktif</span>
+          <h1 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">LKPD 1: Jaringan Komputer Dasar & Media Transmisi</h1>
+          <p style="font-size: 12px; color: #64748b; margin: 0;">Pengujian Ping, IP Addressing, Standar Pengkabelan T568B, UTP/STP, Coaxial, & Fiber Optic</p>
+        </div>
+      </div>
+      <div style="background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 12px; border: 1px solid #e2e8f0;">
+        <i class="fa-solid fa-graduation-cap" style="color: #475569;"></i>
+        <span id="status-lkpd-text" style="font-weight: 500; color: #334155; margin-left: 0.5rem;">Status: Mengisi Identitas</span>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;" class="space-y-8">
+
+    <!-- Section 1: Identitas Peserta Didik -->
+    <section class="bg-white rounded-2xl border p-6 relative shadow-sm">
+      <div style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: #0f172a; border-top-left-radius: 1rem; border-bottom-left-radius: 1rem;"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">1</span>
+          Identitas Peserta Didik
+        </h2>
+        <span id="identity-status-badge" style="font-size: 12px; background: #f1f5f9; color: #475569; font-weight: 500; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">
+          <i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> Wajib Diisi
+        </span>
+      </div>
+
+      <div id="validation-warning" style="margin-bottom: 1rem; padding: 0.75rem; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 0.75rem; font-size: 12px; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-triangle-exclamation" style="color: #d97706; font-size: 1rem;"></i>
+        <span>Harap pilih Sekolah, Kelas, dan Nama Lengkap Anda di bawah ini untuk mengaktifkan lembar kerja dan soal sumatif.</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Sekolah</label>
+          <select id="sel-sekolah" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="updateDropdownKelas()">
+            <option value="">-- Pilih Sekolah --</option>
+            <option value="SMK Negeri 1">SMK Negeri 1</option>
+            <option value="SMK Negeri 2">SMK Negeri 2</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Kelas / Jurusan</label>
+          <select id="sel-kelas" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="updateDropdownSiswa()" disabled>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">Nama Lengkap</label>
+          <select id="sel-nama" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; font-size: 12px; font-weight: 500; color: #1e293b;" onchange="validateIdentity()" disabled>
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Wrapper (Locked until validation) -->
+    <div id="main-content" class="locked-section space-y-8">
+
+      <!-- Section 3: Soal Pilihan Ganda Kompleks -->
+      <section class="bg-white rounded-2xl border p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">3</span>
+              Soal Pilihan Ganda Kompleks (Sumatif Lingkup Materi 1)
+            </h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: 0.25rem;">Petunjuk Pilihan Ganda Kompleks: Pilihlah beberapa jawaban yang paling tepat untuk setiap pertanyaan di bawah ini.</p>
+          </div>
+          <span style="font-size: 12px; font-weight: 600; background: #f1f5f9; color: #1e293b; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">13 Soal Kompleks</span>
+        </div>
+
+        <div class="space-y-6" style="font-size: 12px; color: #334155;">
+          <!-- 13 Soal Kompleks dari gemini-code-1790403849453 -->
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;" class="space-y-3">
+            <p style="font-weight: bold; color: #0f172a;">1. Kebocoran sinyal elektromagnetik antara dua pasang kabel yang berdekatan di dalam mantel UTP dinamakan...</p>
+            <div class="grid grid-cols-2 gap-2">
+              <label><input type="checkbox" name="kompleks_1" value="A"> A. NEXT (Near-End Crosstalk)</label>
+              <label><input type="checkbox" name="kompleks_1" value="B"> B. Fenomena interferensi sinyal antar-pasangan kabel</label>
+              <label><input type="checkbox" name="kompleks_1" value="C"> C. Gangguan induksi elektromagnetik</label>
+              <label><input type="checkbox" name="kompleks_1" value="D"> D. Near-End Crosstalk (NEXT)</label>
+              <label><input type="checkbox" name="kompleks_1" value="E"> E. Suara atau sinyal bocor dari satu pair ke pair lain</label>
+            </div>
+          </div>
+          <!-- (Soal kompleks 2 hingga 13 dapat disesuaikan mengikuti pola struktur yang sama) -->
+        </div>
+      </section>
+
+      <!-- Section 5: Soal Uraian (Essay) -->
+      <section class="bg-white rounded-2xl border p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 style="font-size: 1rem; font-weight: bold; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: #f1f5f9; color: #0f172a; border-radius: 0.5rem; font-size: 12px; border: 1px solid #e2e8f0;">5</span>
+              Soal Uraian (Essay)
+            </h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: 0.25rem;">Jawablah pertanyaan-pertanyaan di bawah ini dengan jelas dan tepat.</p>
+          </div>
+          <span style="font-size: 12px; font-weight: 600; background: #f1f5f9; color: #1e293b; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #e2e8f0;">5 Soal Uraian</span>
+        </div>
+
+        <div class="space-y-4" style="font-size: 12px; color: #334155;">
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">1. Apa arti dari pesan "Reply from..." saat proses ping ke IP lokal/gateway sedang berjalan?</p>
+            <textarea id="essay_1" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          </div>
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">2. Apa arti dari pesan "Request Timed Out" (RTO) pada target yang tidak aktif?</p>
+            <textarea id="essay_2" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          </div>
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">3. Mengapa nilai latency (waktu tunda) ke IP Gateway lokal umumnya jauh lebih kecil?</p>
+            <textarea id="essay_3" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          </div>
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">4. Apa fungsi dari protokol ICMP dalam perintah ping?</p>
+            <textarea id="essay_4" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          </div>
+          <div style="padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem;">
+            <p style="font-weight: bold; color: #0f172a; margin-bottom: 0.25rem;">5. Bagaimana perbedaan hasil pengujian ping ketika menggunakan IP langsung vs domain?</p>
+            <textarea id="essay_5" rows="2" style="width: 100%; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; outline: none;" placeholder="Tulis jawaban Anda di sini..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tombol Selesaikan LKPD -->
+      <div style="text-align: center; padding-top: 1rem;">
+        <button onclick="selesaikanLKPD()" style="background: #0f172a; color: white; font-weight: bold; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; cursor: pointer; font-size: 12px;">
+          <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Selesaikan LKPD & Hitung Nilai
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal Hasil -->
+  <div id="modal-result" class="hidden" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: white; border-radius: 1rem; max-width: 400px; width: 100%; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center;">
+      <h3 style="font-size: 1.125rem; font-weight: bold; color: #0f172a;">LKPD Selesai Dikerjakan!</h3>
+      <p style="font-size: 12px; font-weight: 600; color: #334155; margin-top: 0.5rem;" id="modal-student-name">-</p>
+      <p style="font-size: 12px; color: #64748b; margin-top: 0.5rem;">Total Skor Akhir Anda:</p>
+      <p style="font-size: 2rem; font-weight: 800; color: #0f172a; margin: 0.5rem 0;" id="modal-score">0</p>
+      <p style="font-size: 11px; color: #64748b; font-style: italic;" id="modal-score-desc">-</p>
+      <button onclick="document.getElementById('modal-result').classList.add('hidden')" style="width: 100%; margin-top: 1rem; background: #0f172a; color: white; padding: 0.75rem; border-radius: 0.75rem; border: none; font-size: 12px; cursor: pointer;">
+        Tutup & Periksa Kembali
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Data Siswa & Identitas
+    const daftarSiswa = {
+      "SMK Negeri 1": {
+        "X TKJ 1": ["Ahmad Fauzi", "Budi Santoso", "Siti Aminah"],
+        "X TKJ 2": ["Joko Widodo", "Rina Marlina", "Dewi Lestari"]
+      },
+      "SMK Negeri 2": {
+        "X TKJ 1": ["Andi Pratama", "Maya Sari", "Rian Hidayat"],
+        "X TKJ 2": ["Eko Prasetyo", "Fitri Handayani", "Dimas Anggara"]
+      }
+    };
+
+    function updateDropdownKelas() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const selectKelas = document.getElementById('sel-kelas');
+      const selectNama = document.getElementById('sel-nama');
+
+      selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+      selectNama.disabled = true;
+
+      if (sekolah && daftarSiswa[sekolah]) {
+        selectKelas.disabled = false;
+        for (let kelas in daftarSiswa[sekolah]) {
+          let opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas;
+          selectKelas.appendChild(opt);
+        }
+      } else {
+        selectKelas.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function updateDropdownSiswa() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const selectNama = document.getElementById('sel-nama');
+
+      selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+      if (sekolah && kelas && daftarSiswa[sekolah][kelas]) {
+        selectNama.disabled = false;
+        daftarSiswa[sekolah][kelas].forEach(nama => {
+          let opt = document.createElement('option');
+          opt.value = nama;
+          opt.textContent = nama;
+          selectNama.appendChild(opt);
+        });
+      } else {
+        selectNama.disabled = true;
+      }
+      validateIdentity();
+    }
+
+    function validateIdentity() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+      const mainContent = document.getElementById('main-content');
+      const warning = document.getElementById('validation-warning');
+      const badge = document.getElementById('identity-status-badge');
+      const statusText = document.getElementById('status-lkpd-text');
+
+      if (sekolah && kelas && nama) {
+        mainContent.classList.remove('locked-section');
+        mainContent.classList.add('unlocked-section');
+        warning.classList.add('hidden');
+        badge.innerHTML = '<i class="fa-solid fa-lock-open" style="margin-right: 0.25rem; color: #059669;"></i> Terverifikasi';
+        badge.style.background = '#ecfdf5';
+        badge.style.color = '#047857';
+        badge.style.borderColor = '#a7f3d0';
+        statusText.innerText = 'Status: Sedang Mengerjakan';
+      } else {
+        mainContent.classList.add('locked-section');
+        mainContent.classList.remove('unlocked-section');
+        warning.classList.remove('hidden');
+        badge.innerHTML = '<i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> Wajib Diisi';
+        badge.style.background = '#f1f5f9';
+        badge.style.color = '#475569';
+        badge.style.borderColor = '#e2e8f0';
+        statusText.innerText = 'Status: Mengisi Identitas';
+      }
+    }
+
+    // ==========================================
+    // BANK SOAL & KUNCI JAWABAN (KOMPLEKS & ESSAY) - gemini-code-1790404338181
+    // ==========================================
+    const kunciKompleks = {
+      kompleks_1: ['A', 'B', 'C', 'D', 'E'], 
+      kompleks_2: ['B', 'C', 'D', 'E', 'A'],
+      kompleks_3: ['C', 'D', 'E', 'H', 'I'],
+      kompleks_4: ['A', 'C', 'D', 'E', 'F'],
+      kompleks_5: ['B', 'C', 'D', 'E', 'A'],
+      kompleks_6: ['B', 'C', 'D', 'E', 'F'],
+      kompleks_7: ['C', 'D', 'E', 'B', 'A'],
+      kompleks_8: ['D', 'E', 'G', 'H', 'C'],
+      kompleks_9: ['B', 'C', 'D', 'E', 'A'],
+      kompleks_10: ['B', 'C', 'D', 'E', 'A'],
+      kompleks_11: ['C', 'D', 'E', 'B', 'A'],
+      kompleks_12: ['B', 'C', 'D', 'E', 'A'],
+      kompleks_13: ['B', 'C', 'D', 'E', 'A']
+    };
+
+    const kunciEssay = {
+      essay_1: ["berhasil", "terhubung", "koneksi", "reply", "aktif", "tersambung"],
+      essay_2: ["tidak aktif", "putus", "timeout", "mati", "blokir", "firewall", "rto"],
+      essay_3: ["lokal", "dekat", "gateway", "publik", "internet", "jarak", "hop", "langsung"],
+      essay_4: ["pesan", "kontrol", "konektivitas", "jaringan", "error", "status", "ping"],
+      essay_5: ["dns", "domain", "resolusi", "terjemah", "nama", "ip", "waktu"]
+    };
+
+    // ==========================================
+    // FUNGSI PENILAIAN
+    // ==========================================
+    function nilaiPGKompleks() {
+      let skorKompleks = 0;
+      const poinPerJawabanBenar = 2;
+
+      for (let i = 1; i <= 13; i++) {
+        const pilihanSiswa = Array.from(document.querySelectorAll(`input[name="kompleks_${i}"]:checked`)).map(cb => cb.value);
+        const jawabanBenar = kunciKompleks[`kompleks_${i}`] || [];
+        
+        let poinSoalIni = 0;
+        pilihanSiswa.forEach(jawaban => {
+          if (jawabanBenar.includes(jawaban)) {
+            poinSoalIni += poinPerJawabanBenar; 
+          } else {
+            poinSoalIni -= (poinPerJawabanBenar / 2);
+          }
+        });
+
+        if (poinSoalIni < 0) poinSoalIni = 0;
+        if (poinSoalIni > (5 * poinPerJawabanBenar)) poinSoalIni = (5 * poinPerJawabanBenar);
+        
+        skorKompleks += poinSoalIni;
+      }
+      return skorKompleks;
+    }
+
+    function nilaiEssay() {
+      let skorEssay = 0;
+      const poinPenuhEssay = 10;
+
+      for (let i = 1; i <= 5; i++) {
+        const elemenEssay = document.getElementById(`essay_${i}`);
+        if (!elemenEssay) continue;
+
+        const teksJawaban = elemenEssay.value.toLowerCase();
+        const keywords = kunciEssay[`essay_${i}`] || [];
+        let matchCount = 0;
+
+        keywords.forEach(kata => {
+          const regex = new RegExp(`\\b${kata}\\b`, 'g');
+          if (regex.test(teksJawaban)) {
+            matchCount++;
+          }
+        });
+
+        if (matchCount >= 3) {
+          skorEssay += poinPenuhEssay;
+        } else if (matchCount === 2) {
+          skorEssay += (poinPenuhEssay * 0.7);
+        } else if (matchCount === 1) {
+          skorEssay += (poinPenuhEssay * 0.3);
+        }
+      }
+      return Math.round(skorEssay);
+    }
+
+    function selesaikanLKPD() {
+      const sekolah = document.getElementById('sel-sekolah').value;
+      const kelas = document.getElementById('sel-kelas').value;
+      const nama = document.getElementById('sel-nama').value;
+
+      if (!sekolah || !kelas || !nama) {
+        alert("Harap lengkapi Identitas (Sekolah, Kelas, dan Nama) terlebih dahulu!");
+        return;
+      }
+
+      let skorPilganStandar = 0; 
+      if (typeof hitungNilaiPilganBiasa === "function") {
+        skorPilganStandar = hitungNilaiPilganBiasa(); 
+      }
+
+      const skorKompleks = nilaiPGKompleks();
+      const skorEssay = nilaiEssay();
+      
+      const totalSkor = skorPilganStandar + skorKompleks + skorEssay;
+      
+      document.getElementById('modal-student-name').innerText = `${nama} - ${kelas}`;
+      document.getElementById('modal-score').innerText = totalSkor;
+      
+      const scoreDesc = document.getElementById('modal-score-desc');
+      if (scoreDesc) {
+          if(totalSkor > 80) scoreDesc.innerText = "Sangat Baik! Anda telah memahami materi dengan luar biasa.";
+          else if(totalSkor >= 60) scoreDesc.innerText = "Baik! Tingkatkan lagi pemahaman Anda.";
+          else scoreDesc.innerText = "Perlu Perbaikan. Jangan menyerah dan pelajari lagi materinya.";
+      }
+      
+      const modalResult = document.getElementById('modal-result');
+      if (modalResult) {
+        modalResult.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
