@@ -88,7 +88,7 @@
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-400 to-purple-500">Teknologi Jaringan Kabel & Nirkabel</span>
             </h1>
             <p class="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
-                Akses modul interaktif laboratorium digital. Jelajahi teknologi transmisi Fiber Optic, gelombang radio, arsitektur Wireless, hingga optimasi keamanan jaringan nirkabel.
+                Akses modul interaktif laboratorium digital. Jelajahi teknologi transmisi Fiber Optic, gelombang radio, arsitektur Wireless, hingga optimasi keamanan jaringan nirkabel dan evaluasi sumatif.
             </p>
         </div>
     </header>
@@ -99,12 +99,12 @@
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold font-tech text-white tracking-wide flex items-center gap-3">
                     <span class="inline-block w-2 h-6 bg-cyan-500 rounded-full shadow-[0_0_10px_#00f3ff]"></span>
-                    MODUL LKPD TERSEDIA
+                    MODUL LKPD & SUMATIF TERSEDIA
                 </h2>
-                <p class="text-xs font-mono text-slate-400 mt-1">Silakan pilih modul pembelajaran untuk memulai simulasi praktikum.</p>
+                <p class="text-xs font-mono text-slate-400 mt-1">Silakan pilih modul pembelajaran atau asesmen sumatif untuk memulai.</p>
             </div>
             <span class="text-xs font-mono px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-cyan-400">
-                12 NODE MODUL ACTIVE
+                16 NODE MODUL ACTIVE
             </span>
         </div>
 
@@ -117,14 +117,14 @@
     <footer class="border-t border-slate-800/80 bg-slate-950 py-8 text-center text-xs font-mono text-slate-500">
         <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-2">
             <div class="flex space-x-3 text-cyan-500/60 mb-1">
-                <span>[FIBER]</span><span>[RF-WAVE]</span><span>[WPA3-SEC]</span>
+                <span>[FIBER]</span><span>[RF-WAVE]</span><span>[WPA3-SEC]</span><span>[SUMATIF]</span>
             </div>
             <p>&copy; 2026 TJKN CyberLab Engine. All Network Protocols Active.</p>
         </div>
     </footer>
 
     <script>
-        // File rujukan LKPD Teknologi Jaringan Kabel dan Nirkabel
+        // File rujukan LKPD dan Sumatif Teknologi Jaringan Kabel dan Nirkabel
         const tjknFiles = [
             "lkpd_tjkn_1.html",  
             "lkpd_tjkn_2.html",  
@@ -137,10 +137,14 @@
             "lkpd_tjkn_9.html",  
             "lkpd_tjkn_10.html", 
             "lkpd_tjkn_11.html", 
-            "lkpd_tjkn_12.html"  
+            "lkpd_tjkn_12.html",
+            "sumatif_lingkup_materi_1.html",
+            "sumatif_lingkup_materi_2.html",
+            "sumatif_lingkup_materi_3.html",
+            "sumatif_lingkup_materi_4.html"
         ];
 
-        // Daftar Materi TJKN
+        // Daftar Materi TJKN & Sumatif
         const tjknTopics = [
             "Perancangan & Struktur Jaringan Kabel (Copper & Fiber Optic)",
             "Karakteristik Media Transmisi Kabel (UTP, STP, Coaxial & Optik)",
@@ -153,7 +157,11 @@
             "Pengenalan Media Fiber Optik & Spesifikasi Kabel",
             "Teknik Penyambungan Kabel Optik (Splicing & Termination)",
             "Pengukuran, Pengujian Sinyal & Troubleshooting Optik",
-            "Perancangan & Arsitektur Jaringan FTTH (Fiber to the Home)"
+            "Perancangan & Arsitektur Jaringan FTTH (Fiber to the Home)",
+            "Evaluasi & Asesmen Sumatif Lingkup Materi 1 (Sistem Transmisi & Kabel)",
+            "Evaluasi & Asesmen Sumatif Lingkup Materi 2 (Instalasi & Splicing Optik)",
+            "Evaluasi & Asesmen Sumatif Lingkup Materi 3 (Standar & Frekuensi Nirkabel)",
+            "Evaluasi & Asesmen Sumatif Lingkup Materi 4 (Konfigurasi & Arsitektur FTTH)"
         ];
 
         // Skema Warna Futuristik per Kartu
@@ -166,13 +174,17 @@
 
         const grid = document.getElementById('cardGrid');
 
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 16; i++) {
             const card = document.createElement('div');
             const targetFile = tjknFiles[i-1];
             const style = glowStyles[(i-1) % glowStyles.length];
 
             card.className = `group relative p-6 rounded-2xl bg-slate-900/60 border border-slate-800 ${style.border} transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col justify-between overflow-hidden backdrop-blur-xl`;
             
+            const isSumatif = i > 12;
+            const titleLabel = isSumatif ? `Sumatif Materi ${i - 12}` : `Modul Pertemuan ${i}`;
+            const buttonLabel = isSumatif ? 'MULAI_SUMATIF' : 'MULAI_MODUL';
+
             card.innerHTML = `
                 <!-- Accent Line Atas Kartu -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-slate-700 group-hover:via-cyan-400 to-transparent transition-all duration-500"></div>
@@ -180,16 +192,16 @@
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl font-tech font-bold text-sm border ${style.badge} shadow-sm">
-                            0${i < 10 ? '0' + i : i}
+                            ${i < 10 ? '0' + i : i}
                         </span>
                         <span class="text-[10px] font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">${targetFile}</span>
                     </div>
-                    <h3 class="text-base font-bold font-tech text-slate-100 mb-2 group-hover:text-cyan-400 transition-colors">Modul Pertemuan ${i}</h3>
+                    <h3 class="text-base font-bold font-tech text-slate-100 mb-2 group-hover:text-cyan-400 transition-colors">${titleLabel}</h3>
                     <p class="text-slate-400 text-xs mb-6 line-clamp-3 leading-relaxed font-sans">${tjknTopics[i-1]}</p>
                 </div>
                 
                 <a href="${targetFile}" class="w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold transition-all duration-300 flex items-center justify-between group/btn border shadow-sm ${style.btn}">
-                    <span>MULAI_MODUL</span>
+                    <span>${buttonLabel}</span>
                     <svg class="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                 </a>
             `;
@@ -198,4 +210,3 @@
     </script>
 </body>
 </html>
-
